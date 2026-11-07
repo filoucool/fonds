@@ -78,6 +78,54 @@ describe('protected git history', () => {
     expect(exists(marker)).toBe(false);
     expect(exists(path.join(root, 'alias-ran'))).toBe(false);
   });
+
+  it('leaves archived commits in place when a later fetch is cancelled', async () => {
+    const root = temp();
+    const origin = path.join(root, 'origin');
+    mkdirSync(origin);
+    const first = commit(origin, 'README.md', 'first\n', 'init');
+    const gitDir = path.join(root, 'repository.git');
+    await sync(gitDir, origin);
+    const controller = new AbortController();
+    controller.abort();
+    await expect(
+      syncBareRepository({
+        gitDir,
+        remoteUrl: origin,
+        namespaces: ['heads', 'tags'],
+        allowFileProtocol: true,
+        recordedAt: new Date().toISOString(),
+        timeoutMs: 20_000,
+        signal: controller.signal,
+      }),
+    ).rejects.toThrow(/cancelled/);
+    expect(objectType(gitDir, first)).toBe('commit');
+  });
+
+  it('checks the network policy again before git fetch', async () => {
+    await expect(
+      syncBareRepository({
+        gitDir: path.join(temp(), 'repository.git'),
+        remoteUrl: 'http://169.254.169.254/latest',
+        namespaces: ['heads'],
+        allowFileProtocol: false,
+        recordedAt: new Date().toISOString(),
+        timeoutMs: 5_000,
+        networkPolicy: { allowPrivateNetworks: false, privateNetworkExceptions: [], allowFileUrls: false },
+      }),
+    ).rejects.toThrow(/blocked/);
+    await expect(
+      syncBareRepository({
+        gitDir: path.join(temp(), 'repository.git'),
+        remoteUrl: 'git@169.254.169.254:org/repo.git',
+        namespaces: ['heads'],
+        allowFileProtocol: false,
+        recordedAt: new Date().toISOString(),
+        timeoutMs: 5_000,
+        networkPolicy: { allowPrivateNetworks: false, privateNetworkExceptions: [], allowFileUrls: false },
+      }),
+    ).rejects.toThrow(/blocked/);
+  });
 });
 
 describe('git executor', () => {

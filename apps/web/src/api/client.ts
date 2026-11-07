@@ -23,6 +23,7 @@ import type {
   ImportResult,
   IntegrityRun,
   Job,
+  LfsObject,
   JobQuery,
   JobRef,
   Page,
@@ -371,6 +372,26 @@ async function listPulls(id: string, query: CursorQuery = {}): Promise<Page<Disc
   return expectPage<DiscussionItem>(data, 'Pull requests');
 }
 
+async function listDiscussions(id: string, query: CursorQuery = {}): Promise<Page<DiscussionItem>> {
+  const data = await request<unknown>(
+    `/api/repositories/${repositoryId(id)}/discussions${qs({ cursor: query.cursor, limit: query.limit })}`,
+  );
+  return expectPage<DiscussionItem>(data, 'Discussions');
+}
+
+async function listComments(id: string, kind: 'issue' | 'pull', parents: string[]): Promise<DiscussionItem[]> {
+  if (parents.length === 0) return [];
+  const data = await request<unknown>(
+    `/api/repositories/${repositoryId(id)}/comments${qs({ kind, parent: parents.join(',') })}`,
+  );
+  return expectList<DiscussionItem>(data, 'Comments');
+}
+
+async function listLfs(id: string): Promise<LfsObject[]> {
+  const data = await request<unknown>(`/api/repositories/${repositoryId(id)}/lfs`);
+  return expectList<LfsObject>(data, 'LFS objects');
+}
+
 async function listReleases(id: string): Promise<ReleaseItem[]> {
   const data = await request<unknown>(`/api/repositories/${repositoryId(id)}/releases`);
   return expectList<ReleaseItem>(data, 'Releases');
@@ -665,6 +686,9 @@ export const api = {
   listEvents,
   listIssues,
   listPulls,
+  listDiscussions,
+  listComments,
+  listLfs,
   listReleases,
   assetDownloadUrl,
   listIntegrity,

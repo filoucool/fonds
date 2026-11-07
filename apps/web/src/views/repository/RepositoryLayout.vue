@@ -26,6 +26,8 @@ const tabs = [
   ['issues', 'Issues'],
   ['pulls', 'Pulls'],
   ['releases', 'Releases'],
+  ['lfs', 'LFS'],
+  ['discussions', 'Discussions'],
   ['components', 'Components'],
   ['events', 'Events'],
   ['health', 'Health'],

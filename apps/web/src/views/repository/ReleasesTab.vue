@@ -38,6 +38,7 @@ function assetHref(assetId: string): string {
         <header class="cluster">
           <h2 style="margin: 0">{{ release.tag }}</h2>
           <StatusLabel :value="release.state" />
+          <StatusLabel v-if="release.upstreamMissing" value="deleted" label="removed upstream" />
         </header>
         <p v-if="release.title">{{ release.title }}</p>
         <p class="muted">{{ release.author || 'Unknown author' }} · {{ formatDate(release.createdAt) }}</p>

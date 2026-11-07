@@ -14,6 +14,7 @@ import FilesTab from './views/repository/FilesTab.vue';
 import CommitsTab from './views/repository/CommitsTab.vue';
 import RefsTab from './views/repository/RefsTab.vue';
 import DiscussionPane from './views/repository/DiscussionPane.vue';
+import LfsTab from './views/repository/LfsTab.vue';
 import ReleasesTab from './views/repository/ReleasesTab.vue';
 import ComponentsTab from './views/repository/ComponentsTab.vue';
 import EventsTab from './views/repository/EventsTab.vue';
@@ -66,6 +67,13 @@ const router = createRouter({
           meta: { title: 'Pulls' },
         },
         { path: 'releases', component: ReleasesTab, meta: { title: 'Releases' } },
+        { path: 'lfs', component: LfsTab, meta: { title: 'LFS' } },
+        {
+          path: 'discussions',
+          component: DiscussionPane,
+          props: { kind: 'discussions' },
+          meta: { title: 'Discussions' },
+        },
         { path: 'components', component: ComponentsTab, meta: { title: 'Components' } },
         { path: 'events', component: EventsTab, meta: { title: 'Events' } },
         { path: 'health', component: HealthTab, meta: { title: 'Health' } },

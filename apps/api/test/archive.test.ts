@@ -1,12 +1,15 @@
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { verifyChecksums } from '@repo-archive/archive-format';
+import { standardProfile } from '@repo-archive/shared';
 import { loadConfig } from '../src/config';
 import { createContainer, type Container } from '../src/container';
 import { StorageThresholdError } from '../src/errors';
+import { listTreeRecursive } from '../src/services/browse';
+import { providerFor } from '../src/services/providers';
 
 const roots: string[] = [];
 
@@ -118,6 +121,82 @@ describe('catalog and preservation', () => {
     roomy.settings.update({ balancingEnabled: true, balanceHighWatermarkRatio: 0.2, balanceLowWatermarkRatio: 0.1 });
     expect(roomy.settings.get().balancingEnabled).toBe(true);
   });
+
+  it('exports nested documentation and keeps profile coverage distinct', async () => {
+    const container = open();
+    container.settings.update({ allowFileUrls: true });
+    const origin = path.join(container.config.dataDir, 'origin');
+    mkdirSync(path.join(origin, 'docs'), { recursive: true });
+    commit(origin, 'docs/guide.md', 'nested guide\n', 'docs');
+    const created = await container.catalog.create({ url: origin, profileId: 'profile-standard' });
+    await container.runner.run(container.jobs.get(created.jobId), new AbortController().signal);
+    const archived = path.join(container.config.dataDir, 'pool-1', created.repository.relativePath, 'metadata', 'docs', 'guide.md');
+    expect(readFileSync(archived, 'utf8')).toBe('nested guide\n');
+    const detail = container.catalog.get(created.repository.id);
+    expect(detail.components.find((item) => item.component === 'issues')?.state).toBe('skipped');
+
+    const other = path.join(container.config.dataDir, 'origin-complete');
+    mkdirSync(path.join(other, 'docs'), { recursive: true });
+    commit(other, 'docs/guide.md', 'nested guide\n', 'docs');
+    const full = await container.catalog.create({ url: other, profileId: 'profile-complete' });
+    await container.runner.run(container.jobs.get(full.jobId), new AbortController().signal);
+    const fullDetail = container.catalog.get(full.repository.id);
+    expect(fullDetail.components.find((item) => item.component === 'docs')?.state).toBe('complete');
+    expect(fullDetail.components.find((item) => item.component === 'issues')?.state).toBe('unsupported');
+    expect(providerFor('github').capabilities().has('discussions')).toBe(true);
+    expect(providerFor('gitlab').capabilities().has('issues')).toBe(true);
+    expect(providerFor('gitlab').capabilities().has('discussions')).toBe(false);
+    expect(providerFor('git').capabilities().has('issues')).toBe(false);
+  });
+
+  it('stops docs export at the component byte limit', async () => {
+    const container = open();
+    container.settings.update({ allowFileUrls: true });
+    const config = standardProfile();
+    config.limits.maxComponentBytes = 8;
+    container.sqlite.prepare(`UPDATE archival_profiles SET config_json = ? WHERE id = ?`).run(JSON.stringify(config), 'profile-standard');
+    const origin = path.join(container.config.dataDir, 'origin');
+    mkdirSync(path.join(origin, 'docs'), { recursive: true });
+    commit(origin, 'docs/guide.md', 'this document is longer than eight bytes\n', 'docs');
+    const created = await container.catalog.create({ url: origin, profileId: 'profile-standard' });
+    const outcome = await container.runner.run(container.jobs.get(created.jobId), new AbortController().signal);
+    expect(outcome).toBe('partial');
+    expect(container.catalog.get(created.repository.id).components.find((item) => item.component === 'docs')?.state).toBe('partial');
+    expect(exists(path.join(container.config.dataDir, 'pool-1', created.repository.relativePath, 'docs', 'guide.md'))).toBe(false);
+  });
+
+  it('attributes a damaged git object to git and does not repair it', async () => {
+    const container = open();
+    container.settings.update({ allowFileUrls: true });
+    const origin = path.join(container.config.dataDir, 'origin');
+    mkdirSync(origin);
+    commit(origin, 'README.md', 'hello\n', 'init');
+    const created = await container.catalog.create({ url: origin, profileId: 'profile-minimal' });
+    await container.runner.run(container.jobs.get(created.jobId), new AbortController().signal);
+    const gitDir = path.join(container.config.dataDir, 'pool-1', created.repository.relativePath, 'repository.git');
+    const damaged = damageGitObject(gitDir);
+    const report = await container.integrity.verify(created.repository.id);
+    expect(report.results.ok).toBe(false);
+    expect(report.results.checks.some((check) => check.component === 'git' && !check.ok)).toBe(true);
+    expect(readFileSync(damaged, 'utf8')).toBe('damaged');
+    expect(container.catalog.get(created.repository.id).health).toBe('corrupt');
+  });
+
+  it('browses and verifies an archive after the upstream is gone', async () => {
+    const container = open();
+    container.settings.update({ allowFileUrls: true });
+    const origin = path.join(container.config.dataDir, 'origin');
+    mkdirSync(origin);
+    commit(origin, 'README.md', 'offline\n', 'init');
+    const created = await container.catalog.create({ url: origin, profileId: 'profile-minimal' });
+    await container.runner.run(container.jobs.get(created.jobId), new AbortController().signal);
+    rmSync(origin, { recursive: true, force: true });
+    const gitDir = path.join(container.config.dataDir, 'pool-1', created.repository.relativePath, 'repository.git');
+    const entries = await listTreeRecursive(gitDir, 'HEAD');
+    expect(entries.some((entry) => entry.path === 'README.md')).toBe(true);
+    const report = await container.integrity.verify(created.repository.id);
+    expect(report.results.ok).toBe(true);
+  });
 });
 
 function open(probe?: () => { freeBytes: number; totalBytes: number }): Container {
@@ -143,6 +222,39 @@ function commit(repo: string, file: string, contents: string, message: string): 
   execFileSync('git', ['add', file], { cwd: repo });
   execFileSync('git', ['commit', '-m', message], { cwd: repo, stdio: 'ignore' });
   return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim();
+}
+
+function damageGitObject(gitDir: string): string {
+  const packDir = path.join(gitDir, 'objects', 'pack');
+  try {
+    const pack = readdirSync(packDir).find((name) => name.endsWith('.pack'));
+    if (pack) {
+      const file = path.join(packDir, pack);
+      writeFileSync(file, 'damaged');
+      return file;
+    }
+  } catch {
+    // Objects may still be loose.
+  }
+  const loose = looseObject(path.join(gitDir, 'objects'));
+  if (!loose) throw new Error('archived git directory has no object to damage');
+  chmodSync(loose, 0o644);
+  writeFileSync(loose, 'damaged');
+  return loose;
+}
+
+function looseObject(directory: string): string | null {
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    if (entry.name === 'pack' || entry.name === 'info') continue;
+    const full = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      const nested = looseObject(full);
+      if (nested) return nested;
+    } else if (entry.isFile()) {
+      return full;
+    }
+  }
+  return null;
 }
 
 function exists(file: string): boolean {
