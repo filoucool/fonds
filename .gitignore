@@ -1,0 +1,12 @@
+node_modules
+dist
+*.tsbuildinfo
+.DS_Store
+data
+coverage
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+.pnpm-store
+*.log
+.vite
