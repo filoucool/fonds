@@ -10,7 +10,7 @@ export const THEMES = [
   {
     id: 'noctua',
     name: 'Noctua',
-    description: 'Beige and brown, the color of the fans.',
+    description: 'Beige field and brown frame, the two fan colors.',
     scheme: 'light',
   },
   {
