@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { request as httpRequest, type IncomingMessage } from 'node:http';
 import { request as httpsRequest } from 'node:https';
 import { mkdir, open, rename, rm } from 'node:fs/promises';
-import { lookup } from 'node:dns';
+import { lookup, type LookupAddress, type LookupOptions } from 'node:dns';
 import path from 'node:path';
 import { addressAllowed, assertRemotePermitted, type NetworkPolicy } from '@repo-archive/shared/policy';
 import { RateLimitError } from '../errors';
@@ -254,24 +254,42 @@ export class NodeHttpClient implements ArchiveHttp {
   }
 }
 
+type LookupCallback = (error: NodeJS.ErrnoException | null, address: string | LookupAddress[], family?: number) => void;
+
 function blockedLookup(policy: NetworkPolicy) {
-  return (hostname: string, _options: unknown, callback: (error: NodeJS.ErrnoException | null, address: string, family: number) => void) => {
+  return (hostname: string, options: LookupOptions | LookupCallback, maybeCallback?: LookupCallback) => {
+    const lookupOptions = typeof options === 'function' ? {} : options;
+    const callback = typeof options === 'function' ? options : maybeCallback;
+    if (!callback) return;
     lookup(hostname, { all: true, verbatim: true }, (error, addresses) => {
       if (error) {
-        callback(error, '', 4);
+        if (lookupOptions.all) callback(error, []);
+        else callback(error, '', 4);
         return;
       }
       const allowed = addresses.filter((entry) => addressAllowed(entry.address, hostname, policy));
-      const first = allowed[0];
-      if (!first) {
-        const blocked = new Error(`blocked address for ${hostname}`) as NodeJS.ErrnoException;
-        blocked.code = 'EPERM';
-        callback(blocked, '', 4);
+      if (allowed.length === 0) {
+        const blocked = blockedAddressError(hostname);
+        if (lookupOptions.all) callback(blocked, []);
+        else callback(blocked, '', 4);
         return;
       }
+      if (lookupOptions.all) {
+        callback(
+          null,
+          allowed.map((entry) => ({ address: entry.address, family: entry.family })),
+        );
+        return;
+      }
+      const first = allowed[0];
+      if (!first) return;
       callback(null, first.address, first.family);
     });
   };
+}
+
+function blockedAddressError(hostname: string): NodeJS.ErrnoException {
+  return Object.assign(new Error(`blocked address for ${hostname}`), { code: 'EPERM' });
 }
 
 function isRedirect(status: number): boolean {

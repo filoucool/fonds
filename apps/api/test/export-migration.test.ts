@@ -86,4 +86,26 @@ describe('http client', () => {
     hopper.close();
     expect(seen.join('')).not.toContain(secret);
   });
+
+  it('connects when Node requests every resolved address', async () => {
+    const server = createServer((_request, response) => {
+      response.end('ok');
+    });
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', () => resolve()));
+    const address = server.address();
+    if (!address || typeof address === 'string') throw new Error('no port');
+    const client = new NodeHttpClient();
+    const response = await client.request({
+      url: `http://localhost:${address.port}/ok`,
+      policy: {
+        allowPrivateNetworks: false,
+        privateNetworkExceptions: ['localhost', '127.0.0.1'],
+        allowFileUrls: false,
+      },
+      timeoutMs: 5_000,
+    });
+    server.close();
+    expect(response.status).toBe(200);
+    expect(response.text).toBe('ok');
+  });
 });
