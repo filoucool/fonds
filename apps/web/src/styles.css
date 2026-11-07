@@ -13,26 +13,26 @@
   --danger: #e07a68;
   --info: #8fb3ad;
   --selection: #5c4a2e;
-  --placeholder: #6f6a58;
+  --placeholder: #b3aa96;
 }
 
 [data-theme='noctua'] {
   color-scheme: light;
-  --bg: #e4d3b4;
-  --surface: #5c4033;
-  --raised: #6e4e3c;
-  --border: #3e2b22;
-  --text: #3e2b22;
-  --on-surface: #e4d3b4;
-  --muted: #6b5140;
-  --muted-on-surface: #d9c6a8;
-  --brass: #5c4033;
-  --ok: #7a5a3c;
-  --warn: #a07a45;
-  --danger: #8a3e32;
-  --info: #6e5848;
+  --bg: #f3e6cc;
+  --surface: #3f291c;
+  --raised: #4e3426;
+  --border: #2a1a12;
+  --text: #24160f;
+  --on-surface: #f6ead8;
+  --muted: #5a4030;
+  --muted-on-surface: #e4d3b4;
+  --brass: #3f291c;
+  --ok: #2f4a22;
+  --warn: #6a3a0e;
+  --danger: #7a261c;
+  --info: #3a4630;
   --selection: #c4a574;
-  --placeholder: #8c7358;
+  --placeholder: #5a4030;
 }
 
 [data-theme='card-catalog'] {
@@ -42,14 +42,14 @@
   --raised: #e0d1b4;
   --border: #c2b08c;
   --text: #2a2418;
-  --muted: #6f624c;
+  --muted: #5a4c38;
   --brass: #7e2e24;
   --ok: #3e6848;
-  --warn: #8a5a28;
+  --warn: #6e4214;
   --danger: #8a3830;
   --info: #3a5864;
   --selection: #d4c09a;
-  --placeholder: #8a7b62;
+  --placeholder: #5e4e3a;
 }
 
 [data-theme='green-shade'] {
@@ -573,24 +573,63 @@ legend { padding: 0 4px; color: var(--muted); font-variant: all-small-caps; lett
   font-weight: 600;
 }
 
-[data-theme='noctua'] a,
-[data-theme='noctua'] button.linkish {
-  color: var(--surface);
-}
-[data-theme='noctua'] .nav a,
-[data-theme='noctua'] .panel a,
-[data-theme='noctua'] .dialog a,
-[data-theme='noctua'] .banner a,
-[data-theme='noctua'] .empty a,
+[data-theme='noctua'] .nav,
+[data-theme='noctua'] .panel,
 [data-theme='noctua'] .stat,
+[data-theme='noctua'] .dialog,
+[data-theme='noctua'] .banner,
+[data-theme='noctua'] .empty,
 [data-theme='noctua'] .theme-card,
-[data-theme='noctua'] button.linkish {
-  color: var(--on-surface);
+[data-theme='noctua'] th,
+[data-theme='noctua'] tr:hover td {
+  --text: #f6ead8;
+  --muted: #e4d3b4;
+  --brass: #f6ead8;
+  --on-surface: #f6ead8;
+  --muted-on-surface: #e4d3b4;
+  --ok: #d7e6be;
+  --warn: #f3d7a6;
+  --danger: #f6c8bc;
+  --info: #d5e4cc;
+  color: #f6ead8;
 }
+
+[data-theme='noctua'] button,
+[data-theme='noctua'] a.button {
+  background: #4e3426;
+  color: #f6ead8;
+  border-color: #2a1a12;
+}
+
+[data-theme='noctua'] button.linkish {
+  background: none;
+  border: none;
+  color: var(--brass);
+}
+
 [data-theme='noctua'] button.primary,
 [data-theme='noctua'] a.button.primary,
 [data-theme='noctua'] button[aria-pressed='true'] {
-  background: var(--bg);
-  color: var(--text);
-  border-color: var(--text);
+  background: #f6ead8;
+  color: #24160f;
+  border-color: #3f291c;
+}
+
+[data-theme='noctua'] button.danger {
+  background: #f6ead8;
+  color: #7a261c;
+  border-color: #7a261c;
+}
+
+[data-theme='noctua'] input,
+[data-theme='noctua'] select,
+[data-theme='noctua'] textarea {
+  background: #f6ead8;
+  color: #24160f;
+  border-color: #4a3024;
+}
+
+[data-theme='noctua'] input::placeholder,
+[data-theme='noctua'] textarea::placeholder {
+  color: #5a4030;
 }
