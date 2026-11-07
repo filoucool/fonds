@@ -6,6 +6,15 @@ import { isValidRefName, runGit } from '@repo-archive/git-exec';
 import type { CommitView, TreeEntry } from '@repo-archive/shared';
 import { HttpError } from '../errors';
 
+export function defaultGitRef(defaultBranch: string | null | undefined, requested?: string | null): string {
+  const explicit = requested?.trim();
+  if (explicit) return explicit;
+  if (defaultBranch && defaultBranch.length > 0) {
+    return defaultBranch.startsWith('refs/') ? defaultBranch : `refs/heads/${defaultBranch}`;
+  }
+  return 'HEAD';
+}
+
 export async function listTree(gitDir: string, ref: string, directory: string): Promise<TreeEntry[]> {
   assertRef(ref);
   assertRelative(directory);
@@ -13,8 +22,9 @@ export async function listTree(gitDir: string, ref: string, directory: string): 
   let result;
   try {
     result = await runGit(['ls-tree', '-l', spec], { gitDir, allowFileProtocol: true, timeoutMs: 30_000 });
-  } catch {
-    return [];
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'tree is not available';
+    throw new HttpError(404, message);
   }
   const entries: TreeEntry[] = [];
   for (const line of result.stdout.split('\n')) {
@@ -110,6 +120,7 @@ function parseCommit(line: string): CommitView {
 }
 
 function assertRef(ref: string): void {
+  if (ref === 'HEAD') return;
   if (!isValidRefName(ref)) throw new HttpError(400, 'ref name is not allowed');
 }
 

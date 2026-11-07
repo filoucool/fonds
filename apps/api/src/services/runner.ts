@@ -350,12 +350,12 @@ export class ArchiveRunner {
   private async exportDocs(repo: RepoRecord, paths: { docs: string; gitDir: string }, maxAssetBytes: number | null, exclusions: string[]): Promise<void> {
     const fresh = this.catalog.require(repo.id);
     const ref = fresh.defaultBranch ? `refs/heads/${fresh.defaultBranch}` : 'HEAD';
-    const entries = await listTree(paths.gitDir, ref === 'HEAD' ? 'refs/heads/main' : ref, '').catch(() => []);
+    const entries = await listTree(paths.gitDir, ref, '').catch(() => []);
     const interesting = entries.filter((entry) => entry.kind === 'blob' && (entry.name.toLowerCase().startsWith('readme') || entry.name.toLowerCase().startsWith('license') || entry.name.toLowerCase().startsWith('changelog') || entry.path.startsWith('docs/')));
     for (const entry of interesting) {
       if (matchesAnyExclusion(exclusions, entry.path)) continue;
       if (entry.sizeBytes !== null && maxAssetBytes !== null && entry.sizeBytes > maxAssetBytes) continue;
-      const blob = await readBlob(paths.gitDir, ref === 'HEAD' ? 'refs/heads/main' : ref, entry.path).catch(() => null);
+      const blob = await readBlob(paths.gitDir, ref, entry.path).catch(() => null);
       if (!blob?.content) continue;
       await atomicWriteFile(resolveInside(paths.docs, entry.path), blob.content);
     }
@@ -370,7 +370,7 @@ export class ArchiveRunner {
     enabled: boolean,
   ): Promise<void> {
     const fresh = this.catalog.require(repo.id);
-    const ref = fresh.defaultBranch ? `refs/heads/${fresh.defaultBranch}` : 'refs/heads/main';
+    const ref = fresh.defaultBranch ? `refs/heads/${fresh.defaultBranch}` : 'HEAD';
     const blob = await readBlob(paths.gitDir, ref, '.gitmodules').catch(() => null);
     const modules = blob?.content ? parseGitmodules(blob.content) : [];
     await atomicWriteFile(path.join(paths.metadata, 'submodules.json'), `${JSON.stringify(modules, null, 2)}\n`);
@@ -401,7 +401,7 @@ export class ArchiveRunner {
   ): Promise<void> {
     const endpoint = provider.lfsEndpoint?.(coords);
     const fresh = this.catalog.require(repo.id);
-    const ref = fresh.defaultBranch ? `refs/heads/${fresh.defaultBranch}` : 'refs/heads/main';
+    const ref = fresh.defaultBranch ? `refs/heads/${fresh.defaultBranch}` : 'HEAD';
     const entries = await listTree(paths.gitDir, ref, '').catch(() => []);
     const pointers: { oid: string; size: number; path: string }[] = [];
     for (const entry of entries) {

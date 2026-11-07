@@ -9,7 +9,7 @@ import { MaintenanceService } from '../container';
 import { HttpError } from '../errors';
 import { APP_CONFIG } from './tokens';
 import type { AppConfig } from '../config';
-import { readBlob, readCommits, listTree } from '../services/browse';
+import { defaultGitRef, readBlob, readCommits, listTree } from '../services/browse';
 import { CatalogService } from '../services/catalog';
 import { ExportService } from '../services/exporter';
 import { IntegrityService } from '../services/integrity';
@@ -206,25 +206,27 @@ export class ApiController {
   commits(@Param('id') id: string, @Query() query: Record<string, string | undefined>) {
     const repo = this.catalog.require(id);
     const located = this.storage.pathsFor(repo.storagePoolId, repo.id);
-    const ref = query.ref || (repo.defaultBranch ? `refs/heads/${repo.defaultBranch}` : 'refs/heads/main');
+    const ref = defaultGitRef(repo.defaultBranch, query.ref);
     return readCommits(located.paths.gitDir, ref, query.cursor ?? null, numberQuery(query.limit) ?? 30);
   }
 
   @Get('repositories/:id/tree')
   tree(@Param('id') id: string, @Query() query: Record<string, string | undefined>) {
-    const gitDir = this.gitDir(id, query.space);
-    const ref = query.ref || 'refs/heads/main';
-    return listTree(gitDir, ref, query.path ?? '').then((entries) => ({ ref, path: query.path ?? '', entries }));
+    const repo = this.catalog.require(id);
+    const ref = defaultGitRef(repo.defaultBranch, query.ref);
+    return listTree(this.gitDir(id, query.space), ref, query.path ?? '').then((entries) => ({ ref, path: query.path ?? '', entries }));
   }
 
   @Get('repositories/:id/blob')
   blob(@Param('id') id: string, @Query() query: Record<string, string | undefined>) {
-    return readBlob(this.gitDir(id, query.space), query.ref || 'refs/heads/main', query.path ?? '');
+    const repo = this.catalog.require(id);
+    return readBlob(this.gitDir(id, query.space), defaultGitRef(repo.defaultBranch, query.ref), query.path ?? '');
   }
 
   @Get('repositories/:id/blob/raw')
   async blobRaw(@Param('id') id: string, @Query() query: Record<string, string | undefined>, @Res() reply: FastifyReply) {
-    const blob = await readBlob(this.gitDir(id, query.space), query.ref || 'refs/heads/main', query.path ?? '');
+    const repo = this.catalog.require(id);
+    const blob = await readBlob(this.gitDir(id, query.space), defaultGitRef(repo.defaultBranch, query.ref), query.path ?? '');
     reply.header('content-type', 'text/plain; charset=utf-8');
     return reply.send(blob.content ?? '');
   }
