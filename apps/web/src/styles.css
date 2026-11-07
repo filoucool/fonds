@@ -1,4 +1,5 @@
-:root {
+:root,
+[data-theme='reading-room'] {
   color-scheme: dark;
   --bg: #12140e;
   --surface: #1c2016;
@@ -11,6 +12,96 @@
   --warn: #e0b15a;
   --danger: #e07a68;
   --info: #8fb3ad;
+  --selection: #5c4a2e;
+  --placeholder: #6f6a58;
+}
+
+[data-theme='noctua'] {
+  color-scheme: light;
+  --bg: #e6d3b3;
+  --surface: #f3e6cc;
+  --raised: #d9c4a0;
+  --border: #a58b68;
+  --text: #3c2a1c;
+  --muted: #6e5640;
+  --brass: #6b4630;
+  --ok: #5c6a3e;
+  --warn: #8d5e28;
+  --danger: #8e4034;
+  --info: #5a6558;
+  --selection: #c4a074;
+  --placeholder: #8c7358;
+}
+
+[data-theme='card-catalog'] {
+  color-scheme: light;
+  --bg: #e9dcc3;
+  --surface: #f6eedc;
+  --raised: #e0d1b4;
+  --border: #c2b08c;
+  --text: #2a2418;
+  --muted: #6f624c;
+  --brass: #7e2e24;
+  --ok: #3e6848;
+  --warn: #8a5a28;
+  --danger: #8a3830;
+  --info: #3a5864;
+  --selection: #d4c09a;
+  --placeholder: #8a7b62;
+}
+
+[data-theme='green-shade'] {
+  color-scheme: dark;
+  --bg: #101712;
+  --surface: #182119;
+  --raised: #243026;
+  --border: #3c4c3e;
+  --text: #e7e2d2;
+  --muted: #a3aa96;
+  --brass: #c6a15a;
+  --ok: #8fb48a;
+  --warn: #d2b06a;
+  --danger: #c97a68;
+  --info: #8eaea4;
+  --selection: #3a4a32;
+  --placeholder: #7a8474;
+}
+
+[data-theme='morocco'] {
+  color-scheme: dark;
+  --bg: #160e10;
+  --surface: #231416;
+  --raised: #321c20;
+  --border: #5a3236;
+  --text: #f4e7d6;
+  --muted: #c8b0a4;
+  --brass: #d4b06a;
+  --ok: #a8b890;
+  --warn: #e0b15a;
+  --danger: #e09080;
+  --info: #c8a8a8;
+  --selection: #4a282c;
+  --placeholder: #9a847c;
+}
+
+[data-theme='blue-buckram'] {
+  color-scheme: dark;
+  --bg: #121820;
+  --surface: #1a2230;
+  --raised: #243044;
+  --border: #3a4a5c;
+  --text: #e8e3d6;
+  --muted: #a8b0b4;
+  --brass: #c6a86a;
+  --ok: #90b09a;
+  --warn: #d4b06a;
+  --danger: #d48a7c;
+  --info: #8eacc0;
+  --selection: #2a3848;
+  --placeholder: #7a848c;
+}
+
+:root {
   --sans: 'IBM Plex Sans', 'Segoe UI', sans-serif;
   --serif: 'Newsreader', 'Iowan Old Style', Palatino, serif;
   --mono: 'IBM Plex Mono', ui-monospace, monospace;
@@ -30,7 +121,7 @@ body {
   line-height: 1.45;
 }
 
-::selection { background: #5c4a2e; color: var(--text); }
+::selection { background: var(--selection); color: var(--text); }
 
 :focus-visible {
   outline: 2px solid var(--brass);
@@ -84,7 +175,7 @@ textarea {
 textarea { font-family: var(--mono); font-size: 12px; min-height: 140px; resize: vertical; }
 input[type='number'] { font-family: var(--mono); }
 input[type='checkbox'], input[type='radio'] { accent-color: var(--brass); width: auto; }
-::placeholder { color: #6f6a58; }
+::placeholder { color: var(--placeholder); }
 
 a { color: var(--brass); text-underline-offset: 2px; }
 a:hover { color: var(--text); }
@@ -421,4 +512,50 @@ legend { padding: 0 4px; color: var(--muted); font-variant: all-small-caps; lett
 
 @media (max-width: 640px) {
   h1 { font-size: 26px; }
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.theme-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  text-align: left;
+  padding: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.theme-card[aria-checked='true'] {
+  border-color: var(--brass);
+  box-shadow: inset 0 0 0 1px var(--brass);
+}
+
+.theme-preview {
+  display: flex;
+  width: 100%;
+  height: 28px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.theme-preview i {
+  flex: 1;
+  display: block;
+}
+
+.theme-preview .bg { background: var(--bg); }
+.theme-preview .surface { background: var(--surface); }
+.theme-preview .brass { background: var(--brass); }
+.theme-preview .ink { background: var(--text); }
+
+.theme-card strong {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 600;
 }

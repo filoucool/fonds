@@ -7,5 +7,7 @@ import '@fontsource/ibm-plex-sans/400.css';
 import '@fontsource/ibm-plex-sans/500.css';
 import '@fontsource/ibm-plex-mono/400.css';
 import './styles.css';
+import { applyTheme, loadTheme } from './lib/themes';
 
+applyTheme(loadTheme());
 createApp(App).use(router).mount('#app');

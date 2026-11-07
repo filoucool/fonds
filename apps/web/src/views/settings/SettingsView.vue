@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import PageHeader from '../../components/PageHeader.vue';
+import AppearancePanel from './AppearancePanel.vue';
 import ArchivalProfilesPanel from './ArchivalProfilesPanel.vue';
 import CategoriesPanel from './CategoriesPanel.vue';
 import CollectionsPanel from './CollectionsPanel.vue';
@@ -14,9 +15,10 @@ import TagsPanel from './TagsPanel.vue';
 <template>
   <PageHeader
     title="Settings"
-    lede="Archival policy, schedules, credentials, network limits, queue, and placement."
+    lede="Color, archival policy, schedules, credentials, network limits, queue, and placement."
   />
   <nav class="subnav" aria-label="Settings sections">
+    <a href="#appearance">Appearance</a>
     <a href="#profiles">Archival profiles</a>
     <a href="#sync">Sync profiles</a>
     <a href="#credentials">Credentials</a>
@@ -29,6 +31,7 @@ import TagsPanel from './TagsPanel.vue';
     <RouterLink to="/inventory">Inventory</RouterLink>
   </nav>
   <div class="stack">
+    <AppearancePanel />
     <ArchivalProfilesPanel />
     <SyncProfilesPanel />
     <CredentialsPanel />
