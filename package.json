@@ -1,0 +1,30 @@
+{
+  "name": "archiver",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Private self-hosted archival system for Git repositories",
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@9.15.9",
+  "scripts": {
+    "build:packages": "pnpm --filter @repo-archive/shared --filter @repo-archive/archive-format --filter @repo-archive/git-exec build",
+    "build": "pnpm build:packages && pnpm --filter @repo-archive/api build && pnpm --filter @repo-archive/web build",
+    "typecheck": "pnpm build:packages && pnpm -r --if-present typecheck",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "dev:api": "pnpm --filter @repo-archive/api dev",
+    "dev:web": "pnpm --filter @repo-archive/web dev",
+    "start": "node apps/api/dist/main.js",
+    "inventory": "node scripts/write-inventory.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "eslint": "^9.17.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.19.0",
+    "unplugin-swc": "^1.5.1",
+    "vitest": "^3.2.4"
+  }
+}
