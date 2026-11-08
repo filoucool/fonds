@@ -251,6 +251,24 @@ export class ApiController {
     return this.catalog.records(id, 'pull', query.cursor ?? null, numberQuery(query.limit) ?? 30);
   }
 
+  @Get('repositories/:id/discussions')
+  discussions(@Param('id') id: string, @Query() query: Record<string, string | undefined>) {
+    return this.catalog.records(id, 'discussion', query.cursor ?? null, numberQuery(query.limit) ?? 30);
+  }
+
+  @Get('repositories/:id/comments')
+  comments(@Param('id') id: string, @Query() query: Record<string, string | string[] | undefined>) {
+    const kind = query.kind === 'pull' ? 'pull_comment' : 'issue_comment';
+    const raw = query.parent;
+    const parents = Array.isArray(raw) ? raw.filter((item) => typeof item === 'string') : typeof raw === 'string' && raw.length > 0 ? [raw] : [];
+    return { items: this.catalog.children(id, kind, parents) };
+  }
+
+  @Get('repositories/:id/lfs')
+  async lfs(@Param('id') id: string) {
+    return { items: await this.catalog.lfsObjects(id) };
+  }
+
   @Get('repositories/:id/releases')
   releases(@Param('id') id: string) {
     return { items: this.catalog.releases(id) };

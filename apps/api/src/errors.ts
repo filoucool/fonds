@@ -26,6 +26,15 @@ export class RateLimitError extends Error {
   }
 }
 
+export class ComponentLimitError extends Error {
+  readonly category = 'limit';
+
+  constructor(message = 'component size limit reached') {
+    super(message);
+    this.name = 'ComponentLimitError';
+  }
+}
+
 export class JobInterrupted extends Error {
   constructor(readonly outcome: 'paused' | 'cancelled') {
     super(outcome);

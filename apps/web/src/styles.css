@@ -12,6 +12,11 @@
   --warn: #e0b15a;
   --danger: #e07a68;
   --info: #8fb3ad;
+  --pip-ok: #c4ee78;
+  --pip-warn: #ffd056;
+  --pip-danger: #ff8b74;
+  --pip-info: #6eefe0;
+  --pip-brass: #ffc14a;
   --selection: #5c4a2e;
   --placeholder: #b3aa96;
 }
@@ -31,6 +36,11 @@
   --warn: #6a3a0e;
   --danger: #7a261c;
   --info: #3a4630;
+  --pip-ok: #4cb02e;
+  --pip-warn: #f0a020;
+  --pip-danger: #ee4c38;
+  --pip-info: #1a9aaa;
+  --pip-brass: #e09018;
   --selection: #c4a574;
   --placeholder: #5a4030;
 }
@@ -48,6 +58,11 @@
   --warn: #6e4214;
   --danger: #8a3830;
   --info: #3a5864;
+  --pip-ok: #2ea848;
+  --pip-warn: #ee9820;
+  --pip-danger: #ee5040;
+  --pip-info: #1a90c0;
+  --pip-brass: #ee5844;
   --selection: #d4c09a;
   --placeholder: #5e4e3a;
 }
@@ -65,6 +80,11 @@
   --warn: #d2b06a;
   --danger: #c97a68;
   --info: #8eaea4;
+  --pip-ok: #9aee8c;
+  --pip-warn: #ffd56a;
+  --pip-danger: #ff967e;
+  --pip-info: #74efe0;
+  --pip-brass: #ffd56a;
   --selection: #3a4a32;
   --placeholder: #7a8474;
 }
@@ -82,6 +102,11 @@
   --warn: #e0b15a;
   --danger: #e09080;
   --info: #c8a8a8;
+  --pip-ok: #d2ee8c;
+  --pip-warn: #ffd056;
+  --pip-danger: #ffaa9c;
+  --pip-info: #ffc0bc;
+  --pip-brass: #ffd56a;
   --selection: #4a282c;
   --placeholder: #9a847c;
 }
@@ -99,6 +124,11 @@
   --warn: #d4b06a;
   --danger: #d48a7c;
   --info: #8eacc0;
+  --pip-ok: #8eeeb0;
+  --pip-warn: #ffd56a;
+  --pip-danger: #ffaa96;
+  --pip-info: #7ed0ff;
+  --pip-brass: #ffd56a;
   --selection: #2a3848;
   --placeholder: #7a848c;
 }
@@ -353,7 +383,12 @@ td.right, th.right { text-align: right; }
 .status.neutral, .pip.neutral { color: var(--muted); }
 .status.skip { color: var(--muted); }
 .status.unsupported { color: var(--info); }
-.status .pip { background: currentColor; }
+.status.ok .pip, .pip.ok { background: var(--pip-ok); }
+.status.warn .pip, .pip.warn { background: var(--pip-warn); }
+.status.danger .pip, .pip.danger { background: var(--pip-danger); }
+.status.info .pip, .pip.info { background: var(--pip-info); }
+.status.brass .pip, .pip.brass { background: var(--pip-brass); }
+.status.neutral .pip, .pip.neutral { background: var(--border); }
 .status.skip .pip, .pip.skip {
   background: transparent;
   box-shadow: inset 0 0 0 1.5px currentColor;
@@ -362,15 +397,9 @@ td.right, th.right { text-align: right; }
 .status.unsupported .pip, .pip.unsupported {
   border-radius: 0;
   background: transparent;
-  box-shadow: inset 0 0 0 1.5px currentColor;
-  color: var(--info);
+  box-shadow: inset 0 0 0 1.5px var(--pip-info);
+  color: var(--pip-info);
 }
-.pip.ok { background: var(--ok); }
-.pip.warn { background: var(--warn); }
-.pip.danger { background: var(--danger); }
-.pip.info { background: var(--info); }
-.pip.brass { background: var(--brass); }
-.pip.neutral { background: var(--border); }
 .mini-pips { display: inline-flex; gap: 3px; align-items: center; }
 .mini-pips .pip { width: 8px; height: 8px; }
 
@@ -591,6 +620,11 @@ legend { padding: 0 4px; color: var(--muted); font-variant: all-small-caps; lett
   --warn: #f3d7a6;
   --danger: #f6c8bc;
   --info: #d5e4cc;
+  --pip-ok: #c6f070;
+  --pip-warn: #ffd060;
+  --pip-danger: #ff9a86;
+  --pip-info: #7eefd0;
+  --pip-brass: #ffd060;
   color: #f6ead8;
 }
 

@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { atomicWriteFile, resolveInside, sanitizeFileName } from '@repo-archive/archive-format';
 import {
@@ -9,9 +9,9 @@ import {
   type ComponentState,
 } from '@repo-archive/shared';
 import { GitCommandError, listLocalRefs, syncBareRepository, type RefNamespace } from '@repo-archive/git-exec';
-import { JobInterrupted, RateLimitError, StorageThresholdError } from '../errors';
+import { ComponentLimitError, JobInterrupted, RateLimitError, StorageThresholdError } from '../errors';
 import { nowIso } from '../rows';
-import { listTree, readBlob } from './browse';
+import { listTreeRecursive, readBlob } from './browse';
 import type { CatalogService, RepoRecord } from './catalog';
 import type { JobRecord, JobsService } from './jobs';
 import { authUsername, providerFor, type GitProvider, type IssueRecord, type ProviderContext, type ReleaseRecord } from './providers';
@@ -75,6 +75,12 @@ export class ArchiveRunner {
         this.jobs.updateStep(job.id, component, { state: 'unsupported', finishedAt: nowIso() });
         continue;
       }
+      if (component === 'discussions' && provider.discussions && !this.catalog.credentialFor(repo.provider)) {
+        this.catalog.setComponent(repo.id, component, { state: 'unsupported', error: null, detail: { reason: 'credential' } });
+        this.jobs.updateStep(job.id, component, { state: 'unsupported', finishedAt: nowIso() });
+        successes += 1;
+        continue;
+      }
       const step = this.jobs.get(job.id).steps.find((item) => item.component === component);
       if (step && (step.state === 'complete' || step.state === 'skipped' || step.state === 'unsupported')) {
         successes += 1;
@@ -84,7 +90,7 @@ export class ArchiveRunner {
       this.jobs.updateStep(job.id, component, { state: 'running', startedAt: step?.startedAt ?? nowIso() });
       this.catalog.setComponent(repo.id, component, { state: 'running' });
       try {
-        const outcome = await this.runComponent(component, repo, provider, signal, located.paths);
+        const outcome = await this.runComponent(job.id, component, repo, provider, signal, located.paths);
         const state = outcome ?? 'complete';
         this.catalog.setComponent(repo.id, component, {
           state,
@@ -96,6 +102,12 @@ export class ArchiveRunner {
         if (state === 'partial') failures += 1;
         else successes += 1;
       } catch (error) {
+        if (error instanceof ComponentLimitError) {
+          this.catalog.setComponent(repo.id, component, { state: 'partial', error: error.message, detail: { outcome: 'partial' } });
+          this.jobs.updateStep(job.id, component, { state: 'partial', finishedAt: nowIso(), error: error.message });
+          failures += 1;
+          continue;
+        }
         if (error instanceof JobInterrupted || error instanceof StorageThresholdError || error instanceof RateLimitError) throw error;
         const message = redact(error instanceof Error ? error.message : 'component failed', secrets);
         const contact = component === 'git' || component === 'metadata' ? classifyContact(error) : null;
@@ -130,6 +142,7 @@ export class ArchiveRunner {
   }
 
   private async runComponent(
+    jobId: string,
     component: ComponentKey,
     repo: RepoRecord,
     provider: GitProvider,
@@ -156,7 +169,11 @@ export class ArchiveRunner {
     };
     if (component === 'metadata') {
       const metadata = await provider.metadata(coords, ctx);
-      if (metadata.sizeBytes !== null && profile.limits.maxRepositoryBytes !== null && metadata.sizeBytes > profile.limits.maxRepositoryBytes) {
+      const tooLarge =
+        metadata.sizeBytes !== null &&
+        ((profile.limits.maxRepositoryBytes !== null && metadata.sizeBytes > profile.limits.maxRepositoryBytes) ||
+          (profile.limits.maxComponentBytes !== null && metadata.sizeBytes > profile.limits.maxComponentBytes));
+      if (tooLarge) {
         this.catalog.setComponent(repo.id, 'git', { state: 'skipped', error: 'repository size exceeds the profile limit', detail: { sizeBytes: metadata.sizeBytes } });
       }
       this.catalog.applyMetadata(repo.id, metadata);
@@ -183,6 +200,7 @@ export class ArchiveRunner {
         signal,
         allowFileProtocol: settings.allowFileUrls,
         auth: credential ? { username: authUsername(repo.provider), token: credential.token } : undefined,
+        networkPolicy: this.settings.networkPolicy(),
         recordedAt: nowIso(),
       });
       this.catalog.setUpstream(repo.id, 'reachable');
@@ -202,54 +220,89 @@ export class ArchiveRunner {
       );
       return;
     }
-    if (component === 'docs') return this.exportDocs(repo, paths, profile.limits.maxAssetBytes, profile.exclusions);
+    if (component === 'docs') return this.exportDocs(repo, paths, profile.limits.maxAssetBytes, profile.limits.maxComponentBytes, profile.exclusions);
     if (component === 'submodules') return this.archiveSubmodules(repo, paths, settings.allowFileUrls, settings.gitTimeoutMs, signal, profile.components.submodules);
-    if (component === 'lfs') return this.archiveLfs(repo, provider, coords, ctx, paths, profile.limits.maxAssetBytes);
+    if (component === 'lfs') return this.archiveLfs(repo, provider, coords, ctx, paths, profile.limits.maxAssetBytes, profile.limits.maxComponentBytes);
     if (component === 'wiki') return this.archiveWiki(repo, provider, coords, paths, settings, signal, credential);
-    if (component === 'releases') return this.archiveReleases(repo, provider, coords, ctx, paths, false, profile.limits.maxAssetBytes, profile.exclusions);
-    if (component === 'releaseAssets') return this.archiveReleases(repo, provider, coords, ctx, paths, true, profile.limits.maxAssetBytes, profile.exclusions);
-    if (component === 'issues') return this.archivePages(repo, 'issue', (cursor) => provider.issues?.(coords, ctx, cursor) ?? Promise.resolve({ items: [], nextCursor: null }), paths);
-    if (component === 'pullRequests') return this.archivePages(repo, 'pull', (cursor) => provider.pullRequests?.(coords, ctx, cursor) ?? Promise.resolve({ items: [], nextCursor: null }), paths);
+    const budget = componentBudget(this.jobs.get(jobId).steps.find((step) => step.component === component)?.checkpoint, profile.limits.maxComponentBytes);
+    if (component === 'releases') return this.archiveReleases(jobId, component, repo, provider, coords, ctx, paths, false, profile.limits.maxAssetBytes, profile.exclusions, budget);
+    if (component === 'releaseAssets') return this.archiveReleases(jobId, component, repo, provider, coords, ctx, paths, true, profile.limits.maxAssetBytes, profile.exclusions, budget);
+    if (component === 'issues') return this.archivePages(jobId, component, repo, 'issue', (cursor) => provider.issues?.(coords, ctx, cursor) ?? Promise.resolve({ items: [], nextCursor: null }), paths, budget);
+    if (component === 'pullRequests') return this.archivePages(jobId, component, repo, 'pull', (cursor) => provider.pullRequests?.(coords, ctx, cursor) ?? Promise.resolve({ items: [], nextCursor: null }), paths, budget);
     if (component === 'discussions') {
       if (!provider.discussions || !credential) return 'unsupported';
-      return this.archivePages(repo, 'discussion', (cursor) => provider.discussions?.(coords, ctx, cursor) ?? Promise.resolve({ items: [], nextCursor: null }), paths);
+      return this.archivePages(jobId, component, repo, 'discussion', (cursor) => provider.discussions?.(coords, ctx, cursor) ?? Promise.resolve({ items: [], nextCursor: null }), paths, budget);
     }
     if (component === 'issueComments' || component === 'pullRequestComments') {
       const parentKind = component === 'issueComments' ? 'issue' : 'pull';
+      const commentKind = component === 'issueComments' ? 'issue_comment' : 'pull_comment';
       const parents = this.catalog.recordKeys(repo.id, parentKind);
+      const saved = readPageCheckpoint(this.jobs.get(jobId).steps.find((step) => step.component === component)?.checkpoint);
       let index = 0;
       for (const parent of parents) {
-        this.assertActive(repo.id, signal);
-        if (parent.number === null) continue;
+        this.assertActive(jobId, signal);
+        if (parent.number === null) {
+          index += 1;
+          continue;
+        }
+        if (saved && (index < saved.parentIndex || (index === saved.parentIndex && saved.cursor === null))) {
+          index += 1;
+          continue;
+        }
         const load = component === 'issueComments' ? provider.issueComments : provider.pullComments;
         if (!load) return 'unsupported';
-        await this.archivePages(repo, component === 'issueComments' ? 'issue_comment' : 'pull_comment', (cursor) => load.call(provider, coords, ctx, parent.number ?? 0, cursor), paths, `${parent.key}:${index}`);
+        const outcome = await this.archivePages(
+          jobId,
+          component,
+          repo,
+          commentKind,
+          (cursor) => load.call(provider, coords, ctx, parent.number ?? 0, cursor),
+          paths,
+          budget,
+          { generationKey: parent.key, parentKey: parent.key, parentIndex: index, markMissing: false },
+        );
+        if (outcome === 'partial') return 'partial';
         index += 1;
       }
+      this.catalog.markMissing(repo.id, commentKind, budget.generation);
     }
   }
 
   private async archivePages(
+    jobId: string,
+    component: ComponentKey,
     repo: RepoRecord,
     kind: string,
     load: (cursor: string | null) => Promise<{ items: IssueRecord[]; nextCursor: string | null }>,
     paths: { metadata: string },
-    generationKey = kind,
+    budget: ComponentBudget,
+    options?: { generationKey?: string; parentKey?: string | null; parentIndex?: number; markMissing?: boolean },
   ): Promise<ComponentState | void> {
-    const generation = Date.now();
-    let cursor: string | null = null;
-    let pages = 0;
+    const generationKey = options?.generationKey ?? kind;
+    const parentIndex = options?.parentIndex ?? 0;
+    const saved = readPageCheckpoint(this.jobs.get(jobId).steps.find((step) => step.component === component)?.checkpoint);
+    const resumeHere = saved !== null && saved.parentIndex === parentIndex && saved.cursor !== null;
+    let cursor: string | null = resumeHere ? saved.cursor : null;
+    let pages = resumeHere ? saved.page : 0;
     const maxPages = this.settings.get().maxProviderPages;
     const rawDir = path.join(paths.metadata, 'raw', kind);
+    let partial = false;
     do {
       const page = await load(cursor);
       pages += 1;
-      await atomicWriteFile(path.join(rawDir, `page-${pages}.json`), `${JSON.stringify(page.items.map((item) => item.raw), null, 2)}\n`);
+      await atomicWriteFile(path.join(rawDir, `${sanitizeFileName(generationKey)}-page-${pages}.json`), `${JSON.stringify(page.items.map((item) => item.raw), null, 2)}\n`);
       for (const item of page.items) {
+        const addition = Buffer.byteLength(item.title) + Buffer.byteLength(item.body);
+        if (budget.limit !== null && budget.used + addition > budget.limit) {
+          partial = true;
+          break;
+        }
+        budget.used += addition;
         this.catalog.upsertRecord({
           repositoryId: repo.id,
           kind,
           providerKey: `${generationKey}:${item.key}`,
+          parentKey: options?.parentKey ?? null,
           number: item.number,
           title: item.title,
           state: item.state,
@@ -258,21 +311,22 @@ export class ArchiveRunner {
           url: item.url,
           createdAt: item.createdAt,
           updatedAt: item.updatedAt,
-          generation,
-          rawRelativePath: `metadata/raw/${kind}/page-${pages}.json`,
+          generation: budget.generation,
+          rawRelativePath: `metadata/raw/${kind}/${sanitizeFileName(generationKey)}-page-${pages}.json`,
         });
-        if (item.number !== null) {
-          const markdown = `# ${item.title}\n\n${item.body}\n`;
-          await atomicWriteFile(path.join(paths.metadata, kind, `${item.number}.md`), markdown);
-        }
+        if (item.number !== null) await writeReadable(path.join(paths.metadata, kind, `${sanitizeFileName(generationKey)}-${item.number}`), item.title, item.body);
       }
-      cursor = page.nextCursor;
+      cursor = partial ? cursor : page.nextCursor;
+      this.jobs.updateStep(jobId, component, { checkpoint: pageCheckpoint(cursor, pages, budget, parentIndex) });
+      if (partial) return 'partial';
       if (pages >= maxPages && cursor) return 'partial';
     } while (cursor);
-    this.catalog.markMissing(repo.id, kind, generation);
+    if (options?.markMissing !== false) this.catalog.markMissing(repo.id, kind, budget.generation);
   }
 
   private async archiveReleases(
+    jobId: string,
+    component: ComponentKey,
     repo: RepoRecord,
     provider: GitProvider,
     coords: Parameters<GitProvider['metadata']>[0],
@@ -281,14 +335,24 @@ export class ArchiveRunner {
     assetsOnly: boolean,
     maxAssetBytes: number | null,
     exclusions: string[],
+    budget: ComponentBudget,
   ): Promise<ComponentState | void> {
     if (!provider.releases) return 'unsupported';
-    let cursor: string | null = null;
-    const generation = Date.now();
+    const saved = readPageCheckpoint(this.jobs.get(jobId).steps.find((step) => step.component === component)?.checkpoint);
+    let cursor: string | null = saved?.cursor ?? null;
+    let pages = saved?.page ?? 0;
+    let partial = false;
     do {
       const page = await provider.releases(coords, ctx, cursor);
+      pages += 1;
       for (const release of page.items) {
         if (!assetsOnly) {
+          const addition = Buffer.byteLength(release.title) + Buffer.byteLength(release.body);
+          if (budget.limit !== null && budget.used + addition > budget.limit) {
+            partial = true;
+            break;
+          }
+          budget.used += addition;
           this.catalog.upsertRecord({
             repositoryId: repo.id,
             kind: 'release',
@@ -299,23 +363,45 @@ export class ArchiveRunner {
             body: release.body,
             url: release.url,
             createdAt: release.createdAt,
-            generation,
+            generation: budget.generation,
           });
-          await atomicWriteFile(path.join(paths.metadata, 'releases', `${sanitizeFileName(release.tag)}.md`), `# ${release.title}\n\n${release.body}\n`);
+          await writeReadable(path.join(paths.metadata, 'releases', sanitizeFileName(release.tag)), release.title, release.body);
         } else {
-          await this.downloadAssets(repo, release, ctx, paths.releases, maxAssetBytes, exclusions);
+          const outcome = await this.downloadAssets(repo, release, ctx, paths.releases, maxAssetBytes, exclusions, budget);
+          if (outcome === 'partial') partial = true;
         }
       }
-      cursor = page.nextCursor;
+      cursor = partial ? cursor : page.nextCursor;
+      this.jobs.updateStep(jobId, component, { checkpoint: pageCheckpoint(cursor, pages, budget, 0) });
+      if (partial) return 'partial';
     } while (cursor);
-    if (!assetsOnly) this.catalog.markMissing(repo.id, 'release', generation);
+    if (!assetsOnly) this.catalog.markMissing(repo.id, 'release', budget.generation);
   }
 
-  private async downloadAssets(repo: RepoRecord, release: ReleaseRecord, ctx: ProviderContext, releasesRoot: string, maxAssetBytes: number | null, exclusions: string[]): Promise<void> {
+  private async downloadAssets(
+    repo: RepoRecord,
+    release: ReleaseRecord,
+    ctx: ProviderContext,
+    releasesRoot: string,
+    maxAssetBytes: number | null,
+    exclusions: string[],
+    budget: ComponentBudget,
+  ): Promise<ComponentState | void> {
+    let partial = false;
     for (const asset of release.assets) {
       const relative = `releases/${sanitizeFileName(release.tag)}/${sanitizeFileName(asset.name)}`;
+      const saved = this.catalog.savedAsset(repo.id, release.key, asset.name);
+      if (saved?.state === 'complete' && saved.relativePath) {
+        budget.used += saved.byteSize ?? 0;
+        continue;
+      }
       if (matchesAnyExclusion(exclusions, relative) || (asset.sizeBytes !== null && maxAssetBytes !== null && asset.sizeBytes > maxAssetBytes)) {
         this.catalog.upsertAsset({ repositoryId: repo.id, releaseKey: release.key, name: asset.name, upstreamUrl: asset.downloadUrl, relativePath: null, byteSize: asset.sizeBytes, sha256: null, state: 'skipped', error: 'size_limit or exclusion' });
+        continue;
+      }
+      if (asset.sizeBytes !== null && budget.limit !== null && budget.used + asset.sizeBytes > budget.limit) {
+        this.catalog.upsertAsset({ repositoryId: repo.id, releaseKey: release.key, name: asset.name, upstreamUrl: asset.downloadUrl, relativePath: null, byteSize: asset.sizeBytes, sha256: null, state: 'skipped', error: 'component size limit' });
+        partial = true;
         continue;
       }
       if (!asset.downloadUrl) {
@@ -332,7 +418,9 @@ export class ArchiveRunner {
         signal: ctx.signal,
         timeoutMs: ctx.timeoutMs,
         policy: ctx.policy,
+        onProgress: (bytes) => this.watchDownload(repo, budget, bytes),
       });
+      budget.used += downloaded.bytes;
       this.catalog.upsertAsset({
         repositoryId: repo.id,
         releaseKey: release.key,
@@ -345,20 +433,46 @@ export class ArchiveRunner {
         error: null,
       });
     }
+    if (partial) return 'partial';
   }
 
-  private async exportDocs(repo: RepoRecord, paths: { docs: string; gitDir: string }, maxAssetBytes: number | null, exclusions: string[]): Promise<void> {
+  private watchDownload(repo: RepoRecord, budget: ComponentBudget, fileBytes: number): void {
+    this.storage.assertSpace(repo.storagePoolId);
+    if (budget.limit !== null && budget.used + fileBytes > budget.limit) throw new ComponentLimitError();
+  }
+
+  private async exportDocs(
+    repo: RepoRecord,
+    paths: { docs: string; gitDir: string },
+    maxAssetBytes: number | null,
+    maxComponentBytes: number | null,
+    exclusions: string[],
+  ): Promise<ComponentState | void> {
     const fresh = this.catalog.require(repo.id);
     const ref = fresh.defaultBranch ? `refs/heads/${fresh.defaultBranch}` : 'HEAD';
-    const entries = await listTree(paths.gitDir, ref, '').catch(() => []);
-    const interesting = entries.filter((entry) => entry.kind === 'blob' && (entry.name.toLowerCase().startsWith('readme') || entry.name.toLowerCase().startsWith('license') || entry.name.toLowerCase().startsWith('changelog') || entry.path.startsWith('docs/')));
-    for (const entry of interesting) {
+    const entries = await listTreeRecursive(paths.gitDir, ref).catch(() => []);
+    let used = 0;
+    let partial = false;
+    for (const entry of entries) {
+      if (entry.kind !== 'blob' || !isDocEntry(entry.path, entry.name)) continue;
       if (matchesAnyExclusion(exclusions, entry.path)) continue;
       if (entry.sizeBytes !== null && maxAssetBytes !== null && entry.sizeBytes > maxAssetBytes) continue;
+      if (entry.sizeBytes !== null && maxComponentBytes !== null && used + entry.sizeBytes > maxComponentBytes) {
+        partial = true;
+        continue;
+      }
       const blob = await readBlob(paths.gitDir, ref, entry.path).catch(() => null);
       if (!blob?.content) continue;
-      await atomicWriteFile(resolveInside(paths.docs, entry.path), blob.content);
+      const bytes = Buffer.byteLength(blob.content);
+      if (maxComponentBytes !== null && used + bytes > maxComponentBytes) {
+        partial = true;
+        continue;
+      }
+      used += bytes;
+      const relative = entry.path.startsWith('docs/') ? entry.path.slice('docs/'.length) : entry.path;
+      await atomicWriteFile(resolveInside(paths.docs, relative), blob.content);
     }
+    if (partial) return 'partial';
   }
 
   private async archiveSubmodules(
@@ -380,11 +494,12 @@ export class ArchiveRunner {
       const destination = path.join(paths.submodules, `${index}-${sanitizeFileName(module.path)}.git`);
       await syncBareRepository({
         gitDir: destination,
-        remoteUrl: module.url,
+        remoteUrl: resolveSubmoduleUrl(repo.fetchUrl, module.url),
         namespaces: ['heads', 'tags'],
         timeoutMs,
         signal,
         allowFileProtocol: allowFile,
+        networkPolicy: this.settings.networkPolicy(),
         recordedAt: nowIso(),
       });
       index += 1;
@@ -398,11 +513,12 @@ export class ArchiveRunner {
     ctx: ProviderContext,
     paths: { gitDir: string; lfs: string },
     maxAssetBytes: number | null,
-  ): Promise<void> {
+    maxComponentBytes: number | null,
+  ): Promise<ComponentState | void> {
     const endpoint = provider.lfsEndpoint?.(coords);
     const fresh = this.catalog.require(repo.id);
     const ref = fresh.defaultBranch ? `refs/heads/${fresh.defaultBranch}` : 'HEAD';
-    const entries = await listTree(paths.gitDir, ref, '').catch(() => []);
+    const entries = await listTreeRecursive(paths.gitDir, ref).catch(() => []);
     const pointers: { oid: string; size: number; path: string }[] = [];
     for (const entry of entries) {
       if (entry.kind !== 'blob' || entry.sizeBytes === null || entry.sizeBytes > 200) continue;
@@ -410,6 +526,7 @@ export class ArchiveRunner {
       const pointer = blob?.content ? parseLfsPointer(blob.content) : null;
       if (pointer) pointers.push({ ...pointer, path: entry.path });
     }
+    await atomicWriteFile(path.join(paths.lfs, 'index.json'), `${JSON.stringify({ objects: pointers }, null, 2)}\n`);
     if (!endpoint || pointers.length === 0) return;
     const response = await this.http.request({
       url: `${endpoint}/objects/batch`,
@@ -425,14 +542,37 @@ export class ArchiveRunner {
       policy: ctx.policy,
     });
     if (!isRecordBody(response.body) || !Array.isArray(response.body.objects)) return;
+    const budget = componentBudget(undefined, maxComponentBytes);
+    let partial = false;
     for (const object of response.body.objects) {
       if (!isRecordBody(object) || typeof object.oid !== 'string') continue;
+      const known = pointers.find((pointer) => pointer.oid === object.oid);
+      const destination = path.join(paths.lfs, 'objects', object.oid.slice(0, 2), object.oid);
+      const existing = await stat(destination).catch(() => null);
+      if (existing && known && existing.size === known.size) {
+        budget.used += existing.size;
+        continue;
+      }
+      if (known && maxAssetBytes !== null && known.size > maxAssetBytes) continue;
+      if (known && budget.limit !== null && budget.used + known.size > budget.limit) {
+        partial = true;
+        continue;
+      }
       const action = isRecordBody(object.actions) && isRecordBody(object.actions.download) ? object.actions.download : null;
       const href = action && typeof action.href === 'string' ? action.href : null;
       if (!href) continue;
-      const destination = path.join(paths.lfs, 'objects', object.oid.slice(0, 2), object.oid);
-      await this.http.download({ url: href, destination, maxBytes: maxAssetBytes, signal: ctx.signal, timeoutMs: ctx.timeoutMs, policy: ctx.policy });
+      const downloaded = await this.http.download({
+        url: href,
+        destination,
+        maxBytes: maxAssetBytes,
+        signal: ctx.signal,
+        timeoutMs: ctx.timeoutMs,
+        policy: ctx.policy,
+        onProgress: (bytes) => this.watchDownload(repo, budget, bytes),
+      });
+      budget.used += downloaded.bytes;
     }
+    if (partial) return 'partial';
   }
 
   private async archiveWiki(
@@ -455,6 +595,7 @@ export class ArchiveRunner {
         signal,
         allowFileProtocol: settings.allowFileUrls,
         auth: credential ? { username: authUsername(repo.provider), token: credential.token } : undefined,
+        networkPolicy: this.settings.networkPolicy(),
         recordedAt: nowIso(),
       });
     } catch (error) {
@@ -489,6 +630,69 @@ function projectPath(repo: RepoRecord): string {
   } catch {
     return repo.displayName;
   }
+}
+
+interface ComponentBudget {
+  used: number;
+  limit: number | null;
+  generation: number;
+}
+
+interface PageCheckpoint {
+  cursor: string | null;
+  page: number;
+  generation: number;
+  bytes: number;
+  parentIndex: number;
+}
+
+function componentBudget(checkpoint: Record<string, unknown> | undefined, limit: number | null): ComponentBudget {
+  const saved = readPageCheckpoint(checkpoint);
+  return { used: saved?.bytes ?? 0, limit, generation: saved?.generation ?? Date.now() };
+}
+
+function readPageCheckpoint(value: Record<string, unknown> | undefined): PageCheckpoint | null {
+  if (!value) return null;
+  const cursor = value.cursor;
+  const page = value.page;
+  const generation = value.generation;
+  const bytes = value.bytes;
+  const parentIndex = value.parentIndex;
+  if (cursor !== null && typeof cursor !== 'string') return null;
+  if (typeof page !== 'number' || typeof generation !== 'number' || typeof bytes !== 'number' || typeof parentIndex !== 'number') return null;
+  return { cursor, page, generation, bytes, parentIndex };
+}
+
+function pageCheckpoint(cursor: string | null, page: number, budget: ComponentBudget, parentIndex: number): Record<string, unknown> {
+  return { cursor, page, generation: budget.generation, bytes: budget.used, parentIndex };
+}
+
+function isDocEntry(filePath: string, name: string): boolean {
+  const base = name.toLowerCase();
+  return filePath === 'docs' || filePath.startsWith('docs/') || base.startsWith('readme') || base.startsWith('license') || base.startsWith('changelog');
+}
+
+async function writeReadable(stem: string, title: string, body: string): Promise<void> {
+  await atomicWriteFile(`${stem}.md`, `# ${title}\n\n${body}\n`);
+  const safeTitle = escapeHtml(title);
+  const safeBody = escapeHtml(body);
+  const html = `<!DOCTYPE html>\n<html lang="en">\n<head><meta charset="utf-8"><title>${safeTitle}</title></head>\n<body><h1>${safeTitle}</h1><pre>${safeBody}</pre></body>\n</html>\n`;
+  await atomicWriteFile(`${stem}.html`, html);
+}
+
+function escapeHtml(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function resolveSubmoduleUrl(parent: string, child: string): string {
+  if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(child) || child.startsWith('/') || /^[\w.+-]+@[\w.-]+:/.test(child)) return child;
+  if (parent.startsWith('/') || parent.startsWith('file:')) {
+    const base = parent.startsWith('file:') ? parent : `file://${parent.endsWith('/') ? parent : `${parent}/`}`;
+    const resolved = new URL(child, base.endsWith('/') ? base : `${base}/`);
+    return decodeURIComponent(resolved.pathname);
+  }
+  const base = parent.endsWith('/') ? parent : `${parent}/`;
+  return new URL(child, base).href;
 }
 
 function parseGitmodules(content: string): { path: string; url: string }[] {

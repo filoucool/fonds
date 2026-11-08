@@ -1,4 +1,4 @@
-import { mkdir, readdir, rm, stat } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rm, stat } from 'node:fs/promises';
 import path from 'node:path';
 import type Database from 'better-sqlite3';
 import {
@@ -525,6 +525,36 @@ export class CatalogService {
       );
   }
 
+  async lfsObjects(repositoryId: string): Promise<{ path: string; oid: string; size: number }[]> {
+    const repo = this.require(repositoryId);
+    const located = this.storage.pathsFor(repo.storagePoolId, repo.id);
+    try {
+      const parsed = parseJson(await readFile(path.join(located.paths.lfs, 'index.json'), 'utf8'));
+      if (!isRecord(parsed) || !Array.isArray(parsed.objects)) return [];
+      return parsed.objects.filter(isLfsObject);
+    } catch {
+      return [];
+    }
+  }
+
+  children(repositoryId: string, kind: string, parentKeys: string[]): TextRecord[] {
+    if (parentKeys.length === 0) return [];
+    const placeholders = parentKeys.map(() => '?').join(', ');
+    return asRows(
+      this.sqlite
+        .prepare(`SELECT * FROM provider_records WHERE repository_id = ? AND kind = ? AND parent_key IN (${placeholders}) ORDER BY number ASC`)
+        .all(repositoryId, kind, ...parentKeys),
+    ).map(mapTextRecord);
+  }
+
+  savedAsset(repositoryId: string, releaseKey: string, name: string): { state: string; relativePath: string | null; byteSize: number | null } | null {
+    const row = asRow(
+      this.sqlite.prepare(`SELECT state, relative_path, byte_size FROM release_assets WHERE repository_id = ? AND release_key = ? AND name = ?`).get(repositoryId, releaseKey, sanitizeFileName(name)),
+    );
+    if (!row) return null;
+    return { state: text(row, 'state'), relativePath: textOrNull(row, 'relative_path'), byteSize: integerOrNull(row, 'byte_size') };
+  }
+
   recordKeys(repositoryId: string, kind: string): { key: string; number: number | null }[] {
     return asRows(this.sqlite.prepare(`SELECT provider_key, number FROM provider_records WHERE repository_id = ? AND kind = ? ORDER BY number ASC`).all(repositoryId, kind)).map((row) => ({
       key: text(row, 'provider_key'),
@@ -613,6 +643,7 @@ export class CatalogService {
         author: text(row, 'author'),
         createdAt: textOrNull(row, 'created_at'),
         url: textOrNull(row, 'url'),
+        upstreamMissing: jsonRecord(text(row, 'extra_json')).upstreamMissing === true,
         assets,
       };
     });
@@ -1124,6 +1155,10 @@ function mapComponent(row: Record<string, unknown>): ComponentSnapshot {
   };
 }
 
+function isLfsObject(value: unknown): value is { path: string; oid: string; size: number } {
+  return isRecord(value) && typeof value.path === 'string' && typeof value.oid === 'string' && typeof value.size === 'number';
+}
+
 function mapProfile(row: Record<string, unknown>): ArchivalProfileView {
   const config = parseJson(text(row, 'config_json'));
   if (!isProfileConfig(config)) throw new Error('stored profile is invalid');
@@ -1138,8 +1173,11 @@ function mapSync(row: Record<string, unknown>): SyncProfileView {
 
 function mapTextRecord(row: Record<string, unknown>): TextRecord {
   const body = text(row, 'body');
+  const extra = jsonRecord(text(row, 'extra_json'));
   return {
     id: text(row, 'id'),
+    providerKey: text(row, 'provider_key'),
+    parentKey: textOrNull(row, 'parent_key'),
     number: integerOrNull(row, 'number'),
     title: text(row, 'title'),
     state: text(row, 'state'),
@@ -1149,6 +1187,7 @@ function mapTextRecord(row: Record<string, unknown>): TextRecord {
     body: body.slice(0, 20_000),
     url: textOrNull(row, 'url'),
     bodyTruncated: body.length > 20_000,
+    upstreamMissing: extra.upstreamMissing === true,
   };
 }
 

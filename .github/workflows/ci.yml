@@ -29,3 +29,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build the image
         run: docker build -t archiver:ci .
+      - name: Record the image digest
+        run: sh scripts/record-image-digest.sh archiver:ci
+      - name: Keep the recorded inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-inventory
+          path: docs/dependency-inventory.json

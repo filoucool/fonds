@@ -211,7 +211,11 @@ export interface Settings {
   gitTimeoutMs: number;
   maxAttempts: number;
   maxProviderPages: number;
+  dashboardWidgets: DashboardWidgetId[];
 }
+
+export const DASHBOARD_WIDGET_IDS = ['status', 'jobs', 'due', 'attention', 'storage', 'events'] as const;
+export type DashboardWidgetId = (typeof DASHBOARD_WIDGET_IDS)[number];
 
 export interface CredentialSummary {
   id: string;
@@ -304,15 +308,24 @@ export interface RefsResponse {
 
 export interface DiscussionItem {
   id: string;
-  number: number;
+  providerKey: string;
+  parentKey: string | null;
+  number: number | null;
   title: string;
   state: string;
   author: string | null;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string | null;
+  updatedAt: string | null;
   body: string | null;
   url: string | null;
   bodyTruncated: boolean;
+  upstreamMissing: boolean;
+}
+
+export interface LfsObject {
+  path: string;
+  oid: string;
+  size: number;
 }
 
 export interface ReleaseAsset {
@@ -333,6 +346,7 @@ export interface ReleaseItem {
   author: string | null;
   createdAt: string;
   url: string | null;
+  upstreamMissing: boolean;
   assets: ReleaseAsset[];
 }
 

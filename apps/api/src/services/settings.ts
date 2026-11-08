@@ -1,5 +1,5 @@
 import type Database from 'better-sqlite3';
-import { isRecord, parseJson, type AppSettings, type ProviderKind } from '@repo-archive/shared';
+import { DASHBOARD_WIDGET_IDS, isRecord, parseJson, type AppSettings, type DashboardWidgetId, type ProviderKind } from '@repo-archive/shared';
 import { HttpError } from '../errors';
 import { asRow, nowIso, text } from '../rows';
 
@@ -9,7 +9,7 @@ export class SettingsService {
   get(): AppSettings {
     const row = asRow(this.sqlite.prepare(`SELECT value_json FROM settings WHERE key = 'app'`).get());
     if (!row) throw new Error('settings are not initialized');
-    const parsed = parseJson(text(row, 'value_json'));
+    const parsed = normalizeSettings(parseJson(text(row, 'value_json')));
     if (!isSettings(parsed)) throw new Error('stored settings are invalid');
     return parsed;
   }
@@ -61,7 +61,13 @@ function sanitizePatch(patch: Record<string, unknown>): Partial<AppSettings> {
   if ('gitTimeoutMs' in patch) next.gitTimeoutMs = integerIn(patch.gitTimeoutMs, 1000, 24 * 60 * 60 * 1000, 'gitTimeoutMs');
   if ('maxAttempts' in patch) next.maxAttempts = integerIn(patch.maxAttempts, 1, 10, 'maxAttempts');
   if ('maxProviderPages' in patch) next.maxProviderPages = integerIn(patch.maxProviderPages, 1, 5000, 'maxProviderPages');
+  if ('dashboardWidgets' in patch) next.dashboardWidgets = widgetList(patch.dashboardWidgets);
   return next;
+}
+
+function normalizeSettings(value: unknown): unknown {
+  if (!isRecord(value) || Array.isArray(value.dashboardWidgets)) return value;
+  return { ...value, dashboardWidgets: [...DASHBOARD_WIDGET_IDS] };
 }
 
 export function isSettings(value: unknown): value is AppSettings {
@@ -83,7 +89,8 @@ export function isSettings(value: unknown): value is AppSettings {
     inRange(value.requestTimeoutMs, 1000, 600_000) &&
     inRange(value.gitTimeoutMs, 1000, 24 * 60 * 60 * 1000) &&
     inRange(value.maxAttempts, 1, 10) &&
-    inRange(value.maxProviderPages, 1, 5000)
+    inRange(value.maxProviderPages, 1, 5000) &&
+    widgetIds(value.dashboardWidgets)
   );
 }
 
@@ -118,6 +125,22 @@ function stringList(value: unknown): string[] {
 
 function hostList(value: unknown): string[] {
   return stringList(value).map((host) => host.toLowerCase());
+}
+
+function widgetList(value: unknown): DashboardWidgetId[] {
+  if (!widgetIds(value)) throw new HttpError(400, 'dashboardWidgets is invalid');
+  return [...new Set(value)];
+}
+
+function widgetIds(value: unknown): value is DashboardWidgetId[] {
+  return Array.isArray(value) && value.every((entry) => typeof entry === 'string' && isWidget(entry));
+}
+
+function isWidget(value: string): value is DashboardWidgetId {
+  for (const id of DASHBOARD_WIDGET_IDS) {
+    if (id === value) return true;
+  }
+  return false;
 }
 
 function ratio(value: unknown, label: string): number {

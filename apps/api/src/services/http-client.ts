@@ -37,6 +37,7 @@ export interface ArchiveHttp {
     signal?: AbortSignal;
     timeoutMs?: number;
     policy: NetworkPolicy;
+    onProgress?: (bytes: number) => void;
   }): Promise<DownloadResult>;
 }
 
@@ -61,6 +62,7 @@ export class NodeHttpClient implements ArchiveHttp {
     signal?: AbortSignal;
     timeoutMs?: number;
     policy: NetworkPolicy;
+    onProgress?: (bytes: number) => void;
   }): Promise<DownloadResult> {
     const temporary = `${input.destination}.${process.pid}.partial`;
     await mkdir(path.dirname(input.destination), { recursive: true });
@@ -123,6 +125,7 @@ export class NodeHttpClient implements ArchiveHttp {
       signal?: AbortSignal;
       timeoutMs?: number;
       policy: NetworkPolicy;
+      onProgress?: (bytes: number) => void;
     },
     destination: string,
     redirects: number,
@@ -155,6 +158,7 @@ export class NodeHttpClient implements ArchiveHttp {
         if (input.maxBytes !== null && bytes > input.maxBytes) {
           throw new Error('download exceeded the size limit');
         }
+        input.onProgress?.(bytes);
         hash.update(buffer);
         await handle.write(buffer);
       }

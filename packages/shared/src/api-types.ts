@@ -101,8 +101,12 @@ export interface Job {
   steps: JobStep[];
 }
 
+export const DASHBOARD_WIDGET_IDS = ['status', 'jobs', 'due', 'attention', 'storage', 'events'] as const;
+export type DashboardWidgetId = (typeof DASHBOARD_WIDGET_IDS)[number];
+
 export interface AppSettings {
   maxConcurrentJobs: number;
+  dashboardWidgets: DashboardWidgetId[];
   allowPrivateNetworks: boolean;
   privateNetworkExceptions: string[];
   allowFileUrls: boolean;
@@ -231,6 +235,8 @@ export interface ArchivedRefView extends RefView {
 
 export interface TextRecord {
   id: string;
+  providerKey: string;
+  parentKey: string | null;
   number: number | null;
   title: string;
   state: string;
@@ -240,6 +246,7 @@ export interface TextRecord {
   body: string;
   url: string | null;
   bodyTruncated: boolean;
+  upstreamMissing: boolean;
 }
 
 export interface ReleaseAssetView {
@@ -260,6 +267,7 @@ export interface ReleaseView {
   author: string;
   createdAt: string | null;
   url: string | null;
+  upstreamMissing: boolean;
   assets: ReleaseAssetView[];
 }
 

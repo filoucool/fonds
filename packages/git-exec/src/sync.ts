@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { assertFetchUrlShape } from '@repo-archive/shared';
+import { assertRemotePermitted, type NetworkPolicy } from '@repo-archive/shared/policy';
 import { GitCommandError, isOid, isValidRefName, runGit, type GitRunOptions } from './executor';
 
 export type RefNamespace = 'heads' | 'tags' | 'notes' | 'pull' | 'merge-requests';
@@ -27,6 +28,7 @@ export interface SyncBareInput {
   allowFileProtocol?: boolean;
   gitBinary?: string;
   auth?: { username: string; token: string };
+  networkPolicy?: NetworkPolicy;
   recordedAt: string;
   templateDir?: string;
 }
@@ -48,6 +50,7 @@ const NAMESPACE_PREFIX: Record<RefNamespace, string> = {
 
 export async function syncBareRepository(input: SyncBareInput): Promise<SyncBareResult> {
   assertFetchUrlShape(input.remoteUrl, input.allowFileProtocol === true);
+  if (input.networkPolicy) await assertRemotePermitted(input.remoteUrl, input.networkPolicy);
   await mkdir(path.dirname(input.gitDir), { recursive: true });
   await ensureBareRepo(input);
   const remote = await listRemoteRefs(input);

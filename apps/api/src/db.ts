@@ -346,6 +346,7 @@ export function defaultSettings(poolId: string): AppSettings {
     gitTimeoutMs: 60 * 60 * 1000,
     maxAttempts: 3,
     maxProviderPages: 200,
+    dashboardWidgets: ['status', 'jobs', 'due', 'attention', 'storage', 'events'],
   };
 }
 

@@ -26,8 +26,12 @@ export async function listTree(gitDir: string, ref: string, directory: string): 
     const message = error instanceof Error ? error.message : 'tree is not available';
     throw new HttpError(404, message);
   }
+  return parseTreeLines(result.stdout, directory);
+}
+
+function parseTreeLines(stdout: string, directory: string): TreeEntry[] {
   const entries: TreeEntry[] = [];
-  for (const line of result.stdout.split('\n')) {
+  for (const line of stdout.split('\n')) {
     if (line.length === 0) continue;
     const tab = line.indexOf('\t');
     if (tab < 0) continue;
@@ -38,8 +42,9 @@ export async function listTree(gitDir: string, ref: string, directory: string): 
     const oid = meta[2] ?? '';
     const size = meta[3] ?? '-';
     const child = directory.length === 0 ? name : `${directory}/${name}`;
+    const base = child.split('/').at(-1) ?? child;
     entries.push({
-      name,
+      name: base,
       path: child,
       kind: type === 'tree' ? 'tree' : type === 'commit' ? 'submodule' : mode === '120000' ? 'symlink' : 'blob',
       mode,
@@ -48,6 +53,18 @@ export async function listTree(gitDir: string, ref: string, directory: string): 
     });
   }
   return entries;
+}
+
+export async function listTreeRecursive(gitDir: string, ref: string): Promise<TreeEntry[]> {
+  assertRef(ref);
+  let result;
+  try {
+    result = await runGit(['ls-tree', '-r', '-l', ref], { gitDir, allowFileProtocol: true, timeoutMs: 60_000 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'tree is not available';
+    throw new HttpError(404, message);
+  }
+  return parseTreeLines(result.stdout, '');
 }
 
 export async function readBlob(gitDir: string, ref: string, filePath: string): Promise<{
