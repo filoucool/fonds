@@ -646,6 +646,44 @@ async function getInventory(): Promise<unknown> {
   return request<unknown>('/api/inventory');
 }
 
+async function getPhase3Settings(): Promise<import('./types').Phase3Settings> {
+  return request<import('./types').Phase3Settings>('/api/phase3/settings');
+}
+
+async function patchPhase3Settings(patch: Record<string, unknown>): Promise<import('./types').Phase3Settings> {
+  return request<import('./types').Phase3Settings>('/api/phase3/settings', { method: 'POST', body: JSON.stringify(patch) });
+}
+
+async function listBackups(): Promise<{ items: import('./types').BackupRunSummary[] }> {
+  return request<{ items: import('./types').BackupRunSummary[] }>('/api/phase3/backups');
+}
+
+async function runBackup(target: Record<string, unknown>, profile: string): Promise<{ jobId: string; backupId: string }> {
+  return request<{ jobId: string; backupId: string }>('/api/phase3/backups/run', { method: 'POST', body: JSON.stringify({ target, profile }) });
+}
+
+async function getSelfPreservationReport(): Promise<import('./types').SelfPreservationReport> {
+  return request<import('./types').SelfPreservationReport>('/api/phase3/supply-chain/report');
+}
+
+type ArchiveSnapshotSummary = {
+  id: string;
+  repositoryId: string;
+  repositoryName: string;
+  cause: string;
+  contentDigest: string;
+  pinned: boolean;
+  createdAt: string;
+};
+
+async function listRepositorySnapshots(repositoryId: string): Promise<{ items: ArchiveSnapshotSummary[] }> {
+  return request<{ items: ArchiveSnapshotSummary[] }>(`/api/phase3/repositories/${encodeURIComponent(repositoryId)}/snapshots`);
+}
+
+async function createRepositorySnapshot(repositoryId: string): Promise<ArchiveSnapshotSummary> {
+  return request<ArchiveSnapshotSummary>(`/api/phase3/repositories/${encodeURIComponent(repositoryId)}/snapshots`, { method: 'POST', body: '{}' });
+}
+
 async function globalSearch(q: string, capabilities: string, filters: Record<string, string | undefined> = {}): Promise<{ items: GlobalSearchHit[]; usageBytes: number }> {
   return request<{ items: GlobalSearchHit[]; usageBytes: number }>(`/api/search${qs({ q, capabilities, ...filters })}`);
 }
@@ -833,6 +871,13 @@ export const api = {
   importLocalArchive,
   backupSqlite,
   getInventory,
+  getPhase3Settings,
+  patchPhase3Settings,
+  listBackups,
+  runBackup,
+  getSelfPreservationReport,
+  listRepositorySnapshots,
+  createRepositorySnapshot,
   getExport,
   exportDownloadUrl,
   globalSearch,

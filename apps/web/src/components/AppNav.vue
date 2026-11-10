@@ -18,6 +18,7 @@ const items = [
   { to: '/import', label: 'Import', match: (path: string) => path === '/import' },
   { to: '/jobs', label: 'Jobs', match: (path: string) => path === '/jobs' || path.startsWith('/jobs/') },
   { to: '/storage', label: 'Storage', match: (path: string) => path === '/storage' },
+  { to: '/preservation', label: 'Preservation', match: (path: string) => path === '/preservation' },
   {
     to: '/settings',
     label: 'Settings',

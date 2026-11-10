@@ -124,7 +124,7 @@ Phase 2 adds optional search indexes (off by default), Git clone over HTTP and S
 
 ## Deferred (Phase 3)
 
-- managed offsite backup scheduler
+- managed backups (local, SFTP, S3-compatible), snapshots, dependency graph, and self-preservation (`/api/phase3`, **Preservation** in the UI)
 - recursive dependency archiving
 
 `pnpm inventory` writes `docs/dependency-inventory.json`, and `scripts/record-image-digest.sh` records image digests after a build. Automatic preservation of those dependencies is Phase 3.

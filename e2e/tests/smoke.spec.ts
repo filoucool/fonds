@@ -66,7 +66,7 @@ test.describe('UI', () => {
   test('search form talks to the API', async ({ page, request }) => {
     await page.goto('/search');
     await page.getByPlaceholder('Repository name, path, or source text').fill('archiver');
-    await page.getByRole('button', { name: 'Search' }).click();
+    await page.locator('form.filters').getByRole('button', { name: 'Search' }).click();
 
     const viaApi = await request.get('/api/search?q=archiver&capabilities=metadata,filenames,source_text');
     expect(viaApi.ok()).toBeTruthy();
