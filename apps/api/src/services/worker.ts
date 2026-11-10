@@ -8,6 +8,8 @@ import type { JobRecord, JobsService } from './jobs';
 import type { ArchiveRunner } from './runner';
 import type { SettingsService } from './settings';
 import type { StorageService } from './storage';
+import type { SearchService } from './search';
+import type { NotificationService } from './notifications';
 
 export class WorkerService {
   private stopped = false;
@@ -25,6 +27,8 @@ export class WorkerService {
     private readonly storage: StorageService,
     private readonly integrity: IntegrityService,
     private readonly exporter: ExportService,
+    private readonly search: SearchService,
+    private readonly notifications: NotificationService,
     private readonly enabled: boolean,
   ) {}
 
@@ -48,6 +52,7 @@ export class WorkerService {
     if (this.storage.list().some((pool) => pool.freeBytes > pool.freeSpaceThresholdBytes)) this.jobs.resumeStoragePauses();
     for (const repositoryId of this.catalog.dueRepositories()) this.catalog.enqueueSync(repositoryId);
     this.balance();
+    void this.notifications.tick();
     const max = this.settings.get().maxConcurrentJobs;
     while (this.inFlight < max) {
       const job = this.jobs.claim(this.owner);
@@ -110,7 +115,15 @@ export class WorkerService {
         this.jobs.finish(job.id, 'completed', null, null);
         return;
       }
+      if (job.type === 'index' && job.repositoryId) {
+        await this.search.rebuild(job.repositoryId, controller.signal);
+        this.jobs.finish(job.id, 'completed', null, null);
+        return;
+      }
       const outcome = await this.runner.run(job, controller.signal);
+      if (job.type === 'sync' && job.repositoryId && outcome !== 'failed') {
+        this.search.scheduleAfterSync(job.repositoryId);
+      }
       this.jobs.finish(job.id, outcome === 'failed' ? 'failed' : outcome === 'partial' ? 'partial' : 'completed', outcome === 'completed' ? null : outcome, null);
     } catch (error) {
       const current = this.jobs.find(job.id);

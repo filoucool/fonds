@@ -10,6 +10,8 @@ import PlacementPanel from './PlacementPanel.vue';
 import QueuePanel from './QueuePanel.vue';
 import SyncProfilesPanel from './SyncProfilesPanel.vue';
 import TagsPanel from './TagsPanel.vue';
+import AccessPanel from './AccessPanel.vue';
+import GitAccessCredentialsPanel from './GitAccessCredentialsPanel.vue';
 </script>
 
 <template>
@@ -22,6 +24,8 @@ import TagsPanel from './TagsPanel.vue';
     <a href="#profiles">Archival profiles</a>
     <a href="#sync">Sync profiles</a>
     <a href="#credentials">Credentials</a>
+    <a href="#access">Access &amp; Git</a>
+    <a href="#git-access">Git credentials</a>
     <a href="#network">Network</a>
     <a href="#queue">Queue</a>
     <a href="#placement">Placement</a>
@@ -35,6 +39,8 @@ import TagsPanel from './TagsPanel.vue';
     <ArchivalProfilesPanel />
     <SyncProfilesPanel />
     <CredentialsPanel />
+    <AccessPanel />
+    <GitAccessCredentialsPanel />
     <NetworkPanel />
     <QueuePanel />
     <PlacementPanel />

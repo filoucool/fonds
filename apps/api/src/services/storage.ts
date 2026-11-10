@@ -7,6 +7,7 @@ import type { AppSettings, StoragePoolView } from '@repo-archive/shared';
 import { HttpError, StorageThresholdError } from '../errors';
 import { asRow, asRows, flag, id, integer, nowIso, text } from '../rows';
 import type { SettingsService } from './settings';
+import { makeGitDirWritable } from './archive-readonly';
 
 export interface SpaceInfo {
   freeBytes: number;
@@ -130,6 +131,7 @@ export class StorageService {
       throw new HttpError(409, 'destination archive failed verification; source was left in place');
     }
     this.sqlite.prepare(`UPDATE repositories SET storage_pool_id = ?, updated_at = ? WHERE id = ?`).run(destination.id, nowIso(), repositoryId);
+    makeGitDirWritable(path.join(from, 'repository.git'));
     await rm(from, { recursive: true, force: true });
   }
 

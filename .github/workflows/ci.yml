@@ -23,6 +23,31 @@ jobs:
       - name: Dependency inventory
         run: pnpm inventory
 
+  e2e:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@9.15.9 --activate
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build application
+        run: pnpm build
+      - name: Install Playwright browser
+        run: pnpm --filter @repo-archive/e2e exec playwright install --with-deps chromium
+      - name: Run Playwright E2E
+        run: pnpm --filter @repo-archive/e2e test
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: e2e/playwright-report
+
   image:
     runs-on: ubuntu-latest
     steps:

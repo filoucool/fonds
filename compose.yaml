@@ -4,6 +4,7 @@ services:
     image: archiver:local
     ports:
       - "127.0.0.1:8080:8080"
+      - "127.0.0.1:2222:2222"
     environment:
       HOST: 0.0.0.0
       PORT: "8080"

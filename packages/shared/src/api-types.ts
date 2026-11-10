@@ -104,6 +104,8 @@ export interface Job {
 export const DASHBOARD_WIDGET_IDS = ['status', 'jobs', 'due', 'attention', 'storage', 'events'] as const;
 export type DashboardWidgetId = (typeof DASHBOARD_WIDGET_IDS)[number];
 
+import type { AuthSettings, GitAccessSettings, NotificationSettings, SearchSettings } from './phase2';
+
 export interface AppSettings {
   maxConcurrentJobs: number;
   dashboardWidgets: DashboardWidgetId[];
@@ -123,6 +125,10 @@ export interface AppSettings {
   gitTimeoutMs: number;
   maxAttempts: number;
   maxProviderPages: number;
+  auth: AuthSettings;
+  gitAccess: GitAccessSettings;
+  search: SearchSettings;
+  notifications: NotificationSettings;
 }
 
 export interface CredentialSummary {

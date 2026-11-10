@@ -3,6 +3,7 @@ import path from 'node:path';
 import Database from 'better-sqlite3';
 import {
   completeProfile,
+  DEFAULT_SEARCH_INDEX,
   minimalProfile,
   standardProfile,
   type AppSettings,
@@ -316,15 +317,124 @@ export function openDatabase(filePath: string): Database.Database {
   return db;
 }
 
+const MIGRATION_0002 = `
+CREATE TABLE users (
+  id TEXT PRIMARY KEY,
+  username TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  password_hash TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'admin',
+  totp_secret TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE sessions (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token_hash TEXT NOT NULL UNIQUE,
+  csrf_token TEXT NOT NULL,
+  expires_at TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  last_seen_at TEXT NOT NULL
+);
+CREATE INDEX idx_sessions_user ON sessions(user_id, expires_at DESC);
+CREATE INDEX idx_sessions_expires ON sessions(expires_at);
+
+CREATE TABLE ssh_public_keys (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  label TEXT NOT NULL,
+  public_key TEXT NOT NULL,
+  fingerprint TEXT NOT NULL UNIQUE,
+  created_at TEXT NOT NULL,
+  last_used_at TEXT
+);
+CREATE INDEX idx_ssh_keys_user ON ssh_public_keys(user_id);
+
+CREATE TABLE access_tokens (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  label TEXT NOT NULL,
+  token_hash TEXT NOT NULL UNIQUE,
+  hint TEXT NOT NULL,
+  scopes_json TEXT NOT NULL,
+  expires_at TEXT,
+  revoked_at TEXT,
+  created_at TEXT NOT NULL,
+  last_used_at TEXT
+);
+CREATE INDEX idx_access_tokens_user ON access_tokens(user_id);
+
+CREATE TABLE working_repositories (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  archive_repository_id TEXT REFERENCES repositories(id) ON DELETE SET NULL,
+  relative_path TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE repository_search_index (
+  repository_id TEXT PRIMARY KEY REFERENCES repositories(id) ON DELETE CASCADE,
+  state TEXT NOT NULL DEFAULT 'disabled',
+  config_json TEXT NOT NULL,
+  file_count INTEGER NOT NULL DEFAULT 0,
+  source_text_bytes INTEGER NOT NULL DEFAULT 0,
+  last_indexed_at TEXT,
+  last_error TEXT,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE audit_events (
+  id TEXT PRIMARY KEY,
+  actor TEXT NOT NULL,
+  kind TEXT NOT NULL,
+  detail_json TEXT NOT NULL DEFAULT '{}',
+  created_at TEXT NOT NULL
+);
+CREATE INDEX idx_audit_time ON audit_events(created_at DESC, id DESC);
+
+CREATE TABLE notification_rules (
+  id TEXT PRIMARY KEY,
+  label TEXT NOT NULL,
+  kind TEXT NOT NULL,
+  enabled INTEGER NOT NULL DEFAULT 1,
+  config_json TEXT NOT NULL DEFAULT '{}',
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE notification_deliveries (
+  id TEXT PRIMARY KEY,
+  rule_id TEXT REFERENCES notification_rules(id) ON DELETE SET NULL,
+  kind TEXT NOT NULL,
+  status TEXT NOT NULL,
+  detail_json TEXT NOT NULL DEFAULT '{}',
+  attempts INTEGER NOT NULL DEFAULT 0,
+  next_attempt_at TEXT,
+  created_at TEXT NOT NULL,
+  finished_at TEXT
+);
+CREATE INDEX idx_notification_pending ON notification_deliveries(status, next_attempt_at);
+`;
+
 function migrate(db: Database.Database): void {
   db.exec(`CREATE TABLE IF NOT EXISTS schema_migrations (id TEXT PRIMARY KEY, applied_at TEXT NOT NULL)`);
-  const existing = db.prepare('SELECT id FROM schema_migrations WHERE id = ?').get('0001_init');
-  if (existing) return;
-  const apply = db.transaction(() => {
-    db.exec(MIGRATION);
-    db.prepare('INSERT INTO schema_migrations (id, applied_at) VALUES (?, ?)').run('0001_init', new Date().toISOString());
-  });
-  apply();
+  const applied = (id: string) => db.prepare('SELECT id FROM schema_migrations WHERE id = ?').get(id);
+  if (!applied('0001_init')) {
+    const apply = db.transaction(() => {
+      db.exec(MIGRATION);
+      db.prepare('INSERT INTO schema_migrations (id, applied_at) VALUES (?, ?)').run('0001_init', new Date().toISOString());
+    });
+    apply();
+  }
+  if (!applied('0002_phase2')) {
+    const apply = db.transaction(() => {
+      db.exec(MIGRATION_0002);
+      db.prepare('INSERT INTO schema_migrations (id, applied_at) VALUES (?, ?)').run('0002_phase2', new Date().toISOString());
+    });
+    apply();
+  }
 }
 
 export function defaultSettings(poolId: string): AppSettings {
@@ -347,6 +457,34 @@ export function defaultSettings(poolId: string): AppSettings {
     maxAttempts: 3,
     maxProviderPages: 200,
     dashboardWidgets: ['status', 'jobs', 'due', 'attention', 'storage', 'events'],
+    auth: {
+      mode: 'trusted',
+      sessionTtlHours: 168,
+      requireHttpsForLogin: false,
+      oidcIssuer: null,
+      oidcClientId: null,
+      bootstrapCompleted: true,
+    },
+    gitAccess: {
+      httpEnabled: true,
+      sshEnabled: false,
+      publicBaseUrl: null,
+      sshHost: null,
+      sshPort: 2222,
+      advertiseArchiveRefs: true,
+    },
+    search: {
+      defaultIndex: { ...DEFAULT_SEARCH_INDEX },
+      globalIndexingEnabled: false,
+      indexDiskBudgetBytes: null,
+    },
+    notifications: {
+      inAppEnabled: true,
+      emailEnabled: false,
+      webhookEnabled: false,
+      webhookUrl: null,
+      webhookSecret: null,
+    },
   };
 }
 

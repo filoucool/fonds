@@ -1,5 +1,15 @@
 import type Database from 'better-sqlite3';
-import { DASHBOARD_WIDGET_IDS, isRecord, parseJson, type AppSettings, type DashboardWidgetId, type ProviderKind } from '@repo-archive/shared';
+import {
+  AUTH_MODES,
+  DASHBOARD_WIDGET_IDS,
+  isRecord,
+  parseJson,
+  type AppSettings,
+  type AuthMode,
+  type DashboardWidgetId,
+  type ProviderKind,
+} from '@repo-archive/shared';
+import { defaultSettings } from '../db';
 import { HttpError } from '../errors';
 import { asRow, nowIso, text } from '../rows';
 
@@ -9,13 +19,14 @@ export class SettingsService {
   get(): AppSettings {
     const row = asRow(this.sqlite.prepare(`SELECT value_json FROM settings WHERE key = 'app'`).get());
     if (!row) throw new Error('settings are not initialized');
-    const parsed = normalizeSettings(parseJson(text(row, 'value_json')));
+    const parsed = hydrateSettings(normalizeSettings(parseJson(text(row, 'value_json'))));
     if (!isSettings(parsed)) throw new Error('stored settings are invalid');
     return parsed;
   }
 
   update(patch: Record<string, unknown>): AppSettings {
-    const next = { ...this.get(), ...sanitizePatch(patch) };
+    const current = this.get();
+    const next = { ...current, ...sanitizePatch(patch, current) };
     if (!isSettings(next)) throw new HttpError(400, 'settings are invalid');
     this.sqlite
       .prepare(`UPDATE settings SET value_json = ?, updated_at = ? WHERE key = 'app'`)
@@ -33,7 +44,7 @@ export class SettingsService {
   }
 }
 
-function sanitizePatch(patch: Record<string, unknown>): Partial<AppSettings> {
+function sanitizePatch(patch: Record<string, unknown>, current: AppSettings): Partial<AppSettings> {
   const next: Partial<AppSettings> = {};
   if ('maxConcurrentJobs' in patch) next.maxConcurrentJobs = integerIn(patch.maxConcurrentJobs, 1, 16, 'maxConcurrentJobs');
   if ('allowPrivateNetworks' in patch) next.allowPrivateNetworks = bool(patch.allowPrivateNetworks, 'allowPrivateNetworks');
@@ -62,7 +73,96 @@ function sanitizePatch(patch: Record<string, unknown>): Partial<AppSettings> {
   if ('maxAttempts' in patch) next.maxAttempts = integerIn(patch.maxAttempts, 1, 10, 'maxAttempts');
   if ('maxProviderPages' in patch) next.maxProviderPages = integerIn(patch.maxProviderPages, 1, 5000, 'maxProviderPages');
   if ('dashboardWidgets' in patch) next.dashboardWidgets = widgetList(patch.dashboardWidgets);
+  if ('auth' in patch && isRecord(patch.auth)) next.auth = { ...current.auth, ...sanitizeAuth(patch.auth) };
+  if ('gitAccess' in patch && isRecord(patch.gitAccess)) next.gitAccess = { ...current.gitAccess, ...sanitizeGitAccess(patch.gitAccess) };
+  if ('search' in patch && isRecord(patch.search)) {
+    next.search = {
+      ...current.search,
+      ...sanitizeSearch(patch.search),
+      defaultIndex: {
+        ...current.search.defaultIndex,
+        ...(isRecord(patch.search.defaultIndex) ? sanitizeSearch({ defaultIndex: patch.search.defaultIndex }).defaultIndex : {}),
+      },
+    };
+  }
+  if ('notifications' in patch && isRecord(patch.notifications)) next.notifications = { ...current.notifications, ...sanitizeNotifications(patch.notifications) };
   return next;
+}
+
+function sanitizeAuth(value: Record<string, unknown>): Partial<AppSettings['auth']> {
+  const next: Partial<AppSettings['auth']> = {};
+  if ('mode' in value) {
+    if (typeof value.mode !== 'string' || !AUTH_MODES.includes(value.mode as AuthMode)) throw new HttpError(400, 'auth.mode is invalid');
+    next.mode = value.mode as AuthMode;
+  }
+  if ('sessionTtlHours' in value) next.sessionTtlHours = integerIn(value.sessionTtlHours, 1, 24 * 30, 'auth.sessionTtlHours');
+  if ('requireHttpsForLogin' in value) next.requireHttpsForLogin = bool(value.requireHttpsForLogin, 'auth.requireHttpsForLogin');
+  if ('oidcIssuer' in value) next.oidcIssuer = value.oidcIssuer === null ? null : stringValue(value.oidcIssuer, 'auth.oidcIssuer');
+  if ('oidcClientId' in value) next.oidcClientId = value.oidcClientId === null ? null : stringValue(value.oidcClientId, 'auth.oidcClientId');
+  if ('bootstrapCompleted' in value) next.bootstrapCompleted = bool(value.bootstrapCompleted, 'auth.bootstrapCompleted');
+  return next;
+}
+
+function sanitizeGitAccess(value: Record<string, unknown>): Partial<AppSettings['gitAccess']> {
+  const next: Partial<AppSettings['gitAccess']> = {};
+  if ('httpEnabled' in value) next.httpEnabled = bool(value.httpEnabled, 'gitAccess.httpEnabled');
+  if ('sshEnabled' in value) next.sshEnabled = bool(value.sshEnabled, 'gitAccess.sshEnabled');
+  if ('publicBaseUrl' in value) next.publicBaseUrl = value.publicBaseUrl === null ? null : stringValue(value.publicBaseUrl, 'gitAccess.publicBaseUrl');
+  if ('sshHost' in value) next.sshHost = value.sshHost === null ? null : stringValue(value.sshHost, 'gitAccess.sshHost');
+  if ('sshPort' in value) next.sshPort = integerIn(value.sshPort, 1, 65535, 'gitAccess.sshPort');
+  if ('advertiseArchiveRefs' in value) next.advertiseArchiveRefs = bool(value.advertiseArchiveRefs, 'gitAccess.advertiseArchiveRefs');
+  return next;
+}
+
+function sanitizeSearch(value: Record<string, unknown>): Partial<AppSettings['search']> {
+  const next: Partial<AppSettings['search']> = {};
+  if ('globalIndexingEnabled' in value) next.globalIndexingEnabled = bool(value.globalIndexingEnabled, 'search.globalIndexingEnabled');
+  if ('indexDiskBudgetBytes' in value) {
+    next.indexDiskBudgetBytes =
+      value.indexDiskBudgetBytes === null ? null : integerIn(value.indexDiskBudgetBytes, 1_000_000, 10_000_000_000_000, 'search.indexDiskBudgetBytes');
+  }
+  if ('defaultIndex' in value && isRecord(value.defaultIndex)) {
+    const raw = value.defaultIndex;
+    next.defaultIndex = {
+      metadata: raw.metadata !== false,
+      filenames: raw.filenames === true,
+      sourceText: raw.sourceText === true,
+      maxFileBytes: typeof raw.maxFileBytes === 'number' ? raw.maxFileBytes : 256 * 1024,
+      excludeGlobs: Array.isArray(raw.excludeGlobs) ? raw.excludeGlobs.filter((entry): entry is string => typeof entry === 'string') : [],
+    };
+  }
+  return next;
+}
+
+function sanitizeNotifications(value: Record<string, unknown>): Partial<AppSettings['notifications']> {
+  const next: Partial<AppSettings['notifications']> = {};
+  if ('inAppEnabled' in value) next.inAppEnabled = bool(value.inAppEnabled, 'notifications.inAppEnabled');
+  if ('emailEnabled' in value) next.emailEnabled = bool(value.emailEnabled, 'notifications.emailEnabled');
+  if ('webhookEnabled' in value) next.webhookEnabled = bool(value.webhookEnabled, 'notifications.webhookEnabled');
+  if ('webhookUrl' in value) next.webhookUrl = value.webhookUrl === null ? null : stringValue(value.webhookUrl, 'notifications.webhookUrl');
+  if ('webhookSecret' in value) next.webhookSecret = value.webhookSecret === null ? null : stringValue(value.webhookSecret, 'notifications.webhookSecret');
+  return next;
+}
+
+function hydrateSettings(value: unknown): unknown {
+  if (!isRecord(value)) return value;
+  const poolId = typeof value.defaultPoolId === 'string' ? value.defaultPoolId : 'pool-default';
+  const defaults = defaultSettings(poolId);
+  return {
+    ...defaults,
+    ...value,
+    auth: { ...defaults.auth, ...(isRecord(value.auth) ? value.auth : {}) },
+    gitAccess: { ...defaults.gitAccess, ...(isRecord(value.gitAccess) ? value.gitAccess : {}) },
+    search: {
+      ...defaults.search,
+      ...(isRecord(value.search) ? value.search : {}),
+      defaultIndex: {
+        ...defaults.search.defaultIndex,
+        ...(isRecord(value.search) && isRecord(value.search.defaultIndex) ? value.search.defaultIndex : {}),
+      },
+    },
+    notifications: { ...defaults.notifications, ...(isRecord(value.notifications) ? value.notifications : {}) },
+  };
 }
 
 function normalizeSettings(value: unknown): unknown {
@@ -90,7 +190,60 @@ export function isSettings(value: unknown): value is AppSettings {
     inRange(value.gitTimeoutMs, 1000, 24 * 60 * 60 * 1000) &&
     inRange(value.maxAttempts, 1, 10) &&
     inRange(value.maxProviderPages, 1, 5000) &&
-    widgetIds(value.dashboardWidgets)
+    widgetIds(value.dashboardWidgets) &&
+    authOk(value.auth) &&
+    gitAccessOk(value.gitAccess) &&
+    searchOk(value.search) &&
+    notificationsOk(value.notifications)
+  );
+}
+
+function authOk(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  return (
+    typeof value.mode === 'string' &&
+    AUTH_MODES.includes(value.mode as AuthMode) &&
+    inRange(value.sessionTtlHours, 1, 24 * 30) &&
+    typeof value.requireHttpsForLogin === 'boolean' &&
+    (value.oidcIssuer === null || typeof value.oidcIssuer === 'string') &&
+    (value.oidcClientId === null || typeof value.oidcClientId === 'string') &&
+    typeof value.bootstrapCompleted === 'boolean'
+  );
+}
+
+function gitAccessOk(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  return (
+    typeof value.httpEnabled === 'boolean' &&
+    typeof value.sshEnabled === 'boolean' &&
+    (value.publicBaseUrl === null || typeof value.publicBaseUrl === 'string') &&
+    (value.sshHost === null || typeof value.sshHost === 'string') &&
+    inRange(value.sshPort, 1, 65535) &&
+    typeof value.advertiseArchiveRefs === 'boolean'
+  );
+}
+
+function searchOk(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  if (typeof value.globalIndexingEnabled !== 'boolean') return false;
+  if (!(value.indexDiskBudgetBytes === null || (typeof value.indexDiskBudgetBytes === 'number' && value.indexDiskBudgetBytes > 0))) return false;
+  if (!isRecord(value.defaultIndex)) return false;
+  return (
+    typeof value.defaultIndex.metadata === 'boolean' &&
+    typeof value.defaultIndex.filenames === 'boolean' &&
+    typeof value.defaultIndex.sourceText === 'boolean' &&
+    typeof value.defaultIndex.maxFileBytes === 'number'
+  );
+}
+
+function notificationsOk(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  return (
+    typeof value.inAppEnabled === 'boolean' &&
+    typeof value.emailEnabled === 'boolean' &&
+    typeof value.webhookEnabled === 'boolean' &&
+    (value.webhookUrl === null || typeof value.webhookUrl === 'string') &&
+    (value.webhookSecret === null || typeof value.webhookSecret === 'string')
   );
 }
 

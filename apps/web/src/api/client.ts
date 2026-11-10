@@ -63,6 +63,8 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+let csrfToken: string | null = null;
+
 function qs(params: Record<string, string | number | boolean | undefined | null>): string {
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
@@ -89,7 +91,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (init.body != null && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
-  const response = await fetch(path, { ...init, headers, cache: 'no-store' });
+  if (csrfToken) headers.set('X-CSRF-Token', csrfToken);
+  const response = await fetch(path, { ...init, headers, cache: 'no-store', credentials: 'include' });
   if (!response.ok) throw new ApiError(await readError(response), response.status);
   if (response.status === 204) return undefined as T;
   const text = await response.text();
@@ -643,6 +646,103 @@ async function getInventory(): Promise<unknown> {
   return request<unknown>('/api/inventory');
 }
 
+async function globalSearch(q: string, capabilities: string, filters: Record<string, string | undefined> = {}): Promise<{ items: GlobalSearchHit[]; usageBytes: number }> {
+  return request<{ items: GlobalSearchHit[]; usageBytes: number }>(`/api/search${qs({ q, capabilities, ...filters })}`);
+}
+
+type AuthSession = { authenticated: boolean; mode: string; user?: { username: string }; csrfToken?: string };
+
+async function getAuthSession(): Promise<AuthSession> {
+  const data = await request<AuthSession>('/api/auth/session');
+  if (data.authenticated && data.csrfToken) csrfToken = data.csrfToken;
+  return data;
+}
+
+async function login(username: string, password: string): Promise<void> {
+  const data = await request<{ csrfToken?: string }>('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ username, password }),
+  });
+  if (data.csrfToken) csrfToken = data.csrfToken;
+}
+
+async function logout(): Promise<void> {
+  await request<void>('/api/auth/logout', { method: 'POST' });
+  csrfToken = null;
+}
+
+type SearchIndexStatus = {
+  repositoryId: string;
+  state: string;
+  enabled: { filenames: boolean; sourceText: boolean; metadata: boolean };
+  fileCount: number;
+  sourceTextBytes: number;
+};
+
+async function getSearchIndex(repositoryId: string): Promise<SearchIndexStatus> {
+  return request<SearchIndexStatus>(`/api/repositories/${repositoryId(repositoryId)}/search-index`);
+}
+
+async function patchSearchIndex(repositoryId: string, enabled: { filenames?: boolean; sourceText?: boolean }): Promise<SearchIndexStatus> {
+  return request<SearchIndexStatus>(`/api/repositories/${repositoryId(repositoryId)}/search-index`, {
+    method: 'PATCH',
+    body: JSON.stringify({ enabled }),
+  });
+}
+
+async function rebuildSearchIndex(repositoryId: string): Promise<{ jobId: string }> {
+  return request<{ jobId: string }>(`/api/repositories/${repositoryId(repositoryId)}/search-index/rebuild`, { method: 'POST' });
+}
+
+async function pauseSearchIndex(repositoryId: string): Promise<SearchIndexStatus> {
+  return request<SearchIndexStatus>(`/api/repositories/${repositoryId(repositoryId)}/search-index/pause`, { method: 'POST' });
+}
+
+async function resumeSearchIndex(repositoryId: string): Promise<{ status: SearchIndexStatus; jobId: string }> {
+  return request<{ status: SearchIndexStatus; jobId: string }>(`/api/repositories/${repositoryId(repositoryId)}/search-index/resume`, { method: 'POST' });
+}
+
+async function deleteSearchIndex(repositoryId: string): Promise<void> {
+  await request<void>(`/api/repositories/${repositoryId(repositoryId)}/search-index`, { method: 'DELETE' });
+}
+
+async function listSshKeys(): Promise<{ id: string; label: string; fingerprint: string }[]> {
+  const data = await request<{ items: { id: string; label: string; fingerprint: string }[] }>('/api/ssh-keys');
+  return data.items;
+}
+
+async function addSshKey(label: string, publicKey: string): Promise<void> {
+  await request('/api/ssh-keys', { method: 'POST', body: JSON.stringify({ label, publicKey }) });
+}
+
+async function listAccessTokens(): Promise<{ id: string; label: string; hint: string; scopes: string[] }[]> {
+  const data = await request<{ items: { id: string; label: string; hint: string; scopes: string[] }[] }>('/api/access-tokens');
+  return data.items;
+}
+
+async function createAccessToken(label: string, scopes: string[]): Promise<{ id: string; token: string; hint: string }> {
+  return request<{ id: string; token: string; hint: string }>('/api/access-tokens', {
+    method: 'POST',
+    body: JSON.stringify({ label, scopes }),
+  });
+}
+
+async function revokeAccessToken(id: string): Promise<void> {
+  await request(`/api/access-tokens/${encodeURIComponent(id)}`, { method: 'DELETE' });
+}
+
+async function getCloneUrls(repositoryId: string): Promise<{ https: string | null; ssh: string | null }> {
+  return request<{ https: string | null; ssh: string | null }>(`/api/repositories/${repositoryId(repositoryId)}/clone-urls`);
+}
+
+type GlobalSearchHit = {
+  repositoryId: string;
+  displayName: string;
+  kind: string;
+  path: string | null;
+  snippet: string | null;
+};
+
 async function getExport(id: string): Promise<ExportRecord> {
   const data = await request<unknown>(`/api/exports/${repositoryId(id)}`);
   if (isRecord(data) && isRecord(data.export)) return data.export as unknown as ExportRecord;
@@ -735,4 +835,20 @@ export const api = {
   getInventory,
   getExport,
   exportDownloadUrl,
+  globalSearch,
+  getCloneUrls,
+  getAuthSession,
+  login,
+  logout,
+  getSearchIndex,
+  patchSearchIndex,
+  rebuildSearchIndex,
+  pauseSearchIndex,
+  resumeSearchIndex,
+  deleteSearchIndex,
+  listSshKeys,
+  addSshKey,
+  listAccessTokens,
+  createAccessToken,
+  revokeAccessToken,
 };

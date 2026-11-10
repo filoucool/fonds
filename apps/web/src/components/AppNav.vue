@@ -14,6 +14,7 @@ const healthText = ref('checking');
 const items = [
   { to: '/dashboard', label: 'Dashboard', match: (path: string) => path === '/dashboard' },
   { to: '/repositories', label: 'Repositories', match: (path: string) => path.startsWith('/repositories') },
+  { to: '/search', label: 'Search', match: (path: string) => path === '/search' },
   { to: '/import', label: 'Import', match: (path: string) => path === '/import' },
   { to: '/jobs', label: 'Jobs', match: (path: string) => path === '/jobs' || path.startsWith('/jobs/') },
   { to: '/storage', label: 'Storage', match: (path: string) => path === '/storage' },

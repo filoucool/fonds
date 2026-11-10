@@ -10,7 +10,14 @@ import { SettingsService } from '../services/settings';
 import { StorageService } from '../services/storage';
 import { WorkerService } from '../services/worker';
 import { ApiController } from './controllers';
+import { Phase2Controller } from './phase2.controller';
+import { V1Controller } from './v1.controller';
 import { SpaController } from './spa.controller';
+import { AuditService } from '../services/audit';
+import { AuthService } from '../services/auth';
+import { GitAccessService } from '../services/git-access';
+import { SearchService } from '../services/search';
+import { WorkingRepositoryService } from '../services/working-repos';
 import { APP_CONFIG } from './tokens';
 
 export { APP_CONFIG };
@@ -20,7 +27,7 @@ export class AppModule {
   static register(container: Container): DynamicModule {
     return {
       module: AppModule,
-      controllers: [ApiController, SpaController],
+      controllers: [ApiController, Phase2Controller, V1Controller, SpaController],
       providers: [
         { provide: APP_CONFIG, useValue: container.config },
         { provide: CatalogService, useValue: container.catalog },
@@ -31,6 +38,11 @@ export class AppModule {
         { provide: ExportService, useValue: container.exporter },
         { provide: WorkerService, useValue: container.worker },
         { provide: MaintenanceService, useValue: container.maintenance },
+        { provide: AuditService, useValue: container.audit },
+        { provide: AuthService, useValue: container.auth },
+        { provide: SearchService, useValue: container.search },
+        { provide: GitAccessService, useValue: container.gitAccess },
+        { provide: WorkingRepositoryService, useValue: container.working },
       ],
     };
   }

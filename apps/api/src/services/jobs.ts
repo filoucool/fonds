@@ -395,7 +395,7 @@ export class JobsService {
 }
 
 function isJobType(value: string): value is JobType {
-  return value === 'sync' || value === 'verify' || value === 'export' || value === 'migrate' || value === 'import' || value === 'rebuild';
+  return value === 'sync' || value === 'verify' || value === 'export' || value === 'migrate' || value === 'import' || value === 'rebuild' || value === 'index';
 }
 
 function isJobState(value: string): value is JobState {
