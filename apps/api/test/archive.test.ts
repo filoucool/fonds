@@ -9,12 +9,20 @@ import { loadConfig } from '../src/config';
 import { createContainer, type Container } from '../src/container';
 import { StorageThresholdError } from '../src/errors';
 import { listTreeRecursive } from '../src/services/browse';
+import { makeGitDirWritable } from '../src/services/archive-readonly';
 import { providerFor } from '../src/services/providers';
 
 const roots: string[] = [];
 
 afterEach(() => {
-  for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
+  for (const root of roots.splice(0)) {
+    try {
+      makeGitDirWritable(root);
+    } catch {
+      // ignore
+    }
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 describe('catalog and preservation', () => {

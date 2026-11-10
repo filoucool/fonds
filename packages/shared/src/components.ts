@@ -76,7 +76,7 @@ export type UpstreamStatus = (typeof UPSTREAM_STATUSES)[number];
 export const PROVIDERS = ['github', 'gitlab', 'git'] as const;
 export type ProviderKind = (typeof PROVIDERS)[number];
 
-export const JOB_TYPES = ['sync', 'verify', 'export', 'migrate', 'import', 'rebuild'] as const;
+export const JOB_TYPES = ['sync', 'verify', 'export', 'migrate', 'import', 'rebuild', 'index'] as const;
 export type JobType = (typeof JOB_TYPES)[number];
 
 export const EXPORT_FORMATS = ['bundle', 'directory', 'package'] as const;

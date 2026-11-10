@@ -43,7 +43,7 @@ export type JobState =
   | 'failed'
   | 'cancelled';
 
-export type JobType = 'sync' | 'verify' | 'export' | 'migrate' | 'import' | 'rebuild';
+export type JobType = 'sync' | 'verify' | 'export' | 'migrate' | 'import' | 'rebuild' | 'index';
 
 export type Health = 'unknown' | 'ok' | 'warning' | 'corrupt';
 
@@ -212,6 +212,9 @@ export interface Settings {
   maxAttempts: number;
   maxProviderPages: number;
   dashboardWidgets: DashboardWidgetId[];
+  auth?: { mode: 'trusted' | 'local' | 'oidc' };
+  gitAccess?: { publicBaseUrl: string | null; httpEnabled?: boolean; sshEnabled?: boolean; sshPort?: number };
+  search?: { globalIndexingEnabled: boolean };
 }
 
 export const DASHBOARD_WIDGET_IDS = ['status', 'jobs', 'due', 'attention', 'storage', 'events'] as const;

@@ -6,11 +6,19 @@ import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { loadConfig } from '../src/config';
 import { createContainer } from '../src/container';
+import { makeGitDirWritable } from '../src/services/archive-readonly';
 import { NodeHttpClient } from '../src/services/http-client';
 
 const roots: string[] = [];
 afterEach(() => {
-  for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
+  for (const root of roots.splice(0)) {
+    try {
+      makeGitDirWritable(root);
+    } catch {
+      // ignore
+    }
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 describe('export and migration', () => {

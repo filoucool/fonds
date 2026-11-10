@@ -1,0 +1,22 @@
+{
+  "name": "@repo-archive/cli",
+  "version": "0.2.0",
+  "private": true,
+  "bin": {
+    "repo-archive": "./dist/main.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@repo-archive/archive-format": "workspace:*",
+    "@repo-archive/git-exec": "workspace:*",
+    "@repo-archive/shared": "workspace:*",
+    "better-sqlite3": "^11.8.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "typescript": "^5.7.2"
+  }
+}

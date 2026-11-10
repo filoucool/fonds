@@ -2,7 +2,7 @@
 
 Archiver is a private, self-hosted archive for Git repositories. It keeps a bare repository plus a versioned `archive.json`, and it stores the previous branch and tag tips before it accepts an upstream update. The SQLite catalog is an index. An archive directory can be rebuilt into the catalog after the database is lost.
 
-Phase 1 is an archive, not a Git hosting service. There is no login. Bind it to loopback or a trusted network.
+Phase 1 is an archive, not a Git hosting service. Phase 2 adds optional search indexes, Git clone over HTTP/SSH (archives are read-only; pushes go to working copies), configurable auth (default trusted LAN), versioned `/api/v1`, and the `repo-archive` CLI. Bind to loopback or a trusted network unless auth and TLS are configured.
 
 ## Run with Docker
 
@@ -49,10 +49,24 @@ Vite serves the UI at [http://127.0.0.1:5173](http://127.0.0.1:5173) and proxies
 pnpm test
 ```
 
+End-to-end tests (Playwright against the built API and UI):
+
+```bash
+pnpm test:e2e
+```
+
+With the app already built and running on port 8080:
+
+```bash
+E2E_PORT=8080 CI= pnpm --filter @repo-archive/e2e test
+```
+
 The preservation tests create local Git repositories, delete branches and tags, force-push, and run `git gc --prune=now`. Archived commits remain readable.
 
 ## Operations
 
+- [REST API and CLI](docs/operations/api-cli.md)
+- [Git access (HTTP/SSH)](docs/operations/git-access.md)
 - [Architecture](docs/architecture/overview.md)
 - [Archive format v1](docs/archive-format/v1.md)
 - [Backup and recovery](docs/operations/backup-recovery.md)

@@ -31,6 +31,7 @@ const tabs = [
   ['components', 'Components'],
   ['events', 'Events'],
   ['health', 'Health'],
+  ['search-index', 'Search index'],
 ] as const;
 
 async function reload() {

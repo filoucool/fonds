@@ -10,3 +10,6 @@ coverage
 .pnpm-store
 *.log
 .vite
+playwright-report
+e2e/test-results
+e2e/playwright/.cache

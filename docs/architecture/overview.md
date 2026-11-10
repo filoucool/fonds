@@ -118,15 +118,12 @@ Pool balancing exists. `balancingEnabled` defaults to `false`.
 
 Credentials are stored in SQLite and nowhere else. Git authentication uses a temporary askpass environment. The token is not placed in the remote URL and is not written into repository config. Backups of the catalog therefore contain provider tokens. Manifests, sync records, and exports do not. See [Security model](../security/model.md).
 
-## Deferred
+## Phase 2 (access, search, integrations)
 
-Phase 2 and Phase 3 are not implemented. Do not treat any of the following as present:
+Phase 2 adds optional search indexes (off by default), Git clone over HTTP and SSH with separate writable working copies, configurable authentication, a versioned `/api/v1` surface with OpenAPI, and the `repo-archive` CLI including offline rescue commands. Archives remain read-only at the protocol and filesystem layer.
 
-- code search
-- Git serving
-- user login
-- public OpenAPI
-- external CLI
+## Deferred (Phase 3)
+
 - managed offsite backup scheduler
 - recursive dependency archiving
 

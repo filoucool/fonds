@@ -332,7 +332,7 @@ export class CatalogService {
     return jobId;
   }
 
-  enqueueTyped(repositoryId: string, type: 'verify' | 'export' | 'migrate' | 'import', payload: Record<string, unknown>): string {
+  enqueueTyped(repositoryId: string, type: 'verify' | 'export' | 'migrate' | 'import' | 'index', payload: Record<string, unknown>): string {
     return this.jobs.enqueue({ repositoryId, type, payload, maxAttempts: this.settings.get().maxAttempts });
   }
 

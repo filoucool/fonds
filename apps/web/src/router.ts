@@ -7,6 +7,7 @@ import JobDetailView from './views/JobDetailView.vue';
 import StorageView from './views/StorageView.vue';
 import SettingsView from './views/settings/SettingsView.vue';
 import InventoryView from './views/InventoryView.vue';
+import SearchView from './views/SearchView.vue';
 import NotFoundView from './views/NotFoundView.vue';
 import RepositoryLayout from './views/repository/RepositoryLayout.vue';
 import OverviewTab from './views/repository/OverviewTab.vue';
@@ -19,6 +20,9 @@ import ReleasesTab from './views/repository/ReleasesTab.vue';
 import ComponentsTab from './views/repository/ComponentsTab.vue';
 import EventsTab from './views/repository/EventsTab.vue';
 import HealthTab from './views/repository/HealthTab.vue';
+import SearchIndexTab from './views/repository/SearchIndexTab.vue';
+import LoginView from './views/LoginView.vue';
+import { api } from './api/client';
 
 function paramId(value: unknown): string {
   if (Array.isArray(value)) return String(value[0] ?? '');
@@ -77,8 +81,11 @@ const router = createRouter({
         { path: 'components', component: ComponentsTab, meta: { title: 'Components' } },
         { path: 'events', component: EventsTab, meta: { title: 'Events' } },
         { path: 'health', component: HealthTab, meta: { title: 'Health' } },
+        { path: 'search-index', component: SearchIndexTab, meta: { title: 'Search index' } },
       ],
     },
+    { path: '/login', name: 'login', component: LoginView, meta: { title: 'Sign in', public: true } },
+    { path: '/search', name: 'search', component: SearchView, meta: { title: 'Search' } },
     { path: '/import', name: 'import', component: ImportView, meta: { title: 'Import' } },
     { path: '/jobs', name: 'jobs', component: JobsView, meta: { title: 'Jobs' } },
     { path: '/jobs/:id', name: 'job', component: JobDetailView, meta: { title: 'Job' } },
@@ -87,6 +94,19 @@ const router = createRouter({
     { path: '/inventory', name: 'inventory', component: InventoryView, meta: { title: 'Inventory' } },
     { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFoundView, meta: { title: 'Not found' } },
   ],
+});
+
+router.beforeEach(async (to) => {
+  if (to.meta.public === true) return true;
+  try {
+    const session = await api.getAuthSession();
+    if (session.mode !== 'trusted' && !session.authenticated) {
+      return { path: '/login', query: { redirect: to.fullPath } };
+    }
+  } catch {
+    return true;
+  }
+  return true;
 });
 
 router.afterEach((to) => {

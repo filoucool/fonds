@@ -8,6 +8,7 @@ import { HttpError } from '../errors';
 import { asRow, id, integerOrNull, nowIso, text, textOrNull } from '../rows';
 import type { CatalogService } from './catalog';
 import type { StorageService } from './storage';
+import { makeGitDirReadOnly, makeGitDirWritable } from './archive-readonly';
 
 export class ExportService {
   constructor(
@@ -33,6 +34,7 @@ export class ExportService {
     const root = path.join(this.dataDir, 'exports', exportId);
     await mkdir(root, { recursive: true });
     this.sqlite.prepare(`UPDATE exports SET status = 'running' WHERE id = ?`).run(exportId);
+    makeGitDirWritable(located.paths.gitDir);
     try {
       const format = text(row, 'format');
       if (format === 'bundle') {
@@ -56,6 +58,12 @@ export class ExportService {
     } catch (error) {
       this.sqlite.prepare(`UPDATE exports SET status = 'failed', error = ?, finished_at = ? WHERE id = ?`).run(error instanceof Error ? error.message : 'export failed', nowIso(), exportId);
       throw error;
+    } finally {
+      try {
+        makeGitDirReadOnly(located.paths.gitDir);
+      } catch {
+        // Some filesystems reject chmod.
+      }
     }
   }
 

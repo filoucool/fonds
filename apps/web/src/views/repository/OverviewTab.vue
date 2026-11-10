@@ -25,6 +25,8 @@ const purgeOpen = ref(false);
 const jobId = ref('');
 const exportRecord = ref<ExportRecord | null>(null);
 const lookupId = ref('');
+const cloneHttps = ref<string | null>(null);
+const cloneSsh = ref<string | null>(null);
 
 async function run(action: 'sync' | 'verify') {
   if (!repo.value) return;
@@ -129,6 +131,24 @@ watch(exportRecord, (record) => {
   if (record) lookupId.value = record.id;
 });
 
+watch(
+  repo,
+  (current) => {
+    void (async () => {
+      if (!current) return;
+      try {
+        const urls = await api.getCloneUrls(current.id);
+        cloneHttps.value = urls.https;
+        cloneSsh.value = urls.ssh;
+      } catch {
+        cloneHttps.value = null;
+        cloneSsh.value = null;
+      }
+    })();
+  },
+  { immediate: true },
+);
+
 useInterval(() => {
   const status = exportRecord.value?.status;
   if (status && ['queued', 'running', 'pending'].includes(status)) void refreshExport();
@@ -171,6 +191,12 @@ useInterval(() => {
       </label>
       <button type="submit">Look up export</button>
     </form>
+    <section v-if="cloneHttps || cloneSsh" class="panel stack">
+      <h2>Git clone <span class="badge">Archive read-only</span></h2>
+      <p class="muted">Push only to a <RouterLink to="/settings#git-access">working copy</RouterLink>.</p>
+      <p v-if="cloneHttps" class="mono">HTTPS: {{ cloneHttps }}</p>
+      <p v-if="cloneSsh" class="mono">SSH: {{ cloneSsh }}</p>
+    </section>
     <BannerNote tone="info">{{ REFS_SURVIVE_NOTE }}</BannerNote>
     <div class="overview-grid">
       <div class="stack">

@@ -13,6 +13,13 @@ import { ArchiveRunner } from './services/runner';
 import { SettingsService } from './services/settings';
 import { StorageService, type SpaceProbe } from './services/storage';
 import { WorkerService } from './services/worker';
+import { AuditService } from './services/audit';
+import { AuthService } from './services/auth';
+import { GitAccessService } from './services/git-access';
+import { GitSshService } from './services/git-ssh';
+import { SearchService } from './services/search';
+import { WorkingRepositoryService } from './services/working-repos';
+import { NotificationService } from './services/notifications';
 
 export class MaintenanceService {
   constructor(
@@ -41,6 +48,13 @@ export interface Container {
   runner: ArchiveRunner;
   worker: WorkerService;
   maintenance: MaintenanceService;
+  audit: AuditService;
+  auth: AuthService;
+  search: SearchService;
+  gitAccess: GitAccessService;
+  gitSsh: GitSshService;
+  working: WorkingRepositoryService;
+  notifications: NotificationService;
 }
 
 export function createContainer(config: AppConfig, probe?: SpaceProbe): Container {
@@ -56,6 +70,32 @@ export function createContainer(config: AppConfig, probe?: SpaceProbe): Containe
   const integrity = new IntegrityService(sqlite, catalog, storage);
   const exporter = new ExportService(sqlite, catalog, storage, config.dataDir);
   const maintenance = new MaintenanceService(sqlite, config.dataDir);
-  const worker = new WorkerService(jobs, runner, catalog, settings, storage, integrity, exporter, config.workerEnabled);
-  return { config, sqlite, settings, storage, jobs, catalog, integrity, exporter, runner, worker, maintenance };
+  const audit = new AuditService(sqlite);
+  const auth = new AuthService(sqlite, settings, audit);
+  const working = new WorkingRepositoryService(sqlite, config.dataDir);
+  const gitAccess = new GitAccessService(catalog, storage, working);
+  const search = new SearchService(sqlite, catalog, storage, settings, path.join(config.dataDir, 'app', 'search-index.sqlite'));
+  const gitSsh = new GitSshService(config.dataDir, gitAccess, auth, settings);
+  const notifications = new NotificationService(sqlite, settings);
+  const worker = new WorkerService(jobs, runner, catalog, settings, storage, integrity, exporter, search, notifications, config.workerEnabled);
+  return {
+    config,
+    sqlite,
+    settings,
+    storage,
+    jobs,
+    catalog,
+    integrity,
+    exporter,
+    runner,
+    worker,
+    maintenance,
+    audit,
+    auth,
+    search,
+    gitAccess,
+    gitSsh,
+    working,
+    notifications,
+  };
 }

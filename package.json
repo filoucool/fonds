@@ -8,10 +8,11 @@
   },
   "packageManager": "pnpm@9.15.9",
   "scripts": {
-    "build:packages": "pnpm --filter @repo-archive/shared --filter @repo-archive/archive-format --filter @repo-archive/git-exec build",
+    "build:packages": "pnpm --filter @repo-archive/shared --filter @repo-archive/archive-format --filter @repo-archive/git-exec --filter @repo-archive/cli --filter @repo-archive/api-client build",
     "build": "pnpm build:packages && pnpm --filter @repo-archive/api build && pnpm --filter @repo-archive/web build",
     "typecheck": "pnpm build:packages && pnpm -r --if-present typecheck",
     "test": "vitest run",
+    "test:e2e": "pnpm build && pnpm --filter @repo-archive/e2e exec playwright install chromium && pnpm --filter @repo-archive/e2e test",
     "lint": "eslint .",
     "dev:api": "pnpm --filter @repo-archive/api dev",
     "dev:web": "pnpm --filter @repo-archive/web dev",

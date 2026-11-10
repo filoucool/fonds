@@ -18,6 +18,7 @@ import { authUsername, providerFor, type GitProvider, type IssueRecord, type Pro
 import type { SettingsService } from './settings';
 import type { StorageService } from './storage';
 import type { ArchiveHttp } from './http-client';
+import { makeGitDirReadOnly, makeGitDirWritable } from './archive-readonly';
 
 const ORDER: ComponentKey[] = [
   'metadata',
@@ -53,6 +54,11 @@ export class ArchiveRunner {
     const settings = this.settings.get();
     const located = this.storage.pathsFor(repo.storagePoolId, repo.id);
     await mkdir(located.paths.root, { recursive: true });
+    try {
+      makeGitDirWritable(located.paths.gitDir);
+    } catch {
+      // Fresh archives may not have repository.git yet.
+    }
     let sequence = 0;
     for (const component of ORDER) {
       this.jobs.ensureStep(job.id, component, sequence);
@@ -136,6 +142,11 @@ export class ArchiveRunner {
     await this.catalog.directorySize(repo.id);
     this.catalog.recompute(repo.id);
     this.catalog.markSynced(repo.id, failures === 0);
+    try {
+      makeGitDirReadOnly(located.paths.gitDir);
+    } catch {
+      // Some filesystems reject chmod.
+    }
     if (failures > 0 && successes > 0) return 'partial';
     if (failures > 0) return 'failed';
     return 'completed';
