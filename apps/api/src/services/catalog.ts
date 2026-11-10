@@ -332,8 +332,17 @@ export class CatalogService {
     return jobId;
   }
 
-  enqueueTyped(repositoryId: string, type: 'verify' | 'export' | 'migrate' | 'import' | 'index', payload: Record<string, unknown>): string {
+  enqueueTyped(
+    repositoryId: string | null,
+    type: 'verify' | 'export' | 'migrate' | 'import' | 'index' | 'snapshot' | 'dependency_archive',
+    payload: Record<string, unknown>,
+  ): string {
     return this.jobs.enqueue({ repositoryId, type, payload, maxAttempts: this.settings.get().maxAttempts });
+  }
+
+  contentHash(repositoryId: string): string | null {
+    const row = asRow(this.sqlite.prepare(`SELECT content_hash FROM archive_manifests WHERE repository_id = ?`).get(repositoryId));
+    return row ? text(row, 'content_hash') : null;
   }
 
   require(repositoryId: string): RepoRecord {

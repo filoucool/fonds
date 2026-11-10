@@ -10,6 +10,10 @@ import type { SettingsService } from './settings';
 import type { StorageService } from './storage';
 import type { SearchService } from './search';
 import type { NotificationService } from './notifications';
+import type { BackupService } from './backups';
+import type { SnapshotService } from './snapshots';
+import type { DependencyGraphService } from './dependency-graph';
+import { computeNextRun, isSchedule } from '@repo-archive/shared';
 
 export class WorkerService {
   private stopped = false;
@@ -29,6 +33,9 @@ export class WorkerService {
     private readonly exporter: ExportService,
     private readonly search: SearchService,
     private readonly notifications: NotificationService,
+    private readonly backups: BackupService,
+    private readonly snapshots: SnapshotService,
+    private readonly dependencies: DependencyGraphService,
     private readonly enabled: boolean,
   ) {}
 
@@ -51,6 +58,7 @@ export class WorkerService {
     this.jobs.reap();
     if (this.storage.list().some((pool) => pool.freeBytes > pool.freeSpaceThresholdBytes)) this.jobs.resumeStoragePauses();
     for (const repositoryId of this.catalog.dueRepositories()) this.catalog.enqueueSync(repositoryId);
+    this.schedulePhase3();
     this.balance();
     void this.notifications.tick();
     const max = this.settings.get().maxConcurrentJobs;
@@ -67,6 +75,24 @@ export class WorkerService {
     }
     if (this.inFlight > 0 || this.jobs.hasReadyWork()) return 1000;
     return this.jobs.msUntilNextWake();
+  }
+
+  private lastBackupScheduleCheck = 0;
+
+  private schedulePhase3(): void {
+    const now = Date.now();
+    if (now - this.lastBackupScheduleCheck < 60_000) return;
+    this.lastBackupScheduleCheck = now;
+    const phase3 = this.settings.get().phase3;
+    if (phase3.backups.enabled && phase3.backups.schedule && isSchedule(phase3.backups.schedule)) {
+      const latest = this.backups.list()[0];
+      const from = latest?.createdAt ? new Date(latest.createdAt) : new Date(0);
+      const next = computeNextRun(phase3.backups.schedule, 'UTC', from);
+      if (next && next.getTime() <= now && phase3.backups.targets.length > 0) {
+        const target = phase3.backups.targets[0];
+        if (target) this.backups.enqueue(target);
+      }
+    }
   }
 
   private balance(): void {
@@ -120,9 +146,32 @@ export class WorkerService {
         this.jobs.finish(job.id, 'completed', null, null);
         return;
       }
+      if (job.type === 'backup') {
+        const backupId = typeof job.payload.backupId === 'string' ? job.payload.backupId : '';
+        const target = job.payload.target;
+        if (!backupId || typeof target !== 'object' || target === null) throw new Error('backup payload is invalid');
+        await this.backups.run(backupId, target as never);
+        this.jobs.finish(job.id, 'completed', null, null);
+        return;
+      }
+      if (job.type === 'snapshot' && job.repositoryId) {
+        const cause = job.payload.cause === 'scheduled' ? 'scheduled' : 'manual';
+        this.snapshots.create(job.repositoryId, cause, job.payload.pinned === true);
+        this.jobs.finish(job.id, 'completed', null, null);
+        return;
+      }
+      if (job.type === 'dependency_archive') {
+        const discoveryId = typeof job.payload.discoveryId === 'string' ? job.payload.discoveryId : '';
+        await this.dependencies.archiveApproved(discoveryId);
+        this.jobs.finish(job.id, 'completed', null, null);
+        return;
+      }
+      const previousHash = job.type === 'sync' && job.repositoryId ? this.catalog.contentHash(job.repositoryId) : null;
       const outcome = await this.runner.run(job, controller.signal);
       if (job.type === 'sync' && job.repositoryId && outcome !== 'failed') {
         this.search.scheduleAfterSync(job.repositoryId);
+        const nextHash = this.catalog.contentHash(job.repositoryId) ?? '';
+        if (nextHash) this.snapshots.maybeOnChange(job.repositoryId, previousHash, nextHash);
       }
       this.jobs.finish(job.id, outcome === 'failed' ? 'failed' : outcome === 'partial' ? 'partial' : 'completed', outcome === 'completed' ? null : outcome, null);
     } catch (error) {

@@ -43,7 +43,41 @@ export type JobState =
   | 'failed'
   | 'cancelled';
 
-export type JobType = 'sync' | 'verify' | 'export' | 'migrate' | 'import' | 'rebuild' | 'index';
+export type JobType = 'sync' | 'verify' | 'export' | 'migrate' | 'import' | 'rebuild' | 'index' | 'backup' | 'snapshot' | 'dependency_archive';
+
+export type Phase3Settings = {
+  backups: {
+    enabled: boolean;
+    profile: string;
+    verifyAfterUpload: boolean;
+    collectionIds: string[];
+    retention: { keepLast: number | null; maxAgeDays: number | null; maxBytes: number | null };
+  };
+  snapshots: { onChange: boolean; manual: boolean; retention: { keepLast: number | null; maxAgeDays: number | null; protectPinned: boolean } };
+  dependencies: {
+    autoDiscover: boolean;
+    requireApproval: boolean;
+    maxDepth: number;
+    maxNewRepositories: number;
+    maxTotalBytes: number;
+  };
+  selfPreservation: { enabled: boolean; enrollResolvedSources: boolean; collectionName: string };
+};
+
+export type BackupRunSummary = {
+  id: string;
+  profile: string;
+  targetType: string;
+  state: string;
+  byteSize: number | null;
+  createdAt: string;
+  finishedAt: string | null;
+};
+
+export type SelfPreservationReport = {
+  enrolled: { name: string; version: string; repositoryId: string | null; url: string | null }[];
+  missing: { name: string; reason: string }[];
+};
 
 export type Health = 'unknown' | 'ok' | 'warning' | 'corrupt';
 

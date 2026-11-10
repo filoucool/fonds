@@ -70,6 +70,7 @@ The preservation tests create local Git repositories, delete branches and tags, 
 - [Architecture](docs/architecture/overview.md)
 - [Archive format v1](docs/archive-format/v1.md)
 - [Backup and recovery](docs/operations/backup-recovery.md)
+- Phase 3 **Preservation** UI (`/preservation`) and API (`/api/phase3/*`) for managed backups, snapshots, dependency discovery, and self-preservation reports
 - [Upgrades and disk relocation](docs/operations/upgrades-and-relocation.md)
 - [Security model](docs/security/model.md)
 

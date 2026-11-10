@@ -20,6 +20,11 @@ import { GitSshService } from './services/git-ssh';
 import { SearchService } from './services/search';
 import { WorkingRepositoryService } from './services/working-repos';
 import { NotificationService } from './services/notifications';
+import { BackupService } from './services/backups';
+import { SnapshotService } from './services/snapshots';
+import { SupplyChainService } from './services/supply-chain';
+import { DependencyGraphService } from './services/dependency-graph';
+import { RecoveryService } from './services/recovery';
 
 export class MaintenanceService {
   constructor(
@@ -55,6 +60,11 @@ export interface Container {
   gitSsh: GitSshService;
   working: WorkingRepositoryService;
   notifications: NotificationService;
+  backups: BackupService;
+  snapshots: SnapshotService;
+  supplyChain: SupplyChainService;
+  dependencies: DependencyGraphService;
+  recovery: RecoveryService;
 }
 
 export function createContainer(config: AppConfig, probe?: SpaceProbe): Container {
@@ -77,7 +87,26 @@ export function createContainer(config: AppConfig, probe?: SpaceProbe): Containe
   const search = new SearchService(sqlite, catalog, storage, settings, path.join(config.dataDir, 'app', 'search-index.sqlite'));
   const gitSsh = new GitSshService(config.dataDir, gitAccess, auth, settings);
   const notifications = new NotificationService(sqlite, settings);
-  const worker = new WorkerService(jobs, runner, catalog, settings, storage, integrity, exporter, search, notifications, config.workerEnabled);
+  const backups = new BackupService(sqlite, config.dataDir, catalog, storage, settings, jobs, notifications);
+  const snapshots = new SnapshotService(sqlite, config.dataDir, catalog, storage, settings);
+  const supplyChain = new SupplyChainService(sqlite, catalog, settings);
+  const dependencies = new DependencyGraphService(sqlite, catalog, storage, settings, jobs);
+  const recovery = new RecoveryService(sqlite, config.dataDir, catalog, storage, backups);
+  const worker = new WorkerService(
+    jobs,
+    runner,
+    catalog,
+    settings,
+    storage,
+    integrity,
+    exporter,
+    search,
+    notifications,
+    backups,
+    snapshots,
+    dependencies,
+    config.workerEnabled,
+  );
   return {
     config,
     sqlite,
@@ -97,5 +126,10 @@ export function createContainer(config: AppConfig, probe?: SpaceProbe): Containe
     gitSsh,
     working,
     notifications,
+    backups,
+    snapshots,
+    supplyChain,
+    dependencies,
+    recovery,
   };
 }

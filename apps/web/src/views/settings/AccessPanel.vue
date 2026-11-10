@@ -4,7 +4,7 @@ import { api, errorMessage } from '../../api/client';
 
 const busy = ref(false);
 const error = ref<string | null>(null);
-const mode = ref('trusted');
+const mode = ref<'trusted' | 'local' | 'oidc'>('trusted');
 const publicBaseUrl = ref('');
 const indexing = ref(false);
 
