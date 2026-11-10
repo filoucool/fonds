@@ -3,6 +3,7 @@ import path from 'node:path';
 import Database from 'better-sqlite3';
 import {
   completeProfile,
+  DEFAULT_PHASE3_SETTINGS,
   DEFAULT_SEARCH_INDEX,
   minimalProfile,
   standardProfile,
@@ -418,6 +419,98 @@ CREATE TABLE notification_deliveries (
 CREATE INDEX idx_notification_pending ON notification_deliveries(status, next_attempt_at);
 `;
 
+const MIGRATION_0003 = `
+CREATE TABLE managed_backups (
+  id TEXT PRIMARY KEY,
+  profile TEXT NOT NULL,
+  scope_json TEXT NOT NULL DEFAULT '{}',
+  target_type TEXT NOT NULL,
+  target_json TEXT NOT NULL DEFAULT '{}',
+  state TEXT NOT NULL,
+  manifest_path TEXT,
+  remote_key TEXT,
+  byte_size INTEGER,
+  content_digest TEXT,
+  boundary_at TEXT NOT NULL,
+  verified_at TEXT,
+  verify_status TEXT,
+  error TEXT,
+  parent_backup_id TEXT,
+  created_at TEXT NOT NULL,
+  finished_at TEXT
+);
+CREATE INDEX idx_managed_backups_created ON managed_backups(created_at DESC, id DESC);
+
+CREATE TABLE archive_snapshots (
+  id TEXT PRIMARY KEY,
+  repository_id TEXT NOT NULL REFERENCES repositories(id) ON DELETE CASCADE,
+  cause TEXT NOT NULL,
+  content_digest TEXT NOT NULL,
+  manifest_rel_path TEXT NOT NULL,
+  pinned INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX idx_archive_snapshots_repo ON archive_snapshots(repository_id, created_at DESC, id DESC);
+
+CREATE TABLE recovery_runs (
+  id TEXT PRIMARY KEY,
+  kind TEXT NOT NULL,
+  scope_json TEXT NOT NULL DEFAULT '{}',
+  source_backup_id TEXT,
+  sandbox INTEGER NOT NULL DEFAULT 0,
+  operator_note TEXT,
+  status TEXT NOT NULL,
+  before_json TEXT NOT NULL DEFAULT '{}',
+  after_json TEXT NOT NULL DEFAULT '{}',
+  evidence_json TEXT NOT NULL DEFAULT '{}',
+  created_at TEXT NOT NULL,
+  finished_at TEXT
+);
+CREATE INDEX idx_recovery_created ON recovery_runs(created_at DESC, id DESC);
+
+CREATE TABLE dependency_nodes (
+  id TEXT PRIMARY KEY,
+  identity_key TEXT NOT NULL UNIQUE,
+  kind TEXT NOT NULL,
+  url TEXT,
+  version TEXT,
+  resolution TEXT NOT NULL,
+  detail_json TEXT NOT NULL DEFAULT '{}',
+  repository_id TEXT REFERENCES repositories(id) ON DELETE SET NULL,
+  discovered_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE dependency_edges (
+  id TEXT PRIMARY KEY,
+  from_repository_id TEXT NOT NULL REFERENCES repositories(id) ON DELETE CASCADE,
+  to_node_id TEXT NOT NULL REFERENCES dependency_nodes(id) ON DELETE CASCADE,
+  kind TEXT NOT NULL,
+  origin_path TEXT NOT NULL,
+  discovered_at TEXT NOT NULL,
+  UNIQUE (from_repository_id, to_node_id, origin_path)
+);
+CREATE INDEX idx_dependency_edges_repo ON dependency_edges(from_repository_id);
+
+CREATE TABLE dependency_discoveries (
+  id TEXT PRIMARY KEY,
+  root_repository_id TEXT NOT NULL REFERENCES repositories(id) ON DELETE CASCADE,
+  state TEXT NOT NULL,
+  approved INTEGER NOT NULL DEFAULT 0,
+  limits_json TEXT NOT NULL DEFAULT '{}',
+  preview_json TEXT NOT NULL DEFAULT '{}',
+  created_at TEXT NOT NULL,
+  finished_at TEXT
+);
+
+CREATE TABLE supply_chain_reports (
+  id TEXT PRIMARY KEY,
+  format TEXT NOT NULL,
+  report_json TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+`;
+
 function migrate(db: Database.Database): void {
   db.exec(`CREATE TABLE IF NOT EXISTS schema_migrations (id TEXT PRIMARY KEY, applied_at TEXT NOT NULL)`);
   const applied = (id: string) => db.prepare('SELECT id FROM schema_migrations WHERE id = ?').get(id);
@@ -432,6 +525,13 @@ function migrate(db: Database.Database): void {
     const apply = db.transaction(() => {
       db.exec(MIGRATION_0002);
       db.prepare('INSERT INTO schema_migrations (id, applied_at) VALUES (?, ?)').run('0002_phase2', new Date().toISOString());
+    });
+    apply();
+  }
+  if (!applied('0003_phase3')) {
+    const apply = db.transaction(() => {
+      db.exec(MIGRATION_0003);
+      db.prepare('INSERT INTO schema_migrations (id, applied_at) VALUES (?, ?)').run('0003_phase3', new Date().toISOString());
     });
     apply();
   }
@@ -485,6 +585,7 @@ export function defaultSettings(poolId: string): AppSettings {
       webhookUrl: null,
       webhookSecret: null,
     },
+    phase3: { ...DEFAULT_PHASE3_SETTINGS },
   };
 }
 
@@ -494,6 +595,8 @@ export function seedDatabase(db: Database.Database, dataDir: string): void {
   const poolRoot = path.join(dataDir, 'pool-1');
   mkdirSync(path.join(poolRoot, 'archives'), { recursive: true, mode: 0o700 });
   mkdirSync(path.join(dataDir, 'app', 'backups'), { recursive: true, mode: 0o700 });
+  mkdirSync(path.join(dataDir, 'app', 'managed-backups'), { recursive: true, mode: 0o700 });
+  mkdirSync(path.join(dataDir, 'app', 'snapshots'), { recursive: true, mode: 0o700 });
   mkdirSync(path.join(dataDir, 'exports'), { recursive: true, mode: 0o700 });
   const insertPool = db.prepare(
     `INSERT INTO storage_pools (id, name, root_path, free_space_threshold_bytes, accept_new, enabled, placement_weight, created_at, updated_at)

@@ -32,6 +32,7 @@ const tabs = [
   ['events', 'Events'],
   ['health', 'Health'],
   ['search-index', 'Search index'],
+  ['snapshots', 'Snapshots'],
 ] as const;
 
 async function reload() {

@@ -86,6 +86,7 @@ function sanitizePatch(patch: Record<string, unknown>, current: AppSettings): Pa
     };
   }
   if ('notifications' in patch && isRecord(patch.notifications)) next.notifications = { ...current.notifications, ...sanitizeNotifications(patch.notifications) };
+  if ('phase3' in patch && isRecord(patch.phase3)) next.phase3 = { ...current.phase3, ...patch.phase3 } as AppSettings['phase3'];
   return next;
 }
 
@@ -162,6 +163,7 @@ function hydrateSettings(value: unknown): unknown {
       },
     },
     notifications: { ...defaults.notifications, ...(isRecord(value.notifications) ? value.notifications : {}) },
+    phase3: { ...defaults.phase3, ...(isRecord(value.phase3) ? value.phase3 : {}) },
   };
 }
 
@@ -194,8 +196,15 @@ export function isSettings(value: unknown): value is AppSettings {
     authOk(value.auth) &&
     gitAccessOk(value.gitAccess) &&
     searchOk(value.search) &&
-    notificationsOk(value.notifications)
+    notificationsOk(value.notifications) &&
+    phase3Ok(value.phase3)
   );
+}
+
+function phase3Ok(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  if (!isRecord(value.backups) || !isRecord(value.snapshots) || !isRecord(value.dependencies) || !isRecord(value.selfPreservation)) return false;
+  return typeof value.backups.enabled === 'boolean' && typeof value.snapshots.onChange === 'boolean';
 }
 
 function authOk(value: unknown): boolean {

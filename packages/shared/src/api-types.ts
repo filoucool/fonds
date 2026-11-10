@@ -105,6 +105,7 @@ export const DASHBOARD_WIDGET_IDS = ['status', 'jobs', 'due', 'attention', 'stor
 export type DashboardWidgetId = (typeof DASHBOARD_WIDGET_IDS)[number];
 
 import type { AuthSettings, GitAccessSettings, NotificationSettings, SearchSettings } from './phase2';
+import type { Phase3Settings } from './phase3';
 
 export interface AppSettings {
   maxConcurrentJobs: number;
@@ -129,6 +130,7 @@ export interface AppSettings {
   gitAccess: GitAccessSettings;
   search: SearchSettings;
   notifications: NotificationSettings;
+  phase3: Phase3Settings;
 }
 
 export interface CredentialSummary {

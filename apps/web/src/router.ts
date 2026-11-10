@@ -7,6 +7,8 @@ import JobDetailView from './views/JobDetailView.vue';
 import StorageView from './views/StorageView.vue';
 import SettingsView from './views/settings/SettingsView.vue';
 import InventoryView from './views/InventoryView.vue';
+import PreservationView from './views/PreservationView.vue';
+import SnapshotsTab from './views/repository/SnapshotsTab.vue';
 import SearchView from './views/SearchView.vue';
 import NotFoundView from './views/NotFoundView.vue';
 import RepositoryLayout from './views/repository/RepositoryLayout.vue';
@@ -82,6 +84,7 @@ const router = createRouter({
         { path: 'events', component: EventsTab, meta: { title: 'Events' } },
         { path: 'health', component: HealthTab, meta: { title: 'Health' } },
         { path: 'search-index', component: SearchIndexTab, meta: { title: 'Search index' } },
+        { path: 'snapshots', component: SnapshotsTab, meta: { title: 'Snapshots' } },
       ],
     },
     { path: '/login', name: 'login', component: LoginView, meta: { title: 'Sign in', public: true } },
@@ -92,6 +95,7 @@ const router = createRouter({
     { path: '/storage', name: 'storage', component: StorageView, meta: { title: 'Storage' } },
     { path: '/settings', name: 'settings', component: SettingsView, meta: { title: 'Settings' } },
     { path: '/inventory', name: 'inventory', component: InventoryView, meta: { title: 'Inventory' } },
+    { path: '/preservation', name: 'preservation', component: PreservationView, meta: { title: 'Preservation' } },
     { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFoundView, meta: { title: 'Not found' } },
   ],
 });
