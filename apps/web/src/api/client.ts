@@ -717,31 +717,31 @@ type SearchIndexStatus = {
   sourceTextBytes: number;
 };
 
-async function getSearchIndex(repositoryId: string): Promise<SearchIndexStatus> {
-  return request<SearchIndexStatus>(`/api/repositories/${repositoryId(repositoryId)}/search-index`);
+async function getSearchIndex(id: string): Promise<SearchIndexStatus> {
+  return request<SearchIndexStatus>(`/api/repositories/${repositoryId(id)}/search-index`);
 }
 
-async function patchSearchIndex(repositoryId: string, enabled: { filenames?: boolean; sourceText?: boolean }): Promise<SearchIndexStatus> {
-  return request<SearchIndexStatus>(`/api/repositories/${repositoryId(repositoryId)}/search-index`, {
+async function patchSearchIndex(id: string, enabled: { filenames?: boolean; sourceText?: boolean }): Promise<SearchIndexStatus> {
+  return request<SearchIndexStatus>(`/api/repositories/${repositoryId(id)}/search-index`, {
     method: 'PATCH',
     body: JSON.stringify({ enabled }),
   });
 }
 
-async function rebuildSearchIndex(repositoryId: string): Promise<{ jobId: string }> {
-  return request<{ jobId: string }>(`/api/repositories/${repositoryId(repositoryId)}/search-index/rebuild`, { method: 'POST' });
+async function rebuildSearchIndex(id: string): Promise<{ jobId: string }> {
+  return request<{ jobId: string }>(`/api/repositories/${repositoryId(id)}/search-index/rebuild`, { method: 'POST' });
 }
 
-async function pauseSearchIndex(repositoryId: string): Promise<SearchIndexStatus> {
-  return request<SearchIndexStatus>(`/api/repositories/${repositoryId(repositoryId)}/search-index/pause`, { method: 'POST' });
+async function pauseSearchIndex(id: string): Promise<SearchIndexStatus> {
+  return request<SearchIndexStatus>(`/api/repositories/${repositoryId(id)}/search-index/pause`, { method: 'POST' });
 }
 
-async function resumeSearchIndex(repositoryId: string): Promise<{ status: SearchIndexStatus; jobId: string }> {
-  return request<{ status: SearchIndexStatus; jobId: string }>(`/api/repositories/${repositoryId(repositoryId)}/search-index/resume`, { method: 'POST' });
+async function resumeSearchIndex(id: string): Promise<{ status: SearchIndexStatus; jobId: string }> {
+  return request<{ status: SearchIndexStatus; jobId: string }>(`/api/repositories/${repositoryId(id)}/search-index/resume`, { method: 'POST' });
 }
 
-async function deleteSearchIndex(repositoryId: string): Promise<void> {
-  await request<void>(`/api/repositories/${repositoryId(repositoryId)}/search-index`, { method: 'DELETE' });
+async function deleteSearchIndex(id: string): Promise<void> {
+  await request<void>(`/api/repositories/${repositoryId(id)}/search-index`, { method: 'DELETE' });
 }
 
 async function listSshKeys(): Promise<{ id: string; label: string; fingerprint: string }[]> {
@@ -769,8 +769,8 @@ async function revokeAccessToken(id: string): Promise<void> {
   await request(`/api/access-tokens/${encodeURIComponent(id)}`, { method: 'DELETE' });
 }
 
-async function getCloneUrls(repositoryId: string): Promise<{ https: string | null; ssh: string | null }> {
-  return request<{ https: string | null; ssh: string | null }>(`/api/repositories/${repositoryId(repositoryId)}/clone-urls`);
+async function getCloneUrls(id: string): Promise<{ https: string | null; ssh: string | null }> {
+  return request<{ https: string | null; ssh: string | null }>(`/api/repositories/${repositoryId(id)}/clone-urls`);
 }
 
 type GlobalSearchHit = {

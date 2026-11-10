@@ -22,7 +22,7 @@ async function createSnapshot() {
 
 <template>
   <LoadingState v-if="loading && !data" message="Loading snapshots…" />
-  <p v-else-if="error" class="error">{{ error.message }}</p>
+  <p v-else-if="error" class="error">{{ error }}</p>
   <div v-else class="stack">
     <div>
       <button type="button" @click="createSnapshot">Create manual snapshot</button>
