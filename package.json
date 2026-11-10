@@ -7,6 +7,11 @@
     "node": ">=22"
   },
   "packageManager": "pnpm@9.15.9",
+  "pnpm": {
+    "overrides": {
+      "fastify": "5.12.6"
+    }
+  },
   "scripts": {
     "build:packages": "pnpm --filter @repo-archive/shared --filter @repo-archive/archive-format --filter @repo-archive/git-exec --filter @repo-archive/cli --filter @repo-archive/api-client build",
     "build": "pnpm build:packages && pnpm --filter @repo-archive/api build && pnpm --filter @repo-archive/web build",
