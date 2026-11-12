@@ -58,7 +58,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section id="git-access" class="panel stack">
+  <section id="git-access" class="stack">
     <h2>Git access credentials</h2>
     <p class="muted">SSH keys and HTTPS tokens for clone/push. Separate from upstream provider tokens.</p>
     <p v-if="error" class="error">{{ error }}</p>

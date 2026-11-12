@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import PageHeader from '../../components/PageHeader.vue';
 import AppearancePanel from './AppearancePanel.vue';
 import ArchivalProfilesPanel from './ArchivalProfilesPanel.vue';
@@ -13,42 +15,118 @@ import TagsPanel from './TagsPanel.vue';
 import AccessPanel from './AccessPanel.vue';
 import DashboardWidgetsPanel from './DashboardWidgetsPanel.vue';
 import GitAccessCredentialsPanel from './GitAccessCredentialsPanel.vue';
+
+const navGroups = [
+  {
+    label: 'Interface',
+    items: [
+      { id: 'appearance', label: 'Appearance' },
+      { id: 'dashboard', label: 'Dashboard' },
+    ],
+  },
+  {
+    label: 'Archival',
+    items: [
+      { id: 'profiles', label: 'Archival profiles' },
+      { id: 'sync', label: 'Sync profiles' },
+      { id: 'placement', label: 'Placement' },
+      { id: 'categories', label: 'Categories' },
+      { id: 'tags', label: 'Tags' },
+      { id: 'collections', label: 'Collections' },
+    ],
+  },
+  {
+    label: 'Access',
+    items: [
+      { id: 'credentials', label: 'Credentials' },
+      { id: 'access', label: 'Access & search' },
+      { id: 'git-access', label: 'Git credentials' },
+    ],
+  },
+  {
+    label: 'Operations',
+    items: [
+      { id: 'network', label: 'Network' },
+      { id: 'queue', label: 'Queue' },
+    ],
+  },
+] as const;
+
+const route = useRoute();
+const hash = ref(route.hash || '#appearance');
+
+watch(
+  () => route.hash,
+  (value) => {
+    hash.value = value || '#appearance';
+  },
+);
+
+const activeId = computed(() => hash.value.replace(/^#/, '') || 'appearance');
+
+function onHashChange() {
+  hash.value = window.location.hash || '#appearance';
+}
+
+function navActive(id: string): boolean {
+  return activeId.value === id;
+}
+
+onMounted(() => {
+  window.addEventListener('hashchange', onHashChange);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('hashchange', onHashChange);
+});
 </script>
 
 <template>
   <PageHeader
     title="Settings"
-    lede="Color, archival policy, schedules, credentials, network limits, queue, and placement."
+    lede="Archive policy, access, and system behavior. Pick a section from the list."
   />
-  <nav class="subnav" aria-label="Settings sections">
-    <a href="#appearance">Appearance</a>
-    <a href="#dashboard">Dashboard</a>
-    <a href="#profiles">Archival profiles</a>
-    <a href="#sync">Sync profiles</a>
-    <a href="#credentials">Credentials</a>
-    <a href="#access">Access &amp; Git</a>
-    <a href="#git-access">Git credentials</a>
-    <a href="#network">Network</a>
-    <a href="#queue">Queue</a>
-    <a href="#placement">Placement</a>
-    <a href="#categories">Categories</a>
-    <a href="#tags">Tags</a>
-    <a href="#collections">Collections</a>
-    <RouterLink to="/inventory">Inventory</RouterLink>
-  </nav>
-  <div class="stack">
-    <AppearancePanel />
-    <DashboardWidgetsPanel />
-    <ArchivalProfilesPanel />
-    <SyncProfilesPanel />
-    <CredentialsPanel />
-    <AccessPanel />
-    <GitAccessCredentialsPanel />
-    <NetworkPanel />
-    <QueuePanel />
-    <PlacementPanel />
-    <CategoriesPanel />
-    <TagsPanel />
-    <CollectionsPanel />
+
+  <div class="settings-layout">
+    <aside class="settings-sidebar">
+      <nav class="settings-nav" aria-label="Settings sections">
+        <div v-for="group in navGroups" :key="group.label" class="settings-nav-group">
+          <p class="settings-nav-group-label">{{ group.label }}</p>
+          <div class="settings-nav-group-items">
+            <a
+              v-for="item in group.items"
+              :key="item.id"
+              :href="`#${item.id}`"
+              :class="{ active: navActive(item.id) }"
+            >
+              {{ item.label }}
+            </a>
+          </div>
+        </div>
+        <div class="settings-nav-group">
+          <p class="settings-nav-group-label">Tools</p>
+          <div class="settings-nav-group-items">
+            <RouterLink to="/inventory">Inventory</RouterLink>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <div class="settings-content">
+      <AppearancePanel v-if="navActive('appearance')" />
+      <DashboardWidgetsPanel v-else-if="navActive('dashboard')" />
+      <ArchivalProfilesPanel v-else-if="navActive('profiles')" />
+      <SyncProfilesPanel v-else-if="navActive('sync')" />
+      <CredentialsPanel v-else-if="navActive('credentials')" />
+      <AccessPanel v-else-if="navActive('access')" />
+      <GitAccessCredentialsPanel v-else-if="navActive('git-access')" />
+      <NetworkPanel v-else-if="navActive('network')" />
+      <QueuePanel v-else-if="navActive('queue')" />
+      <PlacementPanel v-else-if="navActive('placement')" />
+      <CategoriesPanel v-else-if="navActive('categories')" />
+      <TagsPanel v-else-if="navActive('tags')" />
+      <CollectionsPanel v-else-if="navActive('collections')" />
+      <AppearancePanel v-else />
+    </div>
   </div>
 </template>
