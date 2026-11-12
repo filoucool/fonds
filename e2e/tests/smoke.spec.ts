@@ -50,11 +50,12 @@ test.describe('UI', () => {
     await expect(page.getByRole('navigation', { name: 'Primary' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Fonds' })).toBeVisible();
 
-    await page.getByRole('link', { name: 'Repositories' }).click();
+    const primaryNav = page.getByRole('navigation', { name: 'Primary' });
+    await primaryNav.getByRole('link', { name: 'Repositories', exact: true }).click();
     await expect(page).toHaveURL(/\/repositories/);
     await expect(page.getByRole('heading', { name: 'Repositories', level: 1 })).toBeVisible();
 
-    await page.getByRole('link', { name: 'Search' }).click();
+    await primaryNav.getByRole('link', { name: 'Search', exact: true }).click();
     await expect(page).toHaveURL(/\/search/);
     await expect(page.getByRole('heading', { name: 'Search', level: 1 })).toBeVisible();
   });

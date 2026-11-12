@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-12T02:59:08.803Z",
+  "generatedAt": "2026-11-12T04:02:57.390Z",
   "applicationVersion": "0.1.0",
   "node": "v24.20.0",
   "packages": [
@@ -254,27 +254,6 @@
       "license": null,
       "repository": null,
       "private": true
-    },
-    {
-      "name": "@fontsource/ibm-plex-mono",
-      "version": "5.3.0",
-      "license": "OFL-1.1",
-      "repository": "https://github.com/fontsource/font-files",
-      "private": false
-    },
-    {
-      "name": "@fontsource/ibm-plex-sans",
-      "version": "5.3.0",
-      "license": "OFL-1.1",
-      "repository": "https://github.com/fontsource/font-files",
-      "private": false
-    },
-    {
-      "name": "@fontsource/newsreader",
-      "version": "5.3.0",
-      "license": "OFL-1.1",
-      "repository": "https://github.com/fontsource/font-files",
-      "private": false
     },
     {
       "name": "@humanfs/core",
@@ -943,13 +922,6 @@
     },
     {
       "name": "better-sqlite3",
-      "version": "11.10.0",
-      "license": "MIT",
-      "repository": "git://github.com/WiseLibs/better-sqlite3",
-      "private": false
-    },
-    {
-      "name": "better-sqlite3",
       "version": "12.6.2",
       "license": "MIT",
       "repository": "git://github.com/WiseLibs/better-sqlite3",
@@ -1356,13 +1328,6 @@
     },
     {
       "name": "fast-json-stringify",
-      "version": "7.3.1",
-      "license": "MIT",
-      "repository": "https://github.com/fastify/fast-json-stringify",
-      "private": false
-    },
-    {
-      "name": "fast-json-stringify",
       "version": "7.3.4",
       "license": "MIT",
       "repository": "https://github.com/fastify/fast-json-stringify",
@@ -1401,13 +1366,6 @@
       "version": "4.2.3",
       "license": "BSD-3-Clause",
       "repository": "https://github.com/fastify/fast-uri",
-      "private": false
-    },
-    {
-      "name": "fastify",
-      "version": "5.11.3",
-      "license": "MIT",
-      "repository": "https://github.com/fastify/fastify",
       "private": false
     },
     {
@@ -2802,13 +2760,6 @@
       "license": "MIT",
       "repository": "sindresorhus/yocto-queue",
       "private": false
-    },
-    {
-      "name": "zod",
-      "version": "3.25.76",
-      "license": "MIT",
-      "repository": "https://github.com/colinhacks/zod",
-      "private": false
     }
   ],
   "images": [
@@ -2836,5 +2787,5 @@
       "url": "https://nodejs.org/"
     }
   ],
-  "contentSha256": "459329b8f1bfab7d18931eeae167b5f45281ff7331bd28d79962e5f634f04e3d"
+  "contentSha256": "e9484beb7dc6fc3e8cf813db7359b9600879923d5587a04cf67a414ea0dadd05"
 }

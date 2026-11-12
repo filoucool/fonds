@@ -7,7 +7,10 @@ test.describe('storage and inventory pages', () => {
     await expect(page.getByRole('heading', { name: 'Storage', level: 1 })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Refresh' })).toBeVisible();
     await expect(page.getByRole('navigation', { name: 'Storage' })).toBeVisible();
-    await page.getByRole('link', { name: 'Pools' }).click();
+    await page
+      .getByRole('navigation', { name: 'Storage' })
+      .getByRole('link', { name: 'Pools', exact: true })
+      .click();
     await expect(page.getByRole('button', { name: 'Add pool' })).toBeVisible();
     await expect(page.locator('.pool-grid .pool-card').first()).toBeVisible({ timeout: 10_000 });
   });

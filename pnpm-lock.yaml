@@ -41,9 +41,6 @@ importers:
       '@fastify/cookie':
         specifier: ^11.1.5
         version: 11.1.5
-      '@fastify/static':
-        specifier: ^10.1.2
-        version: 10.1.10
       '@nestjs/common':
         specifier: ^11.1.6
         version: 11.2.8(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -71,15 +68,9 @@ importers:
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
-      rxjs:
-        specifier: ^7.8.1
-        version: 7.8.2
       ssh2:
         specifier: ^1.17.0
         version: 1.17.0
-      zod:
-        specifier: ^3.24.2
-        version: 3.25.76
     devDependencies:
       '@types/better-sqlite3':
         specifier: ^7.6.12
@@ -93,15 +84,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@fontsource/ibm-plex-mono':
-        specifier: ^5.1.1
-        version: 5.3.0
-      '@fontsource/ibm-plex-sans':
-        specifier: ^5.1.1
-        version: 5.3.0
-      '@fontsource/newsreader':
-        specifier: ^5.1.1
-        version: 5.3.0
       vue:
         specifier: ^3.5.13
         version: 3.5.45(typescript@5.9.3)
@@ -156,8 +138,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       better-sqlite3:
-        specifier: ^11.8.1
-        version: 11.10.0
+        specifier: ^12.6.2
+        version: 12.6.2
     devDependencies:
       '@types/better-sqlite3':
         specifier: ^7.6.12
@@ -447,15 +429,6 @@ packages:
 
   '@fastify/static@10.1.10':
     resolution: {integrity: sha512-CGwOoZiKg5m4SAqeiS8bzCSKDa71DMFQ7QeVsuWBOrfFu32DpVZWFFb0cpEg7e54YK6HZZsl4g/wfoKMnRQMUw==}
-
-  '@fontsource/ibm-plex-mono@5.3.0':
-    resolution: {integrity: sha512-eTgnZjZEGk1QtD3ZstF+Vclo2HLAni8YMy34/DxllwZvyz1lR/1RF/xTiAquOBO7MvqBx8D2Ig2WCPMVfdZu7Q==}
-
-  '@fontsource/ibm-plex-sans@5.3.0':
-    resolution: {integrity: sha512-CbE4CbbEEZJX860XyUiRpsksXIQR8Rp2XDva2VO53NJox9tVNtusrysd2x5YkUEY3ErQ66W1IiiQL8/wihhw5w==}
-
-  '@fontsource/newsreader@5.3.0':
-    resolution: {integrity: sha512-AFR6ZKY89GNL+9qBI2P2+66NhD5bhOj/v6fsLnFYLM4E0JnMB1yKb+Ro8cA64i1hwAWoBfTq5CHJGWH1toLDkw==}
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -1060,9 +1033,6 @@ packages:
 
   bcrypt-pbkdf@1.0.2:
     resolution: {integrity: sha512-qeFIXtP4MSoi6NLqO12WfqARWWuCKi2Rn/9hJLEmtB5yTNr9DqFWkJRCf2qShWzPeAMRnOgCrq0sg/KLv5ES9w==}
-
-  better-sqlite3@11.10.0:
-    resolution: {integrity: sha512-EwhOpyXiOEL/lKzHz9AW1msWFNzGc/z+LzeB3/jnFJpxu+th2yqvzsSWas1v9jgs9+xiXJcD5A8CJxAG2TaghQ==}
 
   better-sqlite3@12.6.2:
     resolution: {integrity: sha512-8VYKM3MjCa9WcaSAI3hzwhmyHVlH8tiGFwf0RlTsZPWJ1I5MkzjiudCo4KC4DxOaL/53A5B1sI/IbldNFDbsKA==}
@@ -2145,9 +2115,6 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zod@3.25.76:
-    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
-
 snapshots:
 
   '@ampproject/remapping@2.3.0':
@@ -2296,7 +2263,8 @@ snapshots:
       '@eslint/core': 0.17.0
       levn: 0.4.1
 
-  '@fastify/accept-negotiator@2.1.2': {}
+  '@fastify/accept-negotiator@2.1.2':
+    optional: true
 
   '@fastify/ajv-compiler@4.0.7':
     dependencies:
@@ -2353,6 +2321,7 @@ snapshots:
       fast-decode-uri-component: 1.0.1
       http-errors: 2.0.1
       mime: 3.0.0
+    optional: true
 
   '@fastify/static@10.1.10':
     dependencies:
@@ -2363,12 +2332,7 @@ snapshots:
       fastify-plugin: 6.0.1
       fastq: 1.20.3
       glob: 14.0.4
-
-  '@fontsource/ibm-plex-mono@5.3.0': {}
-
-  '@fontsource/ibm-plex-sans@5.3.0': {}
-
-  '@fontsource/newsreader@5.3.0': {}
+    optional: true
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -2395,7 +2359,8 @@ snapshots:
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
 
-  '@isaacs/nonrecursive-glob-match@1.1.0': {}
+  '@isaacs/nonrecursive-glob-match@1.1.0':
+    optional: true
 
   '@istanbuljs/schema@0.1.6': {}
 
@@ -2420,7 +2385,8 @@ snapshots:
 
   '@lukeed/csprng@1.1.0': {}
 
-  '@lukeed/ms@2.0.2': {}
+  '@lukeed/ms@2.0.2':
+    optional: true
 
   '@nestjs/common@11.2.8(reflect-metadata@0.2.2)(rxjs@7.8.2)':
     dependencies:
@@ -2966,11 +2932,6 @@ snapshots:
     dependencies:
       tweetnacl: 0.14.5
 
-  better-sqlite3@11.10.0:
-    dependencies:
-      bindings: 1.5.0
-      prebuild-install: 7.1.3
-
   better-sqlite3@12.6.2:
     dependencies:
       bindings: 1.5.0
@@ -3036,7 +2997,8 @@ snapshots:
 
   concat-map@0.0.1: {}
 
-  content-disposition@3.0.0: {}
+  content-disposition@3.0.0:
+    optional: true
 
   cookie@1.1.1: {}
 
@@ -3072,7 +3034,8 @@ snapshots:
 
   deep-is@0.1.4: {}
 
-  depd@2.0.0: {}
+  depd@2.0.0:
+    optional: true
 
   dequal@2.0.3: {}
 
@@ -3121,7 +3084,8 @@ snapshots:
       '@esbuild/win32-ia32': 0.25.12
       '@esbuild/win32-x64': 0.25.12
 
-  escape-html@1.0.3: {}
+  escape-html@1.0.3:
+    optional: true
 
   escape-string-regexp@4.0.0: {}
 
@@ -3329,6 +3293,7 @@ snapshots:
       minimatch: 11.0.5
       minipass: 7.1.3
       path-scurry: 3.0.0
+    optional: true
 
   globals@14.0.0: {}
 
@@ -3345,6 +3310,7 @@ snapshots:
       setprototypeof: 1.2.0
       statuses: 2.0.2
       toidentifier: 1.0.1
+    optional: true
 
   ieee754@1.2.1: {}
 
@@ -3460,7 +3426,8 @@ snapshots:
 
   lru-cache@10.4.3: {}
 
-  lru-cache@11.5.3: {}
+  lru-cache@11.5.3:
+    optional: true
 
   magic-string@0.30.21:
     dependencies:
@@ -3476,7 +3443,8 @@ snapshots:
     dependencies:
       semver: 7.8.6
 
-  mime@3.0.0: {}
+  mime@3.0.0:
+    optional: true
 
   mimic-response@3.1.0: {}
 
@@ -3488,6 +3456,7 @@ snapshots:
     dependencies:
       '@isaacs/nonrecursive-glob-match': 1.1.0
       brace-expansion: 5.0.12
+    optional: true
 
   minimatch@3.1.5:
     dependencies:
@@ -3564,6 +3533,7 @@ snapshots:
     dependencies:
       lru-cache: 11.5.3
       minipass: 7.1.3
+    optional: true
 
   path-to-regexp@8.4.2: {}
 
@@ -3720,7 +3690,8 @@ snapshots:
 
   set-cookie-parser@3.2.2: {}
 
-  setprototypeof@1.2.0: {}
+  setprototypeof@1.2.0:
+    optional: true
 
   shebang-command@2.0.0:
     dependencies:
@@ -3758,7 +3729,8 @@ snapshots:
 
   stackback@0.0.2: {}
 
-  statuses@2.0.2: {}
+  statuses@2.0.2:
+    optional: true
 
   std-env@3.10.0: {}
 
@@ -3844,7 +3816,8 @@ snapshots:
 
   toad-cache@3.7.4: {}
 
-  toidentifier@1.0.1: {}
+  toidentifier@1.0.1:
+    optional: true
 
   token-types@6.2.0:
     dependencies:
@@ -4053,5 +4026,3 @@ snapshots:
   wrappy@1.0.2: {}
 
   yocto-queue@0.1.0: {}
-
-  zod@3.25.76: {}
