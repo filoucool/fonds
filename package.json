@@ -14,7 +14,7 @@
     }
   },
   "scripts": {
-    "prepare": "bash scripts/setup-git-hooks.sh",
+    "prepare": "bash scripts/ensure-git-identity.sh",
     "build:packages": "pnpm --filter @fonds/shared --filter @fonds/archive-format --filter @fonds/git-exec --filter @fonds/cli --filter @fonds/api-client build",
     "build": "pnpm build:packages && pnpm --filter @fonds/api build && pnpm --filter @fonds/web build",
     "typecheck": "pnpm build:packages && pnpm -r --if-present typecheck",

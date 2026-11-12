@@ -18,14 +18,7 @@ For substantial design work, open an issue first.
 2. Install dependencies and run tests (see [README.md](README.md)).
 3. Keep commits focused; match existing code style (`pnpm lint`, `pnpm typecheck` when relevant).
 4. Open a pull request with a clear description and test notes.
-
-## Git commit identity
-
-Commits are attributed to **whoever is in your local git config** (`user.name` / `user.email`). Nothing in this repo rewrites your name to the maintainer’s.
-
-Hooks only **reject** the old GitHub format `you@users.noreply.github.com` (no `id+` prefix), which can map to the wrong GitHub user. Use an address from [GitHub → Emails](https://github.com/settings/emails), e.g. `12345678+yourlogin@users.noreply.github.com`.
-
-`pnpm install` runs `scripts/setup-git-hooks.sh` when `.git` is present. To wire hooks on an existing clone: `./scripts/setup-git-hooks.sh`.
+5. Use your own `git config user.name` and `user.email` (from [GitHub → Emails](https://github.com/settings/emails)) so commits attribute to your account.
 
 ## License
 
