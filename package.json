@@ -2,7 +2,8 @@
   "name": "archiver",
   "private": true,
   "version": "0.1.0",
-  "description": "Private self-hosted archival system for Git repositories",
+  "description": "Self-hosted archival system for Git repositories",
+  "license": "AGPL-3.0-only",
   "engines": {
     "node": ">=22"
   },

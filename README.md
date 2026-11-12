@@ -18,6 +18,8 @@ The **archive directories on disk are the source of truth**. The SQLite catalog 
 - [Documentation](#documentation)
 - [Roadmap](#roadmap)
 - [Operations](#operations)
+- [Contributing](#contributing)
+- [License](#license)
 
 ---
 
@@ -181,7 +183,15 @@ sh scripts/record-image-digest.sh archiver:local
 
 ## Contributing
 
-This repository is intended as an **open source** project. Issues and pull requests are welcome. For large changes, open an issue first to align on design — especially anything that adds runtime dependencies or changes the on-disk archive format.
+Archiver is an open source project. Issues and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines, test expectations, and how contributions are licensed.
+
+---
+
+## License
+
+Copyright (C) 2025 Félix Chenette-Stewart.
+
+Archiver is licensed under the **[GNU Affero General Public License v3.0](LICENSE)** (AGPL-3.0). You may use, modify, and redistribute the software under those terms. **Commercial use is allowed** when you comply with the license (including offering corresponding source when you provide a modified version as a network service).
 
 ---
 
@@ -197,4 +207,4 @@ packages/
   shared/          Shared types and policy
 ```
 
-License file and formal contribution guidelines may be added as the public release matures; the preservation and minimal-dependency goals above are the north star for design review.
+Preservation and minimal-dependency goals in [Design goals](#design-goals) are the north star for design review.
