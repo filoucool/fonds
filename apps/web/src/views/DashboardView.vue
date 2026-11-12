@@ -17,16 +17,6 @@ import { ARCHIVE_STATUSES, componentLabel } from '../lib/labels';
 const { data, error, loading, refreshing, load } = useResource<Dashboard>(() => api.getDashboard());
 const refreshedAt = ref<Date | null>(null);
 const widgets = ref<DashboardWidgetId[]>([...DASHBOARD_WIDGET_IDS]);
-const widgetError = ref('');
-
-const widgetLabels: Record<DashboardWidgetId, string> = {
-  status: 'Status',
-  jobs: 'Jobs',
-  due: 'Due syncs',
-  attention: 'Attention',
-  storage: 'Storage',
-  events: 'Events',
-};
 
 function shown(id: DashboardWidgetId): boolean {
   return widgets.value.includes(id);
@@ -35,19 +25,6 @@ function shown(id: DashboardWidgetId): boolean {
 async function loadWidgets() {
   const settings = await api.getSettings();
   widgets.value = settings.dashboardWidgets;
-}
-
-async function toggleWidget(id: DashboardWidgetId) {
-  const next = shown(id) ? widgets.value.filter((item) => item !== id) : [...widgets.value, id];
-  widgets.value = next;
-  widgetError.value = '';
-  try {
-    const saved = await api.updateSettings({ dashboardWidgets: next });
-    widgets.value = saved.dashboardWidgets;
-  } catch (reason) {
-    widgetError.value = reason instanceof Error ? reason.message : 'Could not save widgets';
-    await loadWidgets().catch(() => undefined);
-  }
 }
 
 async function refresh(silent = false) {
@@ -104,14 +81,6 @@ useInterval(() => {
   <ErrorState v-else-if="error && !data" :message="error" @retry="refresh(false)" />
   <div v-else-if="data" class="stack">
     <BannerNote v-if="error" tone="danger">{{ error }}</BannerNote>
-    <BannerNote v-if="widgetError" tone="danger">{{ widgetError }}</BannerNote>
-    <fieldset class="panel cluster">
-      <legend>Widgets</legend>
-      <label v-for="id in DASHBOARD_WIDGET_IDS" :key="id" class="cluster">
-        <input type="checkbox" :checked="shown(id)" @change="toggleWidget(id)" />
-        <span>{{ widgetLabels[id] }}</span>
-      </label>
-    </fieldset>
     <BannerNote v-if="total === 0" tone="info">
       No repositories archived yet.
       <RouterLink to="/import">Import a repository</RouterLink>
