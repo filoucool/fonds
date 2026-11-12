@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 
+// @suite ui.import.page
 test('import page loads and API accepts repository creation shape', async ({ page, request }) => {
   await page.goto('/import');
   await expect(page.getByRole('heading', { name: 'Import', level: 1 })).toBeVisible();

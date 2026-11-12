@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 
+// @suite api.get.phase3
 test.describe('Phase 3 API', () => {
   test('phase3 settings and supply chain endpoints respond', async ({ request }) => {
     const settings = await request.get('/api/phase3/settings');
@@ -25,6 +26,7 @@ test.describe('Phase 3 API', () => {
   });
 });
 
+// @suite ui.preservation.shell
 test.describe('Phase 3 UI', () => {
   test('preservation settings page is reachable', async ({ page }) => {
     await page.goto('/preservation');

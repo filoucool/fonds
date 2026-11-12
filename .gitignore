@@ -1,9 +1,14 @@
 node_modules
 dist
+# Accidental tsc emit into package src/ (build output belongs in dist/)
+packages/*/src/*.js
+packages/*/src/*.d.ts
+packages/*/src/*.js.map
 *.tsbuildinfo
 .DS_Store
 data
 coverage
+docs/testing/coverage-report.json
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm
@@ -12,4 +17,5 @@ coverage
 .vite
 playwright-report
 e2e/test-results
+e2e/fixtures/seed-state.json
 e2e/playwright/.cache
