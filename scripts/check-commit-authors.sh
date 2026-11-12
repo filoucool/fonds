@@ -5,10 +5,19 @@ set -euo pipefail
 FORBIDDEN='felix@users.noreply.github.com'
 
 if [ "${GITHUB_EVENT_NAME:-}" = pull_request ]; then
-  base="${GITHUB_EVENT_PULL_REQUEST_BASE_SHA:-}"
-  head="${GITHUB_EVENT_PULL_REQUEST_HEAD_SHA:-HEAD}"
+  base=""
+  head=""
+  if [ -n "${GITHUB_EVENT_PATH:-}" ] && [ -f "$GITHUB_EVENT_PATH" ]; then
+    base=$(jq -r '.pull_request.base.sha // empty' "$GITHUB_EVENT_PATH")
+    head=$(jq -r '.pull_request.head.sha // empty' "$GITHUB_EVENT_PATH")
+  fi
+  if [ -z "$base" ] && [ -n "${GITHUB_BASE_REF:-}" ]; then
+    git fetch origin "$GITHUB_BASE_REF" --depth=1 2>/dev/null || true
+    base=$(git merge-base "origin/${GITHUB_BASE_REF}" HEAD 2>/dev/null || true)
+    head=HEAD
+  fi
   if [ -z "$base" ]; then
-    echo "check-commit-authors: missing base SHA for pull_request" >&2
+    echo "check-commit-authors: could not resolve pull_request base sha" >&2
     exit 1
   fi
   range="${base}..${head}"
