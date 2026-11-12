@@ -1,4 +1,4 @@
-export const THEME_STORAGE_KEY = 'archiver.theme';
+export const THEME_STORAGE_KEY = 'fonds.theme';
 
 export const THEMES = [
   {

@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { APP_VERSION } from '@repo-archive/shared';
+import { APP_VERSION } from '@fonds/shared';
 
 export interface AppConfig {
   host: string;
@@ -25,7 +25,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env, cwd = process.c
     path.resolve(__dirname, '../../web/dist'),
   ].filter((value): value is string => typeof value === 'string' && value.length > 0);
   const askpassCandidates = [
-    env.ARCHIVER_ASKPASS,
+    env.FONDS_ASKPASS,
     path.join(cwd, 'scripts/git-askpass.sh'),
     path.resolve(__dirname, '../../../scripts/git-askpass.sh'),
   ].filter((value): value is string => typeof value === 'string' && value.length > 0);
@@ -37,6 +37,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env, cwd = process.c
     workerEnabled: env.WORKER_ENABLED !== 'false',
     webDist: webCandidates.find((candidate) => existsSync(path.join(candidate, 'index.html'))) ?? null,
     version: APP_VERSION,
-    askpassPath: askpassCandidates.find((candidate) => existsSync(candidate)) ?? askpassCandidates[0] ?? 'archiver-askpass',
+    askpassPath: askpassCandidates.find((candidate) => existsSync(candidate)) ?? askpassCandidates[0] ?? 'fonds-askpass',
   };
 }

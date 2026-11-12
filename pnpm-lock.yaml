@@ -53,13 +53,13 @@ importers:
       '@nestjs/platform-fastify':
         specifier: ^11.1.6
         version: 11.2.8(@fastify/static@10.1.10)(@nestjs/common@11.2.8(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.8(@nestjs/common@11.2.8(reflect-metadata@0.2.2)(rxjs@7.8.2))(reflect-metadata@0.2.2)(rxjs@7.8.2))
-      '@repo-archive/archive-format':
+      '@fonds/archive-format':
         specifier: workspace:*
         version: link:../../packages/archive-format
-      '@repo-archive/git-exec':
+      '@fonds/git-exec':
         specifier: workspace:*
         version: link:../../packages/git-exec
-      '@repo-archive/shared':
+      '@fonds/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       better-sqlite3:
@@ -130,13 +130,13 @@ importers:
 
   packages/api-client:
     dependencies:
-      '@repo-archive/shared':
+      '@fonds/shared':
         specifier: workspace:*
         version: link:../shared
 
   packages/archive-format:
     dependencies:
-      '@repo-archive/shared':
+      '@fonds/shared':
         specifier: workspace:*
         version: link:../shared
     devDependencies:
@@ -146,13 +146,13 @@ importers:
 
   packages/cli:
     dependencies:
-      '@repo-archive/archive-format':
+      '@fonds/archive-format':
         specifier: workspace:*
         version: link:../archive-format
-      '@repo-archive/git-exec':
+      '@fonds/git-exec':
         specifier: workspace:*
         version: link:../git-exec
-      '@repo-archive/shared':
+      '@fonds/shared':
         specifier: workspace:*
         version: link:../shared
       better-sqlite3:
@@ -168,7 +168,7 @@ importers:
 
   packages/git-exec:
     dependencies:
-      '@repo-archive/shared':
+      '@fonds/shared':
         specifier: workspace:*
         version: link:../shared
     devDependencies:

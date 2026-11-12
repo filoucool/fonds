@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, Inject, Param, Post, Query, Req } from '@nestjs/common';
 import type { FastifyRequest } from 'fastify';
-import { isRecord, SEARCH_CAPABILITIES, type ExportFormat, type SearchCapability } from '@repo-archive/shared';
+import { isRecord, SEARCH_CAPABILITIES, type ExportFormat, type SearchCapability } from '@fonds/shared';
 import { HttpError } from '../errors';
 import { V1_OPENAPI } from '../openapi/v1-spec';
 import { assertV1Idempotency, storeV1Idempotency, touchV1RateLimit } from './v1-guards';

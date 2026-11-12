@@ -1,7 +1,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import type Database from 'better-sqlite3';
-import { type DependencyExpansionPreview, type DependencyKind, type DependencyNodeView, type DependencyResolution } from '@repo-archive/shared';
+import { type DependencyExpansionPreview, type DependencyKind, type DependencyNodeView, type DependencyResolution } from '@fonds/shared';
 import { HttpError } from '../errors';
 import { asRow, asRows, id, nowIso, text } from '../rows';
 import type { CatalogService } from './catalog';

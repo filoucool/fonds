@@ -1,8 +1,8 @@
 import { chmodSync, copyFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import type Database from 'better-sqlite3';
-import { parseBackupManifest } from '@repo-archive/archive-format';
-import { type RecoveryKind, type RecoveryRunSummary } from '@repo-archive/shared';
+import { parseBackupManifest } from '@fonds/archive-format';
+import { type RecoveryKind, type RecoveryRunSummary } from '@fonds/shared';
 import { HttpError } from '../errors';
 import { asRow, asRows, id, nowIso, text, textOrNull } from '../rows';
 import type { BackupService } from './backups';

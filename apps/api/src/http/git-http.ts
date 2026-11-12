@@ -1,5 +1,5 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { gitReceivePack, gitUploadPack, serviceAdvertisement } from '@repo-archive/git-exec';
+import { gitReceivePack, gitUploadPack, serviceAdvertisement } from '@fonds/git-exec';
 import type { AuthService } from '../services/auth';
 import type { GitAccessService } from '../services/git-access';
 import type { SettingsService } from '../services/settings';

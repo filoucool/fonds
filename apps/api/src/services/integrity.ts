@@ -1,5 +1,5 @@
 import type Database from 'better-sqlite3';
-import { isRecord, type IntegrityRun } from '@repo-archive/shared';
+import { isRecord, type IntegrityRun } from '@fonds/shared';
 import { asRows, id, jsonRecord, nowIso, text, textOrNull } from '../rows';
 import type { CatalogService } from './catalog';
 import type { StorageService } from './storage';

@@ -12,7 +12,7 @@ import {
   type ArchiveManifest,
   type ManifestArchivedRef,
   type ManifestRef,
-} from '@repo-archive/archive-format';
+} from '@fonds/archive-format';
 import {
   COMPONENT_KEYS,
   computeNextRun,
@@ -47,9 +47,9 @@ import {
   type SyncProfileView,
   type Tag,
   type TextRecord,
-} from '@repo-archive/shared';
-import { assertRemotePermitted, type NetworkPolicy } from '@repo-archive/shared/policy';
-import { UrlRejectedError } from '@repo-archive/shared';
+} from '@fonds/shared';
+import { assertRemotePermitted, type NetworkPolicy } from '@fonds/shared/policy';
+import { UrlRejectedError } from '@fonds/shared';
 import { HttpError } from '../errors';
 import { asRow, asRows, flag, id, integer, integerOrNull, jsonRecord, nowIso, text, textOrNull } from '../rows';
 import type { JobsService } from './jobs';

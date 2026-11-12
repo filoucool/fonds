@@ -32,7 +32,7 @@ E2E uses a **setup project** (`e2e/tests/archive.setup.ts`) that archives a loca
 
 ```bash
 pnpm typecheck && pnpm test
-pnpm build && pnpm --filter @repo-archive/e2e test
+pnpm build && pnpm --filter @fonds/e2e test
 pnpm test:manifest
 pnpm test:coverage && pnpm coverage:audit
 ```

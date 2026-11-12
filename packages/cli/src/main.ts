@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { mkdir, readdir, readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
-import { parseManifest } from '@repo-archive/archive-format';
-import { parseJson } from '@repo-archive/shared';
+import { parseManifest } from '@fonds/archive-format';
+import { parseJson } from '@fonds/shared';
 import { verifyArchiveTree } from './verify-archive.js';
 
 const args = process.argv.slice(2);
@@ -20,8 +20,8 @@ async function main(): Promise<void> {
 }
 
 async function runApiCommand(argv: string[]): Promise<void> {
-  const base = process.env.ARCHIVER_URL ?? 'http://127.0.0.1:8080';
-  const token = process.env.ARCHIVER_TOKEN;
+  const base = process.env.FONDS_URL ?? 'http://127.0.0.1:8080';
+  const token = process.env.FONDS_TOKEN;
   const [command, ...rest] = argv;
   const headers: Record<string, string> = { accept: 'application/json' };
   if (token) headers.authorization = `Bearer ${token}`;
@@ -43,7 +43,7 @@ async function runApiCommand(argv: string[]): Promise<void> {
   }
   if (command === 'storage') {
     const sub = rest[0];
-    if (sub !== 'pools' && sub !== undefined) throw new Error('usage: repo-archive storage pools');
+    if (sub !== 'pools' && sub !== undefined) throw new Error('usage: fonds storage pools');
     const response = await fetch(`${base}/api/v1/storage/pools`, { headers });
     console.log(JSON.stringify(await response.json(), null, 2));
     return;
@@ -144,23 +144,23 @@ async function writeCatalog(dbPath: string, repositories: ArchiveRow[]): Promise
 }
 
 function printHelp(): void {
-  console.log(`repo-archive — Archiver CLI
+  console.log(`fonds — Fonds CLI
 
 Usage:
-  repo-archive list [--format json]
-  repo-archive inspect <repository-id>
-  repo-archive import <url>
-  repo-archive sync <repository-id>
-  repo-archive verify <repository-id>
-  repo-archive job <job-id>
-  repo-archive export <repository-id> [--format bundle|directory|package]
-  repo-archive storage pools
-  repo-archive rescue verify <archive-directory>
-  repo-archive rescue rebuild-catalog <archives-root> [catalog.sqlite]
+  fonds list [--format json]
+  fonds inspect <repository-id>
+  fonds import <url>
+  fonds sync <repository-id>
+  fonds verify <repository-id>
+  fonds job <job-id>
+  fonds export <repository-id> [--format bundle|directory|package]
+  fonds storage pools
+  fonds rescue verify <archive-directory>
+  fonds rescue rebuild-catalog <archives-root> [catalog.sqlite]
 
 Environment:
-  ARCHIVER_URL     API base URL (default http://127.0.0.1:8080)
-  ARCHIVER_TOKEN   Bearer token with api scope
+  FONDS_URL     API base URL (default http://127.0.0.1:8080)
+  FONDS_TOKEN   Bearer token with api scope
 `);
 }
 

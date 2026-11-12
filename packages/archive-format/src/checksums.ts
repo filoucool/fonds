@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { lstat, readdir, readFile, readlink } from 'node:fs/promises';
 import path from 'node:path';
-import { isRecord, parseJson } from '@repo-archive/shared';
+import { isRecord, parseJson } from '@fonds/shared';
 import { atomicWriteFile } from './atomic';
 import { isGitPayloadPath, toPosixRelative } from './layout';
 

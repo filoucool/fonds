@@ -2,7 +2,7 @@ import { createHash, createHmac } from 'node:crypto';
 import { cpSync, createReadStream, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { Client } from 'ssh2';
-import type { BackupTargetConfig, BackupTargetS3, BackupTargetSftp } from '@repo-archive/shared';
+import type { BackupTargetConfig, BackupTargetS3, BackupTargetSftp } from '@fonds/shared';
 
 export interface TransferProgress {
   filesDone: number;

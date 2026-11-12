@@ -16,7 +16,7 @@ Track implementation in [`manifest.json`](./manifest.json). Status legend: **don
 
 ## Packages
 
-### `@repo-archive/shared`
+### `@fonds/shared`
 
 | Module | Behaviors to cover | Target file | Status |
 |--------|-------------------|-------------|--------|
@@ -31,7 +31,7 @@ Track implementation in [`manifest.json`](./manifest.json). Status legend: **don
 | `phase2.ts` | phase2 DTO shapes | `packages/shared/test/phase2.test.ts` | planned |
 | `phase3.ts` | phase3 DTO shapes | `packages/shared/test/phase3.test.ts` | planned |
 
-### `@repo-archive/archive-format`
+### `@fonds/archive-format`
 
 | Module | Behaviors | Target file | Status |
 |--------|-----------|-------------|--------|
@@ -41,7 +41,7 @@ Track implementation in [`manifest.json`](./manifest.json). Status legend: **don
 | `atomic.ts` | atomic write | `packages/archive-format/test/atomic.test.ts` | planned |
 | `backup-manifest.ts` | backup manifest | `packages/archive-format/test/backup-manifest.test.ts` | planned |
 
-### `@repo-archive/git-exec`
+### `@fonds/git-exec`
 
 | Module | Behaviors | Target file | Status |
 |--------|-----------|-------------|--------|
@@ -49,11 +49,11 @@ Track implementation in [`manifest.json`](./manifest.json). Status legend: **don
 | `sync.ts` | bare sync, ref publish | `packages/git-exec/test/sync.test.ts` | planned |
 | `serve.ts` | upload-pack, pkt-line | `packages/git-exec/test/serve.test.ts` | planned |
 
-### `@repo-archive/api-client` / `cli`
+### `@fonds/api-client` / `cli`
 
 | Surface | Behaviors | Target file | Status |
 |---------|-----------|-------------|--------|
-| `ArchiverClient` | v1 list/import/sync paths | `packages/api-client/test/client.test.ts` | planned |
+| `FondsClient` | v1 list/import/sync paths | `packages/api-client/test/client.test.ts` | planned |
 | CLI `list`…`export` | argv → HTTP | `packages/cli/test/main.test.ts` | planned |
 | `rescue verify` | fixture tree | `packages/cli/test/rescue-verify.test.ts` | planned |
 | `rescue rebuild-catalog` | sqlite rebuild | `packages/cli/test/rescue-catalog.test.ts` | planned |

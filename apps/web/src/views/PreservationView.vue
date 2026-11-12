@@ -12,7 +12,7 @@ const settings = ref<Phase3Settings | null>(null);
 const backups = ref<BackupRunSummary[]>([]);
 const report = ref<SelfPreservationReport | null>(null);
 const busy = ref(false);
-const localBackupPath = ref('/var/backups/archiver');
+const localBackupPath = ref('/var/backups/fonds');
 
 async function load() {
   loading.value = true;

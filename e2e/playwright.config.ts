@@ -10,7 +10,7 @@ const webDist = path.join(repoRoot, 'apps/web/dist/index.html');
 const port = process.env.E2E_PORT ?? '18080';
 const baseURL = `http://127.0.0.1:${port}`;
 const dataDir =
-  process.env.E2E_DATA_DIR ?? mkdtempSync(path.join(os.tmpdir(), 'archiver-e2e-'));
+  process.env.E2E_DATA_DIR ?? mkdtempSync(path.join(os.tmpdir(), 'fonds-e2e-'));
 
 const serverReady = existsSync(apiEntry) && existsSync(webDist);
 

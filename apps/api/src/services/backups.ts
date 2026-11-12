@@ -2,8 +2,8 @@ import { createHash } from 'node:crypto';
 import { chmodSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type Database from 'better-sqlite3';
-import { finalizeBackupManifest } from '@repo-archive/archive-format';
-import type { BackupManifestV1 } from '@repo-archive/shared';
+import { finalizeBackupManifest } from '@fonds/archive-format';
+import type { BackupManifestV1 } from '@fonds/shared';
 import {
   type BackupProfile,
   type BackupRunState,
@@ -12,7 +12,7 @@ import {
   type BackupTargetType,
   type RetentionPreview,
   type RetentionPreviewItem,
-} from '@repo-archive/shared';
+} from '@fonds/shared';
 import { HttpError } from '../errors';
 import { asRow, asRows, id, integerOrNull, nowIso, text, textOrNull } from '../rows';
 import type { CatalogService } from './catalog';

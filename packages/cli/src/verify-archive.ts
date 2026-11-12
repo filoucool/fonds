@@ -1,8 +1,8 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { parseManifest, verifyChecksums } from '@repo-archive/archive-format';
-import { isRecord, parseJson, type ComponentKey } from '@repo-archive/shared';
-import { GitCommandError, isOid, runGit } from '@repo-archive/git-exec';
+import { parseManifest, verifyChecksums } from '@fonds/archive-format';
+import { isRecord, parseJson, type ComponentKey } from '@fonds/shared';
+import { GitCommandError, isOid, runGit } from '@fonds/git-exec';
 
 export interface VerificationCheck {
   id: string;

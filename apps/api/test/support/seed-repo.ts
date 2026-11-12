@@ -12,7 +12,7 @@ export interface SeededRepo {
 
 export async function seedLocalRepository(container: Container): Promise<SeededRepo> {
   container.settings.update({ allowFileUrls: true });
-  const origin = mkdtempSync(path.join(tmpdir(), 'archiver-seed-'));
+  const origin = mkdtempSync(path.join(tmpdir(), 'fonds-seed-'));
   commit(origin, 'README.md', '# seed\n', 'init');
   const created = await container.catalog.create({ url: origin, profileId: 'profile-minimal' });
   const job = container.jobs.get(created.jobId);

@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import type Database from 'better-sqlite3';
-import type { AuthMode, AccessTokenScope } from '@repo-archive/shared';
+import type { AuthMode, AccessTokenScope } from '@fonds/shared';
 import { HttpError } from '../errors';
 import { asRow, id, nowIso, text } from '../rows';
 import type { SettingsService } from './settings';

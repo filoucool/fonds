@@ -23,7 +23,7 @@ afterEach(() => {
 
 describe('export and migration', () => {
   it('exports a bundle that git can verify and migrates only after verification', async () => {
-    const root = mkdtempSync(path.join(tmpdir(), 'archiver-export-'));
+    const root = mkdtempSync(path.join(tmpdir(), 'fonds-export-'));
     roots.push(root);
     const container = createContainer(
       loadConfig({ DATA_DIR: root, HOST: '127.0.0.1', PORT: '8080', WORKER_ENABLED: 'false', PATH: process.env.PATH }),

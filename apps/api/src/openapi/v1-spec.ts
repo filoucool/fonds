@@ -1,7 +1,7 @@
 export const V1_OPENAPI = {
   openapi: '3.1.0',
   info: {
-    title: 'Archiver API',
+    title: 'Fonds API',
     version: '1.0.0',
     description: 'Versioned REST API for catalog, jobs, search, and storage.',
   },
@@ -30,7 +30,7 @@ export const V1_OPENAPI = {
     },
     securitySchemes: {
       bearerAuth: { type: 'http', scheme: 'bearer' },
-      sessionCookie: { type: 'apiKey', in: 'cookie', name: 'archiver_session' },
+      sessionCookie: { type: 'apiKey', in: 'cookie', name: 'fonds_session' },
     },
   },
   security: [{ bearerAuth: [] }, { sessionCookie: [] }],

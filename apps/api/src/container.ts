@@ -68,7 +68,7 @@ export interface Container {
 }
 
 export function createContainer(config: AppConfig, probe?: SpaceProbe): Container {
-  process.env.ARCHIVER_ASKPASS = config.askpassPath;
+  process.env.FONDS_ASKPASS = config.askpassPath;
   const sqlite = openDatabase(config.catalogPath);
   seedDatabase(sqlite, config.dataDir);
   const settings = new SettingsService(sqlite);

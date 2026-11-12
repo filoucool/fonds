@@ -37,7 +37,7 @@ test.describe('shell with seeded archive', () => {
   test('brand link returns to dashboard from repository', async ({ page }) => {
     const { repositoryId } = seed();
     await page.goto(`/repositories/${repositoryId}/overview`);
-    await page.getByRole('link', { name: 'Archiver' }).click();
+    await page.getByRole('link', { name: 'Fonds' }).click();
     await expect(page).toHaveURL(/\/dashboard/);
     await expect(page.getByRole('heading', { name: 'Dashboard', level: 1 })).toBeVisible();
   });

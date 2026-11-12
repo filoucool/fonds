@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      '@repo-archive/shared': path.resolve(__dirname, '../../packages/shared/src/index.ts'),
+      '@fonds/shared': path.resolve(__dirname, '../../packages/shared/src/index.ts'),
     },
   },
   server: {

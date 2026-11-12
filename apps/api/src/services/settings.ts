@@ -8,7 +8,7 @@ import {
   type AuthMode,
   type DashboardWidgetId,
   type ProviderKind,
-} from '@repo-archive/shared';
+} from '@fonds/shared';
 import { defaultSettings } from '../db';
 import { HttpError } from '../errors';
 import { asRow, nowIso, text } from '../rows';

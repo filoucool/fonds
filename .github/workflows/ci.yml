@@ -19,7 +19,7 @@ jobs:
       - name: Typecheck and test
         run: pnpm typecheck && pnpm test
       - name: Build the web UI
-        run: pnpm --filter @repo-archive/web build
+        run: pnpm --filter @fonds/web build
       - name: Dependency inventory
         run: pnpm inventory
 
@@ -38,9 +38,9 @@ jobs:
       - name: Build application
         run: pnpm build
       - name: Install Playwright browser
-        run: pnpm --filter @repo-archive/e2e exec playwright install --with-deps chromium
+        run: pnpm --filter @fonds/e2e exec playwright install --with-deps chromium
       - name: Run Playwright E2E
-        run: pnpm --filter @repo-archive/e2e test
+        run: pnpm --filter @fonds/e2e test
       - name: Upload Playwright report on failure
         if: failure()
         uses: actions/upload-artifact@v4
@@ -53,9 +53,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build the image
-        run: docker build -t archiver:ci .
+        run: docker build -t fonds:ci .
       - name: Record the image digest
-        run: sh scripts/record-image-digest.sh archiver:ci
+        run: sh scripts/record-image-digest.sh fonds:ci
       - name: Keep the recorded inventory
         uses: actions/upload-artifact@v4
         with:

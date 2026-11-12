@@ -115,7 +115,7 @@ router.beforeEach(async (to) => {
 
 router.afterEach((to) => {
   const title = typeof to.meta.title === 'string' ? to.meta.title : '';
-  document.title = title ? `${title} · Archiver` : 'Archiver';
+  document.title = title ? `${title} · Fonds` : 'Fonds';
 });
 
 export default router;
