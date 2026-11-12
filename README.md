@@ -1,31 +1,92 @@
 # Archiver
 
-Archiver is a private, self-hosted archive for Git repositories. It keeps a bare repository plus a versioned `archive.json`, and it stores the previous branch and tag tips before it accepts an upstream update. The SQLite catalog is an index. An archive directory can be rebuilt into the catalog after the database is lost.
+**Self-hosted preservation for Git repositories** — not a hosting platform, an archive you can still read decades from now.
 
-Phase 1 is an archive, not a Git hosting service. Phase 2 adds optional search indexes, Git clone over HTTP/SSH (archives are read-only; pushes go to working copies), configurable auth (default trusted LAN), versioned `/api/v1`, and the `repo-archive` CLI. Bind to loopback or a trusted network unless auth and TLS are configured.
+Archiver keeps a **bare Git repository** plus a versioned on-disk manifest (`archive.json`) for every project you care about. Before each upstream update it records previous branch and tag tips in a dedicated ref namespace so force-pushes, deletions, and upstream disappearances do not erase history you already captured.
 
-## Run with Docker
+The **archive directories on disk are the source of truth**. The SQLite catalog is a derived index: if the database is lost, the catalog can be rebuilt by scanning pools. Exports are designed to be useful without the original server.
+
+---
+
+## Table of contents
+
+- [Design goals](#design-goals)
+- [Features](#features)
+- [Quick start (Docker)](#quick-start-docker)
+- [Run from a checkout](#run-from-a-checkout)
+- [Tests](#tests)
+- [Documentation](#documentation)
+- [Roadmap](#roadmap)
+- [Operations](#operations)
+
+---
+
+## Design goals
+
+### Preserve Git history, not just mirror it
+
+Upstream refs stay current, but every superseded tip is also stored under `refs/archive/keep/` and `refs/archive/history/`. Preservation tests run branch and tag deletion, force-push, and `git gc --prune=now`; archived commits remain reachable.
+
+Fetch and publish are separate: a failed or interrupted fetch does not publish and does not replace the existing bare repository. `git fetch --prune` is never applied to the preserved namespace.
+
+### Self-preservation with minimal dependencies
+
+This project is intended to be **100% self-preserving** over the long term. That drives technical choices:
+
+| Principle | What we do |
+| --- | --- |
+| **Few moving parts** | One API process serves the UI and REST API. Job queue lives in SQLite — no Redis, no external broker. |
+| **Git is the engine** | Repository operations go through the native `git` CLI (argument arrays, scrubbed environment), not a heavy Git library stack. |
+| **Recoverable without the server** | Each archive folder is self-describing (`archive.json`, checksums, bare `repository.git`). Import and catalog rebuild work from disk alone. |
+| **Know what we depend on** | `pnpm inventory` writes `docs/dependency-inventory.json` (names, versions, licenses, upstream links). After `docker build`, `scripts/record-image-digest.sh` records image digests. |
+| **Preserve dependencies too (roadmap)** | Phase 3 adds managed backups, snapshots, a dependency graph, and automated preservation of build/runtime dependencies so the project (and its toolchain) can be archived alongside your repos. |
+
+The dependency surface is intentionally small at runtime: **Node.js, SQLite, and Git** — plus whatever you configure for optional Phase 2 features (search, HTTP/SSH Git access, auth). We avoid piling on infrastructure you would have to keep alive just to keep an archive readable.
+
+### Self-hosted by default
+
+Bind to loopback or a trusted network unless you have configured authentication and TLS. Phase 2 adds configurable auth (default: trusted LAN), versioned `/api/v1`, OpenAPI, the `repo-archive` CLI, and read-only archive access over HTTP/SSH with separate writable working copies for pushes.
+
+---
+
+## Features
+
+- **Multi-provider sync** — generic Git, GitHub, and GitLab profiles with schedules and per-repo pause.
+- **Resumable jobs** — leases, heartbeats, and requeue after restart; completed steps are not repeated.
+- **Integrity** — verify via `git fsck`, manifest ref resolution, and `checksums.json` without re-downloading objects.
+- **Export** — git bundle, portable directory, or `tar.gz` package; import and catalog rebuild without the original database.
+- **Storage pools** — sharded archive layout, free-space thresholds, optional balancing.
+- **Phase 2 (in progress / optional)** — search indexes, Git clone over HTTP/SSH, `repo-archive` CLI including offline rescue commands.
+- **Phase 3 (Preservation UI)** — managed backups, snapshots, dependency discovery, and self-preservation reports (`/preservation`, `/api/phase3/*`).
+
+---
+
+## Quick start (Docker)
+
+**Requirements:** Docker with Compose.
 
 ```bash
 docker compose up --build
 ```
 
-The UI and API listen on [http://127.0.0.1:8080](http://127.0.0.1:8080). Compose publishes that port on the host loopback only. Inside the container the process binds `0.0.0.0` so the published port can reach it.
+Open **[http://127.0.0.1:8080](http://127.0.0.1:8080)**. Compose publishes port `8080` on the host loopback only. Inside the container the process binds `0.0.0.0` so the published port can reach it.
 
-Data is the named volume `archiver-data`, mounted at `/data`. The entrypoint starts as root, gives `/data` to uid 10001, and then the process continues as the `archiver` user. A restart keeps the volume, runs forward-only SQLite migrations, and requeues a running job whose lease expired. Completed components are not repeated.
+**Data** lives in the named volume `archiver-data`, mounted at `/data`. The entrypoint fixes ownership for uid `10001`, then runs as the `archiver` user. On restart, SQLite migrations run forward-only and expired job leases are requeued.
 
-To bind-mount a host directory instead:
+**Host directory instead of a named volume:**
 
 ```bash
 mkdir -p ./data
 docker compose run --rm --user root archiver chown -R 10001:10001 /data
 ```
 
-Then replace the named volume in `compose.yaml` with `./data:/data`. Do not change the port mapping to `0.0.0.0:8080:8080` unless the host is on a trusted network.
+Edit `compose.yaml` and replace the named volume with `./data:/data`. Avoid mapping `0.0.0.0:8080:8080` unless the host is on a network you trust.
+
+---
 
 ## Run from a checkout
 
-Node.js 22 and git are required.
+**Requirements:** Node.js **22**, Git, and [pnpm](https://pnpm.io/) (see `packageManager` in `package.json`).
 
 ```bash
 pnpm install
@@ -35,13 +96,21 @@ pnpm --filter @repo-archive/api build
 DATA_DIR=./data HOST=127.0.0.1 PORT=8080 node apps/api/dist/main.js
 ```
 
-For UI development, run the API as above and, in another shell:
+**UI development** — keep the API running, then:
 
 ```bash
 pnpm --filter @repo-archive/web dev
 ```
 
-Vite serves the UI at [http://127.0.0.1:5173](http://127.0.0.1:5173) and proxies `/api` to port 8080.
+Vite serves the UI at [http://127.0.0.1:5173](http://127.0.0.1:5173) and proxies `/api` to port `8080`.
+
+**Full production build:**
+
+```bash
+pnpm build
+```
+
+---
 
 ## Tests
 
@@ -49,43 +118,83 @@ Vite serves the UI at [http://127.0.0.1:5173](http://127.0.0.1:5173) and proxies
 pnpm test
 ```
 
-End-to-end tests (Playwright against the built API and UI):
+End-to-end (Playwright, built API + UI):
 
 ```bash
 pnpm test:e2e
 ```
 
-With the app already built and running on port 8080:
+Against an app already running on port `8080`:
 
 ```bash
 E2E_PORT=8080 CI= pnpm --filter @repo-archive/e2e test
 ```
 
-The preservation tests create local Git repositories, delete branches and tags, force-push, and run `git gc --prune=now`. Archived commits remain readable.
+Preservation scenarios use local Git repositories, destructive upstream actions, and aggressive GC; archived objects must stay readable.
+
+---
+
+## Documentation
+
+| Topic | Link |
+| --- | --- |
+| Architecture | [docs/architecture/overview.md](docs/architecture/overview.md) |
+| Archive format v1 | [docs/archive-format/v1.md](docs/archive-format/v1.md) |
+| REST API and CLI | [docs/operations/api-cli.md](docs/operations/api-cli.md) |
+| Git access (HTTP/SSH) | [docs/operations/git-access.md](docs/operations/git-access.md) |
+| Backup and recovery | [docs/operations/backup-recovery.md](docs/operations/backup-recovery.md) |
+| Upgrades and disk moves | [docs/operations/upgrades-and-relocation.md](docs/operations/upgrades-and-relocation.md) |
+| Security model | [docs/security/model.md](docs/security/model.md) |
+| Testing | [docs/testing/README.md](docs/testing/README.md) |
+
+---
+
+## Roadmap
+
+| Phase | Focus |
+| --- | --- |
+| **1** | Archive core: preservation ref model, jobs, pools, export/import, catalog rebuild. |
+| **2** | Access and tooling: search, HTTP/SSH Git, auth, `/api/v1`, `repo-archive` CLI. |
+| **3** | **Self-preservation:** backups, snapshots, dependency graph, recursive dependency archiving, preservation UI. |
+
+Phase 1 acceptance criteria (preservation under force-push, offline archive read, export without catalog, and more) are summarized in the architecture doc.
+
+---
 
 ## Operations
 
-- [REST API and CLI](docs/operations/api-cli.md)
-- [Git access (HTTP/SSH)](docs/operations/git-access.md)
-- [Architecture](docs/architecture/overview.md)
-- [Archive format v1](docs/archive-format/v1.md)
-- [Backup and recovery](docs/operations/backup-recovery.md)
-- Phase 3 **Preservation** UI (`/preservation`) and API (`/api/phase3/*`) for managed backups, snapshots, dependency discovery, and self-preservation reports
-- [Upgrades and disk relocation](docs/operations/upgrades-and-relocation.md)
-- [Security model](docs/security/model.md)
+**Catalog backup** — `POST /api/maintenance/sqlite-backup` uses the SQLite backup API and writes under `$DATA_DIR/app/backups/`. Copy **pool directories** as well; pools hold the archives, the database is the index.
 
-A consistent catalog backup is `POST /api/maintenance/sqlite-backup`. It uses the SQLite backup API and writes under `$DATA_DIR/app/backups/`. Copy the pool directories as well. The pools are the archive. The database is the index.
-
-Dependency names, versions, licenses, and upstream links are generated with:
+**Dependency inventory:**
 
 ```bash
 pnpm inventory
 ```
 
-After `docker build`, record the image digest with:
+**Record container image digest after build:**
 
 ```bash
 sh scripts/record-image-digest.sh archiver:local
 ```
 
-Automatic preservation of those dependencies is deferred to Phase 3.
+---
+
+## Contributing
+
+This repository is intended as an **open source** project. Issues and pull requests are welcome. For large changes, open an issue first to align on design — especially anything that adds runtime dependencies or changes the on-disk archive format.
+
+---
+
+## Project layout
+
+```
+apps/api/          HTTP API (NestJS on Fastify) + serves built UI
+apps/web/          Vue 3 UI
+packages/
+  archive-format/  Manifest, checksums, layout v1
+  git-exec/        Git CLI invocations
+  cli/             repo-archive CLI
+  shared/          Shared types and policy
+```
+
+License file and formal contribution guidelines may be added as the public release matures; the preservation and minimal-dependency goals above are the north star for design review.
