@@ -8,6 +8,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc tsconfig.base.json .
 COPY apps ./apps
 COPY packages ./packages
 COPY scripts ./scripts
+COPY .githooks ./.githooks
 RUN pnpm install --frozen-lockfile
 RUN pnpm build
 
