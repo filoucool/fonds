@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from 'vue';
 import { api } from '../api/client';
 import { DASHBOARD_WIDGET_IDS, type AttentionItem, type Dashboard, type DashboardWidgetId, type DueSync } from '../api/types';
 import BannerNote from '../components/BannerNote.vue';
-import ByteMeter from '../components/ByteMeter.vue';
+import PoolCard from '../components/PoolCard.vue';
 import EmptyState from '../components/EmptyState.vue';
 import ErrorState from '../components/ErrorState.vue';
 import LoadingState from '../components/LoadingState.vue';
@@ -12,6 +12,7 @@ import StatusLabel from '../components/StatusLabel.vue';
 import { useInterval } from '../composables/useInterval';
 import { useResource } from '../composables/useResource';
 import { formatClock, formatDate, numberOrZero } from '../lib/format';
+import { dashboardPoolToPool } from '../lib/pool';
 import { ARCHIVE_STATUSES, componentLabel } from '../lib/labels';
 
 const { data, error, loading, refreshing, load } = useResource<Dashboard>(() => api.getDashboard());
@@ -186,18 +187,12 @@ useInterval(() => {
         detail="Add a pool on the Storage page before placing new archives."
       />
       <div v-else class="pool-grid">
-        <article v-for="pool in data.storage.pools" :key="pool.id" class="panel stack">
-          <header class="cluster">
-            <h3 style="margin: 0; color: var(--text)">{{ pool.name }}</h3>
-            <span class="mono muted">{{ pool.repositoryCount }} repositories</span>
-          </header>
-          <ByteMeter :free="pool.freeBytes" :total="pool.totalBytes" :threshold="pool.thresholdBytes" />
-          <StatusLabel
-            v-if="pool.freeBytes < pool.thresholdBytes"
-            value="warning"
-            label="Below free-space threshold"
-          />
-        </article>
+        <PoolCard
+          v-for="pool in data.storage.pools"
+          :key="pool.id"
+          compact
+          :pool="dashboardPoolToPool(pool)"
+        />
       </div>
     </section>
 

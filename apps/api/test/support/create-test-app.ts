@@ -7,7 +7,7 @@ import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
 import type { FastifyReply } from 'fastify';
 import cookie from '@fastify/cookie';
-import { isRecord, UrlRejectedError } from '@repo-archive/shared';
+import { isRecord, UrlRejectedError } from '@fonds/shared';
 import { loadConfig, type AppConfig } from '../../src/config';
 import { createContainer, type Container } from '../../src/container';
 import { HttpError, StorageThresholdError } from '../../src/errors';
@@ -63,7 +63,7 @@ export interface TestApp {
 }
 
 export async function createTestApp(dataDir?: string): Promise<TestApp> {
-  const root = dataDir ?? mkdtempSync(path.join(tmpdir(), 'archiver-http-'));
+  const root = dataDir ?? mkdtempSync(path.join(tmpdir(), 'fonds-http-'));
   const config = loadConfig({
     DATA_DIR: root,
     HOST: '127.0.0.1',

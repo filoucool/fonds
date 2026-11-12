@@ -52,7 +52,7 @@ export class NotificationService {
 
   private async flushWebhook(url: string, secret: string | null, kind: string, detail: Record<string, unknown>): Promise<void> {
     const headers: Record<string, string> = { 'content-type': 'application/json' };
-    if (secret) headers['x-archiver-secret'] = secret;
+    if (secret) headers['x-fonds-secret'] = secret;
     try {
       await fetch(url, {
         method: 'POST',

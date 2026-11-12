@@ -179,7 +179,7 @@ function objectType(gitDir: string, oid: string): string {
 }
 
 function temp(): string {
-  const root = mkdtempSync(path.join(tmpdir(), 'archiver-git-'));
+  const root = mkdtempSync(path.join(tmpdir(), 'fonds-git-'));
   roots.push(root);
   return root;
 }

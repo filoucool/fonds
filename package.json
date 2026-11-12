@@ -1,5 +1,5 @@
 {
-  "name": "archiver",
+  "name": "fonds",
   "private": true,
   "version": "0.1.0",
   "description": "Self-hosted archival system for Git repositories",
@@ -14,17 +14,17 @@
     }
   },
   "scripts": {
-    "build:packages": "pnpm --filter @repo-archive/shared --filter @repo-archive/archive-format --filter @repo-archive/git-exec --filter @repo-archive/cli --filter @repo-archive/api-client build",
-    "build": "pnpm build:packages && pnpm --filter @repo-archive/api build && pnpm --filter @repo-archive/web build",
+    "build:packages": "pnpm --filter @fonds/shared --filter @fonds/archive-format --filter @fonds/git-exec --filter @fonds/cli --filter @fonds/api-client build",
+    "build": "pnpm build:packages && pnpm --filter @fonds/api build && pnpm --filter @fonds/web build",
     "typecheck": "pnpm build:packages && pnpm -r --if-present typecheck",
     "test": "vitest run",
-    "test:e2e": "pnpm build && pnpm --filter @repo-archive/e2e exec playwright install chromium && pnpm --filter @repo-archive/e2e test",
+    "test:e2e": "pnpm build && pnpm --filter @fonds/e2e exec playwright install chromium && pnpm --filter @fonds/e2e test",
     "test:manifest": "node scripts/check-test-manifest.mjs",
     "test:coverage": "vitest run --coverage",
     "coverage:audit": "node scripts/coverage-audit.mjs",
     "lint": "eslint .",
-    "dev:api": "pnpm --filter @repo-archive/api dev",
-    "dev:web": "pnpm --filter @repo-archive/web dev",
+    "dev:api": "pnpm --filter @fonds/api dev",
+    "dev:web": "pnpm --filter @fonds/web dev",
     "start": "node apps/api/dist/main.js",
     "inventory": "node scripts/write-inventory.mjs"
   },

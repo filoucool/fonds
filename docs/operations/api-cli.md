@@ -8,50 +8,50 @@
 
 Trusted-network mode (default) allows unauthenticated access on the bind interface. Disable trusted mode in Settings → Access and create a local admin via `POST /api/auth/bootstrap` before first use on an exposed host.
 
-Bearer tokens with the `api` scope work for automation (`ARCHIVER_TOKEN`).
+Bearer tokens with the `api` scope work for automation (`FONDS_TOKEN`).
 
 ## CLI
 
 Build the CLI from the monorepo root:
 
 ```bash
-pnpm --filter @repo-archive/cli build
+pnpm --filter @fonds/cli build
 node packages/cli/dist/main.js list
 ```
 
-Or set `ARCHIVER_URL` and `ARCHIVER_TOKEN` and use the `repo-archive` binary after `pnpm build`.
+Or set `FONDS_URL` and `FONDS_TOKEN` and use the `fonds` binary after `pnpm build`.
 
 ### Remote commands (require a running server)
 
 ```bash
-repo-archive list --format json
-repo-archive inspect <repository-id>
-repo-archive import <url>
-repo-archive sync <repository-id>
-repo-archive verify <repository-id>
-repo-archive job <job-id>
-repo-archive export <repository-id> --format bundle
-repo-archive storage pools
+fonds list --format json
+fonds inspect <repository-id>
+fonds import <url>
+fonds sync <repository-id>
+fonds verify <repository-id>
+fonds job <job-id>
+fonds export <repository-id> --format bundle
+fonds storage pools
 ```
 
 ### Offline rescue (no server)
 
 ```bash
-repo-archive rescue verify <archive-directory>
-repo-archive rescue rebuild-catalog <archives-root> [catalog.sqlite]
+fonds rescue verify <archive-directory>
+fonds rescue rebuild-catalog <archives-root> [catalog.sqlite]
 ```
 
 ## TypeScript client
 
-The workspace package `@repo-archive/api-client` wraps common v1 endpoints:
+The workspace package `@fonds/api-client` wraps common v1 endpoints:
 
 ```bash
-pnpm --filter @repo-archive/api-client build
+pnpm --filter @fonds/api-client build
 ```
 
 ```typescript
-import { ArchiverClient } from '@repo-archive/api-client';
+import { FondsClient } from '@fonds/api-client';
 
-const client = new ArchiverClient({ baseUrl: 'http://127.0.0.1:8080', token: process.env.ARCHIVER_TOKEN });
+const client = new FondsClient({ baseUrl: 'http://127.0.0.1:8080', token: process.env.FONDS_TOKEN });
 const page = await client.listRepositories();
 ```

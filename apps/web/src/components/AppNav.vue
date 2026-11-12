@@ -53,7 +53,7 @@ useInterval(() => {
 
 <template>
   <aside class="nav">
-    <RouterLink to="/dashboard" class="brand">Archiver</RouterLink>
+    <RouterLink to="/dashboard" class="brand">Fonds</RouterLink>
     <p class="brand-sub">repository archive</p>
     <nav class="nav-links" aria-label="Primary">
       <RouterLink

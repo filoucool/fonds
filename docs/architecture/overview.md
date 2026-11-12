@@ -8,7 +8,7 @@ The implementation is a TypeScript monorepo. The API is NestJS on Fastify. The U
 
 The catalog is SQLite in WAL mode at `$DATA_DIR/app/catalog.sqlite`. The job queue is SQLite and runs in-process in that catalog. There is no Redis.
 
-The data volume is `/data`, and that path is `DATA_DIR`. Pools live on the volume. The long-lived process runs as uid 10001 (`archiver`). The container entrypoint starts as root, fixes ownership of `/data`, and then the long-lived process continues as `archiver`.
+The data volume is `/data`, and that path is `DATA_DIR`. Pools live on the volume. The long-lived process runs as uid 10001 (`fonds`). The container entrypoint starts as root, fixes ownership of `/data`, and then the long-lived process continues as `fonds`.
 
 The default bind is `127.0.0.1:8080`. Compose publishes `127.0.0.1:8080:8080` and sets `HOST=0.0.0.0` inside the container network namespace so the published port can reach the process. That `0.0.0.0` is the container interface.
 
@@ -16,11 +16,11 @@ The default bind is `127.0.0.1:8080`. Compose publishes `127.0.0.1:8080:8080` an
 
 | Name | Role |
 | --- | --- |
-| `@repo-archive/shared` | Shared workspace package |
-| `@repo-archive/archive-format` | Archive format v1 manifest, checksums, and content hash |
-| `@repo-archive/git-exec` | git CLI invocations as argument arrays |
-| `apps/api` (`@repo-archive/api`) | HTTP API and the static UI |
-| `apps/web` (`@repo-archive/web`) | Vue 3 UI, built and served by the API |
+| `@fonds/shared` | Shared workspace package |
+| `@fonds/archive-format` | Archive format v1 manifest, checksums, and content hash |
+| `@fonds/git-exec` | git CLI invocations as argument arrays |
+| `apps/api` (`@fonds/api`) | HTTP API and the static UI |
+| `apps/web` (`@fonds/web`) | Vue 3 UI, built and served by the API |
 
 The API entrypoint is `node apps/api/dist/main.js`.
 
@@ -120,7 +120,7 @@ Credentials are stored in SQLite and nowhere else. Git authentication uses a tem
 
 ## Phase 2 (access, search, integrations)
 
-Phase 2 adds optional search indexes (off by default), Git clone over HTTP and SSH with separate writable working copies, configurable authentication, a versioned `/api/v1` surface with OpenAPI, and the `repo-archive` CLI including offline rescue commands. Archives remain read-only at the protocol and filesystem layer.
+Phase 2 adds optional search indexes (off by default), Git clone over HTTP and SSH with separate writable working copies, configurable authentication, a versioned `/api/v1` surface with OpenAPI, and the `fonds` CLI including offline rescue commands. Archives remain read-only at the protocol and filesystem layer.
 
 ## Deferred (Phase 3)
 

@@ -1,4 +1,4 @@
-import { isRecord, parseJson } from '@repo-archive/shared';
+import { isRecord, parseJson } from '@fonds/shared';
 
 export function asRows(value: unknown): Record<string, unknown>[] {
   if (!Array.isArray(value)) throw new Error('expected rows');

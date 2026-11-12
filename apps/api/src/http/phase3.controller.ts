@@ -7,7 +7,7 @@ import {
   type BackupTargetConfig,
   type RecoveryKind,
   type SnapshotCause,
-} from '@repo-archive/shared';
+} from '@fonds/shared';
 import { HttpError } from '../errors';
 import { BackupService } from '../services/backups';
 import { DependencyGraphService } from '../services/dependency-graph';
@@ -254,8 +254,8 @@ function parseTarget(value: unknown): BackupTargetConfig {
   };
 }
 
-function sanitizePhase3Patch(patch: Record<string, unknown>, current: import('@repo-archive/shared').Phase3Settings): Partial<import('@repo-archive/shared').Phase3Settings> {
-  const next: Partial<import('@repo-archive/shared').Phase3Settings> = {};
+function sanitizePhase3Patch(patch: Record<string, unknown>, current: import('@fonds/shared').Phase3Settings): Partial<import('@fonds/shared').Phase3Settings> {
+  const next: Partial<import('@fonds/shared').Phase3Settings> = {};
   if (isRecord(patch.backups)) {
     next.backups = {
       ...current.backups,
@@ -321,6 +321,6 @@ function sanitizePhase3Patch(patch: Record<string, unknown>, current: import('@r
   return next;
 }
 
-function isScheduleValue(value: unknown): value is import('@repo-archive/shared').Schedule {
+function isScheduleValue(value: unknown): value is import('@fonds/shared').Schedule {
   return typeof value === 'object' && value !== null && 'kind' in value;
 }

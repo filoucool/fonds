@@ -22,6 +22,7 @@ const CORE_API_ROUTES: Array<{ method: string; path: string }> = [
   { method: 'GET', path: '/api/jobs' },
   { method: 'GET', path: '/api/jobs/:id' },
   { method: 'GET', path: '/api/storage/pools' },
+  { method: 'GET', path: '/api/storage/path-candidates' },
   { method: 'GET', path: '/api/inventory' },
   { method: 'GET', path: '/api/search' },
   { method: 'POST', path: '/api/auth/login' },

@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
-import { BACKUP_MANIFEST_SCHEMA, type BackupManifestV1 } from '@repo-archive/shared';
-import { isRecord, parseJson } from '@repo-archive/shared';
+import { BACKUP_MANIFEST_SCHEMA, type BackupManifestV1 } from '@fonds/shared';
+import { isRecord, parseJson } from '@fonds/shared';
 
 export function digestBackupManifest(manifest: Omit<BackupManifestV1, 'contentDigest'>): string {
   const body = JSON.stringify({ ...manifest, contentDigest: undefined });

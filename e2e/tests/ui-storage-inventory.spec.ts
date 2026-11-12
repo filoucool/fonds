@@ -2,12 +2,14 @@ import { expect, test } from '@playwright/test';
 
 // @suite ui.flow.storage-pool
 test.describe('storage and inventory pages', () => {
-  test('storage shows default pool and add form', async ({ page }) => {
-    await page.goto('/storage');
+  test('storage overview and pools tabs', async ({ page }) => {
+    await page.goto('/storage/overview');
     await expect(page.getByRole('heading', { name: 'Storage', level: 1 })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Add pool', level: 2 })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Refresh' })).toBeVisible();
-    await expect(page.locator('article.panel, .pool-grid article').first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('navigation', { name: 'Storage' })).toBeVisible();
+    await page.getByRole('link', { name: 'Pools' }).click();
+    await expect(page.getByRole('button', { name: 'Add pool' })).toBeVisible();
+    await expect(page.locator('.pool-grid .pool-card').first()).toBeVisible({ timeout: 10_000 });
   });
 
   test('inventory renders host JSON document', async ({ page }) => {

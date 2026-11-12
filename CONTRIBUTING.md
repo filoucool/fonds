@@ -1,10 +1,10 @@
 # Contributing
 
-Thank you for considering a contribution to Archiver.
+Thank you for considering a contribution to Fonds.
 
 ## What we care about
 
-Archiver is built for **long-term preservation** and **minimal runtime dependencies**. Before you open a large PR:
+Fonds is built for **long-term preservation** and **minimal runtime dependencies**. Before you open a large PR:
 
 - Prefer changes that keep archives readable without the original server or catalog.
 - Avoid new runtime infrastructure (message brokers, extra databases, proprietary SDKs) unless there is a strong, documented reason.

@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
-import { assertFetchUrlShape } from '@repo-archive/shared';
-import { assertRemotePermitted, type NetworkPolicy } from '@repo-archive/shared/policy';
+import { assertFetchUrlShape } from '@fonds/shared';
+import { assertRemotePermitted, type NetworkPolicy } from '@fonds/shared/policy';
 import { GitCommandError, isOid, isValidRefName, runGit, type GitRunOptions } from './executor';
 
 export type RefNamespace = 'heads' | 'tags' | 'notes' | 'pull' | 'merge-requests';

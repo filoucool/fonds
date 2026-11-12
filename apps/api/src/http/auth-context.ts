@@ -1,8 +1,8 @@
 import type { FastifyRequest } from 'fastify';
-import type { AccessTokenScope } from '@repo-archive/shared';
+import type { AccessTokenScope } from '@fonds/shared';
 import type { AuthService, SessionContext } from '../services/auth';
 
-export const SESSION_COOKIE = 'archiver_session';
+export const SESSION_COOKIE = 'fonds_session';
 
 export interface RequestAuth {
   kind: 'anonymous' | 'session' | 'token';

@@ -62,7 +62,7 @@ watch(id, () => {
 watch([repo, () => route.meta.title], () => {
   const name = repo.value?.displayName;
   const tab = typeof route.meta.title === 'string' ? route.meta.title : 'Repository';
-  document.title = name ? `${name} · ${tab} · Archiver` : `${tab} · Archiver`;
+  document.title = name ? `${name} · ${tab} · Fonds` : `${tab} · Fonds`;
 });
 </script>
 

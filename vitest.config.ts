@@ -15,10 +15,10 @@ export default defineConfig({
   ],
   resolve: {
     alias: [
-      { find: '@repo-archive/shared/policy', replacement: path.resolve('packages/shared/src/policy.ts') },
-      { find: '@repo-archive/shared', replacement: path.resolve('packages/shared/src/index.ts') },
-      { find: '@repo-archive/archive-format', replacement: path.resolve('packages/archive-format/src/index.ts') },
-      { find: '@repo-archive/git-exec', replacement: path.resolve('packages/git-exec/src/index.ts') },
+      { find: '@fonds/shared/policy', replacement: path.resolve('packages/shared/src/policy.ts') },
+      { find: '@fonds/shared', replacement: path.resolve('packages/shared/src/index.ts') },
+      { find: '@fonds/archive-format', replacement: path.resolve('packages/archive-format/src/index.ts') },
+      { find: '@fonds/git-exec', replacement: path.resolve('packages/git-exec/src/index.ts') },
     ],
   },
   test: {

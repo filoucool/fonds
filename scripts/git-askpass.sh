@@ -2,12 +2,12 @@
 prompt=$(printf '%s' "${1:-}" | tr '[:upper:]' '[:lower:]')
 case "$prompt" in
   *username*)
-    [ -n "${ARCHIVER_GIT_USERNAME:-}" ] || exit 1
-    printf '%s\n' "$ARCHIVER_GIT_USERNAME"
+    [ -n "${FONDS_GIT_USERNAME:-}" ] || exit 1
+    printf '%s\n' "$FONDS_GIT_USERNAME"
     ;;
   *password*)
-    [ -n "${ARCHIVER_GIT_TOKEN:-}" ] || exit 1
-    printf '%s\n' "$ARCHIVER_GIT_TOKEN"
+    [ -n "${FONDS_GIT_TOKEN:-}" ] || exit 1
+    printf '%s\n' "$FONDS_GIT_TOKEN"
     ;;
   *)
     exit 1

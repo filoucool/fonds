@@ -1,5 +1,5 @@
 {
-  "name": "@repo-archive/git-exec",
+  "name": "@fonds/git-exec",
   "version": "0.1.0",
   "private": true,
   "main": "./dist/index.js",
@@ -15,7 +15,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@repo-archive/shared": "workspace:*"
+    "@fonds/shared": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.2"

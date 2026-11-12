@@ -13,7 +13,7 @@ import type { NotificationService } from './notifications';
 import type { BackupService } from './backups';
 import type { SnapshotService } from './snapshots';
 import type { DependencyGraphService } from './dependency-graph';
-import { computeNextRun, isSchedule } from '@repo-archive/shared';
+import { computeNextRun, isSchedule } from '@fonds/shared';
 
 export class WorkerService {
   private stopped = false;

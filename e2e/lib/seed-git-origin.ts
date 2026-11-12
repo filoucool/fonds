@@ -7,7 +7,7 @@ import { pathToFileURL } from 'node:url';
 export const E2E_SEED_DISPLAY_NAME = 'E2E Seed Repository';
 
 export function createSeedGitOrigin(): { originPath: string; fileUrl: string } {
-  const originPath = mkdtempSync(path.join(tmpdir(), 'archiver-e2e-origin-'));
+  const originPath = mkdtempSync(path.join(tmpdir(), 'fonds-e2e-origin-'));
   commit(originPath, 'README.md', '# E2E fixture\n', 'init');
   mkdirSync(path.join(originPath, 'docs'), { recursive: true });
   writeFileSync(path.join(originPath, 'docs', 'note.txt'), 'extra\n');

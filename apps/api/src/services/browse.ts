@@ -1,9 +1,9 @@
 import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import path from 'node:path';
-import { resolveInside } from '@repo-archive/archive-format';
-import { isValidRefName, runGit } from '@repo-archive/git-exec';
-import type { CommitView, TreeEntry } from '@repo-archive/shared';
+import { resolveInside } from '@fonds/archive-format';
+import { isValidRefName, runGit } from '@fonds/git-exec';
+import type { CommitView, TreeEntry } from '@fonds/shared';
 import { HttpError } from '../errors';
 
 export function defaultGitRef(defaultBranch: string | null | undefined, requested?: string | null): string {

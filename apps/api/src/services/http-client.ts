@@ -4,7 +4,7 @@ import { request as httpsRequest } from 'node:https';
 import { mkdir, open, rename, rm } from 'node:fs/promises';
 import { lookup, type LookupAddress, type LookupOptions } from 'node:dns';
 import path from 'node:path';
-import { addressAllowed, assertRemotePermitted, type NetworkPolicy } from '@repo-archive/shared/policy';
+import { addressAllowed, assertRemotePermitted, type NetworkPolicy } from '@fonds/shared/policy';
 import { RateLimitError } from '../errors';
 
 export interface HttpResult {
@@ -187,7 +187,7 @@ export class NodeHttpClient implements ArchiveHttp {
         target,
         {
           method: input.method ?? 'GET',
-          headers: { 'user-agent': 'archiver/0.1', accept: 'application/json', ...(input.headers ?? {}) },
+          headers: { 'user-agent': 'fonds/0.1', accept: 'application/json', ...(input.headers ?? {}) },
           lookup: blockedLookup(input.policy),
           timeout: input.timeoutMs ?? 60_000,
         },
@@ -234,7 +234,7 @@ export class NodeHttpClient implements ArchiveHttp {
         target,
         {
           method: 'GET',
-          headers: { 'user-agent': 'archiver/0.1', ...(input.headers ?? {}) },
+          headers: { 'user-agent': 'fonds/0.1', ...(input.headers ?? {}) },
           lookup: blockedLookup(input.policy),
           timeout: input.timeoutMs ?? 60_000,
         },

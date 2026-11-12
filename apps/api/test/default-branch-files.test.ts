@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { syncBareRepository } from '@repo-archive/git-exec';
+import { syncBareRepository } from '@fonds/git-exec';
 import { defaultGitRef, listTree } from '../src/services/browse';
 
 const roots: string[] = [];
@@ -19,7 +19,7 @@ describe('default branch file listing', () => {
     expect(defaultGitRef('master', 'refs/heads/main')).toBe('refs/heads/main');
     expect(defaultGitRef(null, undefined)).toBe('HEAD');
 
-    const root = mkdtempSync(path.join(tmpdir(), 'archiver-master-'));
+    const root = mkdtempSync(path.join(tmpdir(), 'fonds-master-'));
     roots.push(root);
     const origin = path.join(root, 'origin');
     mkdirSync(origin);

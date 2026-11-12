@@ -56,7 +56,7 @@ onMounted(() => {
     </label>
     <label>
       Public base URL (for clone addresses)
-      <input v-model="publicBaseUrl" type="url" placeholder="https://archiver.example" :disabled="busy" />
+      <input v-model="publicBaseUrl" type="url" placeholder="https://fonds.example" :disabled="busy" />
     </label>
     <label class="row">
       <input v-model="indexing" type="checkbox" :disabled="busy" />

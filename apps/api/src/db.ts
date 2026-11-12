@@ -8,7 +8,7 @@ import {
   minimalProfile,
   standardProfile,
   type AppSettings,
-} from '@repo-archive/shared';
+} from '@fonds/shared';
 
 const MIGRATION = `
 CREATE TABLE storage_pools (
