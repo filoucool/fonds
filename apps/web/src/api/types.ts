@@ -283,6 +283,14 @@ export interface Collection {
   repositoryCount: number;
 }
 
+export interface StoragePathCandidate {
+  path: string;
+  label: string;
+  kind: string;
+  freeBytes: number;
+  totalBytes: number;
+}
+
 export interface Pool {
   id: string;
   name: string;
@@ -496,6 +504,7 @@ export interface RepositoryQuery {
   categoryId?: string;
   tagId?: string;
   collectionId?: string;
+  storagePoolId?: string;
   sort?: 'updated' | 'name' | 'size';
   includeDeleted?: boolean;
 }

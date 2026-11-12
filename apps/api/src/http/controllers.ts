@@ -66,6 +66,7 @@ export class ApiController {
       categoryId: query.categoryId ?? null,
       tagId: query.tagId ?? null,
       collectionId: query.collectionId ?? null,
+      storagePoolId: query.storagePoolId ?? null,
       sort: query.sort === 'name' || query.sort === 'size' ? query.sort : 'updated',
       includeDeleted: query.includeDeleted === 'true',
     });
@@ -463,6 +464,11 @@ export class ApiController {
   @Get('storage/pools')
   pools() {
     return { items: this.storage.list() };
+  }
+
+  @Get('storage/path-candidates')
+  storagePathCandidates() {
+    return { items: this.storage.pathCandidates() };
   }
 
   @Post('storage/pools')

@@ -30,6 +30,7 @@ import type {
   Pool,
   PoolCreate,
   PoolPatch,
+  StoragePathCandidate,
   RefsResponse,
   ReleaseItem,
   RepositoryDetail,
@@ -178,6 +179,7 @@ async function listRepositories(query: RepositoryQuery = {}): Promise<Page<Repos
       categoryId: query.categoryId,
       tagId: query.tagId,
       collectionId: query.collectionId,
+      storagePoolId: query.storagePoolId,
       sort: query.sort,
       includeDeleted: query.includeDeleted ? 'true' : undefined,
     })}`,
@@ -575,6 +577,13 @@ async function listPools(): Promise<Pool[]> {
   return expectList<Pool>(await request<unknown>('/api/storage/pools'), 'Storage pools');
 }
 
+async function listStoragePathCandidates(): Promise<StoragePathCandidate[]> {
+  return expectList<StoragePathCandidate>(
+    await request<unknown>('/api/storage/path-candidates'),
+    'Storage path candidates',
+  );
+}
+
 async function createPool(body: PoolCreate): Promise<Pool> {
   return request<Pool>('/api/storage/pools', { method: 'POST', body: JSON.stringify(body) });
 }
@@ -859,6 +868,7 @@ export const api = {
   cancelJob,
   retryJob,
   listPools,
+  listStoragePathCandidates,
   createPool,
   updatePool,
   migrateRepository,
