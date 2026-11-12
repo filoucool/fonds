@@ -18,7 +18,6 @@ For substantial design work, open an issue first.
 2. Install dependencies and run tests (see [README.md](README.md)).
 3. Keep commits focused; match existing code style (`pnpm lint`, `pnpm typecheck` when relevant).
 4. Open a pull request with a clear description and test notes.
-5. Use your own `git config user.name` and `user.email` (from [GitHub → Emails](https://github.com/settings/emails)) so commits attribute to your account.
 
 ## License
 
