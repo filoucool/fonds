@@ -19,6 +19,23 @@ For substantial design work, open an issue first.
 3. Keep commits focused; match existing code style (`pnpm lint`, `pnpm typecheck` when relevant).
 4. Open a pull request with a clear description and test notes.
 
+## Git commit identity
+
+Commits must attribute work to the **`filoucool`** GitHub account, not the legacy address `felix@users.noreply.github.com` (that maps to a different user).
+
+Allowed emails for human commits:
+
+- `25182703+filoucool@users.noreply.github.com`
+- `felix@nexumnet.com`
+
+Enable the repo pre-commit check (recommended):
+
+```bash
+./scripts/setup-git-hooks.sh
+```
+
+Do not override `GIT_AUTHOR_*` / `GIT_COMMITTER_*` unless you know which email you are using. Cursor agents should use plain `git commit` without identity env vars.
+
 ## License
 
 By contributing code, documentation, or other materials to this repository, you agree to license your contribution under the same terms as the project: the **GNU Affero General Public License v3.0 (AGPL-3.0)**. See [LICENSE](LICENSE).

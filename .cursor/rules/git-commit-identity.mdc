@@ -1,0 +1,25 @@
+---
+description: Git commit author identity — never attribute commits to the wrong GitHub user
+alwaysApply: true
+---
+
+# Git commit identity (filoucool only)
+
+Wrong commit email once attributed **Felix Hanley (`github.com/felix`)**, not the repo owner **`filoucool`**.
+
+## Never do this
+
+- Do **not** set `GIT_AUTHOR_*`, `GIT_COMMITTER_*`, or `git -c user.name` / `git -c user.email` on `git commit`, `git merge`, `git cherry-pick`, or `git am` unless the user **explicitly** gives identity values in the same message.
+- Do **not** use `felix@users.noreply.github.com` (legacy noreply → wrong GitHub account).
+- Do **not** use bare `*@users.noreply.github.com` without the owner id: use `25182703+filoucool@users.noreply.github.com`.
+
+## When committing
+
+- Prefer plain `git commit` so the developer’s configured `user.name` / `user.email` apply.
+- If you must set identity once, only these emails are allowed for human commits:
+  - `25182703+filoucool@users.noreply.github.com`
+  - `felix@nexumnet.com` (verified on `filoucool`)
+
+## If a commit fails the identity hook
+
+Fix the email; do not bypass hooks with `--no-verify` unless the user explicitly requests it.

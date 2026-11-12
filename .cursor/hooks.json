@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": ".cursor/hooks/block-wrong-git-identity.sh",
+        "matcher": "git\\s+(commit|merge|cherry-pick|am)|GIT_(AUTHOR|COMMITTER)_",
+        "failClosed": false
+      }
+    ]
+  }
+}
