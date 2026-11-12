@@ -10,6 +10,7 @@ The **archive directories on disk are the source of truth**. The SQLite catalog 
 
 - [Design goals](#design-goals)
 - [Features](#features)
+  - [Roadmap](#roadmap)
 - [Quick start (Docker)](#quick-start-docker)
 - [Run from a checkout](#run-from-a-checkout)
 - [Tests](#tests)
@@ -53,6 +54,28 @@ Bind to loopback or a trusted network unless you have configured authentication 
 - **Storage pools:** sharded archive layout, free-space thresholds, optional balancing.
 - **Phase 2 (in progress / optional):** search indexes, Git clone over HTTP/SSH, `fonds` CLI including offline rescue commands.
 - **Phase 3 (Preservation UI):** managed backups, snapshots, dependency discovery, and self-preservation reports (`/preservation`, `/api/phase3/*`).
+
+### Roadmap
+
+Planned enhancements (not yet implemented):
+
+- **Point-in-time restore:** republish or export a repository view from a chosen archival ref without discarding newer preserved objects.
+- **Bulk register & sync:** add many remotes at once (CSV, org URL, or token-scoped provider listing) with shared profile defaults.
+- **Bitbucket & Gitea/Forgejo profiles:** provider adapters alongside GitHub and GitLab for metadata and platform-specific refs where available.
+- **Stale upstream detection:** surface renamed, deleted, or inaccessible remotes with a guided relink flow.
+- **Submodule & nested-repo policy:** per-profile rules to archive submodule SHAs, shallow submodule clones, or skip with explicit `unsupported` status.
+- **Full source-text indexing:** capability-aware search (`metadata`, `filenames`, `source_text`) with disk budget and exclude globs.
+- **Global search UI:** search across repositories with filters for pool, provider, sync status, and integrity.
+- **In-browser blame & history:** commit history and blame for paths without leaving the archive UI.
+- **OIDC login & scoped API tokens:** external identity, session TTL, and tokens scoped to API vs Git fetch/push.
+- **Writable working copies:** sandboxes for allowed pushes that preserve fetch/publish separation and archival refs.
+- **Dependency graph & toolchain archive:** inventory runtime and build dependencies, relate them in a graph, and preserve the Fonds toolchain alongside user repos.
+- **`fonds rescue` offline toolkit:** verify, rebuild the catalog, and export from copied pool data with no server process.
+- **LFS integrity audit:** report missing pointers and orphaned LFS objects, with optional re-fetch when credentials still work.
+- **Job SLO dashboard:** queue depth, sync duration percentiles, failure rates, and lease timeouts over time.
+- **IP allowlists & mTLS:** network-level access control beyond OIDC for trusted LAN or edge deployment.
+- **Token rotation assistant:** track expiring provider credentials and warn before sync begins to fail.
+- **Preservation attestation pack:** one download with fsck summary, checksum coverage, image digest, dependency inventory, and an auditor-facing cover sheet.
 
 ## Quick start (Docker)
 
