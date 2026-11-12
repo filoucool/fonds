@@ -1,8 +1,15 @@
 {
-  "generatedAt": "2026-11-07T06:42:12.110Z",
+  "generatedAt": "2026-11-12T02:59:08.803Z",
   "applicationVersion": "0.1.0",
-  "node": "v22.23.4",
+  "node": "v24.20.0",
   "packages": [
+    {
+      "name": "@ampproject/remapping",
+      "version": "2.3.0",
+      "license": "Apache-2.0",
+      "repository": "https://github.com/ampproject/remapping",
+      "private": false
+    },
     {
       "name": "@babel/helper-string-parser",
       "version": "7.29.13",
@@ -29,6 +36,13 @@
       "version": "7.29.11",
       "license": "MIT",
       "repository": "https://github.com/babel/babel",
+      "private": false
+    },
+    {
+      "name": "@bcoe/v8-coverage",
+      "version": "1.0.2",
+      "license": "MIT",
+      "repository": "git://github.com/bcoe/v8-coverage",
       "private": false
     },
     {
@@ -123,6 +137,13 @@
       "private": false
     },
     {
+      "name": "@fastify/cookie",
+      "version": "11.1.5",
+      "license": "MIT",
+      "repository": "https://github.com/fastify/fastify-cookie",
+      "private": false
+    },
+    {
       "name": "@fastify/cors",
       "version": "11.3.0",
       "license": "MIT",
@@ -200,11 +221,39 @@
       "private": false
     },
     {
-      "name": "@fastify/static",
-      "version": "8.3.0",
-      "license": "MIT",
-      "repository": "https://github.com/fastify/fastify-static",
-      "private": false
+      "name": "@fonds/api",
+      "version": "0.1.0",
+      "license": null,
+      "repository": null,
+      "private": true
+    },
+    {
+      "name": "@fonds/archive-format",
+      "version": "0.1.0",
+      "license": null,
+      "repository": null,
+      "private": true
+    },
+    {
+      "name": "@fonds/git-exec",
+      "version": "0.1.0",
+      "license": null,
+      "repository": null,
+      "private": true
+    },
+    {
+      "name": "@fonds/shared",
+      "version": "0.1.0",
+      "license": null,
+      "repository": null,
+      "private": true
+    },
+    {
+      "name": "@fonds/web",
+      "version": "0.1.0",
+      "license": null,
+      "repository": null,
+      "private": true
     },
     {
       "name": "@fontsource/ibm-plex-mono",
@@ -264,9 +313,9 @@
     },
     {
       "name": "@isaacs/cliui",
-      "version": "9.0.0",
-      "license": "BlueOak-1.0.0",
-      "repository": "ssh://git@github.com:isaacs/cliui",
+      "version": "8.0.2",
+      "license": "ISC",
+      "repository": "yargs/cliui",
       "private": false
     },
     {
@@ -274,6 +323,13 @@
       "version": "1.1.0",
       "license": "BlueOak-1.0.0",
       "repository": null,
+      "private": false
+    },
+    {
+      "name": "@istanbuljs/schema",
+      "version": "0.1.6",
+      "license": "MIT",
+      "repository": "https://github.com/istanbuljs/schema",
       "private": false
     },
     {
@@ -354,39 +410,18 @@
       "private": false
     },
     {
-      "name": "@repo-archive/api",
-      "version": "0.1.0",
-      "license": null,
-      "repository": null,
-      "private": true
+      "name": "@pkgjs/parseargs",
+      "version": "0.11.0",
+      "license": "MIT",
+      "repository": "git@github.com:pkgjs/parseargs",
+      "private": false
     },
     {
-      "name": "@repo-archive/archive-format",
-      "version": "0.1.0",
-      "license": null,
-      "repository": null,
-      "private": true
-    },
-    {
-      "name": "@repo-archive/git-exec",
-      "version": "0.1.0",
-      "license": null,
-      "repository": null,
-      "private": true
-    },
-    {
-      "name": "@repo-archive/shared",
-      "version": "0.1.0",
-      "license": null,
-      "repository": null,
-      "private": true
-    },
-    {
-      "name": "@repo-archive/web",
-      "version": "0.1.0",
-      "license": null,
-      "repository": null,
-      "private": true
+      "name": "@playwright/test",
+      "version": "1.65.0",
+      "license": "Apache-2.0",
+      "repository": "https://github.com/microsoft/playwright",
+      "private": false
     },
     {
       "name": "@rolldown/pluginutils",
@@ -502,7 +537,21 @@
     },
     {
       "name": "@types/node",
+      "version": "18.19.130",
+      "license": "MIT",
+      "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+      "private": false
+    },
+    {
+      "name": "@types/node",
       "version": "22.20.5",
+      "license": "MIT",
+      "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+      "private": false
+    },
+    {
+      "name": "@types/ssh2",
+      "version": "1.15.6",
       "license": "MIT",
       "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
       "private": false
@@ -582,6 +631,13 @@
       "version": "5.2.4",
       "license": "MIT",
       "repository": "https://github.com/vitejs/vite-plugin-vue",
+      "private": false
+    },
+    {
+      "name": "@vitest/coverage-v8",
+      "version": "3.2.7",
+      "license": "MIT",
+      "repository": "https://github.com/vitest-dev/vitest",
       "private": false
     },
     {
@@ -788,6 +844,20 @@
       "private": false
     },
     {
+      "name": "ansi-regex",
+      "version": "5.0.1",
+      "license": "MIT",
+      "repository": "chalk/ansi-regex",
+      "private": false
+    },
+    {
+      "name": "ansi-regex",
+      "version": "6.6.0",
+      "license": "MIT",
+      "repository": "chalk/ansi-regex",
+      "private": false
+    },
+    {
       "name": "ansi-styles",
       "version": "4.3.0",
       "license": "MIT",
@@ -795,11 +865,11 @@
       "private": false
     },
     {
-      "name": "archiver",
-      "version": "0.1.0",
-      "license": null,
-      "repository": null,
-      "private": true
+      "name": "ansi-styles",
+      "version": "6.2.3",
+      "license": "MIT",
+      "repository": "chalk/ansi-styles",
+      "private": false
     },
     {
       "name": "argparse",
@@ -809,10 +879,24 @@
       "private": false
     },
     {
+      "name": "asn1",
+      "version": "0.2.6",
+      "license": "MIT",
+      "repository": "https://github.com/joyent/node-asn1",
+      "private": false
+    },
+    {
       "name": "assertion-error",
       "version": "2.0.1",
       "license": "MIT",
       "repository": "git@github.com:chaijs/assertion-error",
+      "private": false
+    },
+    {
+      "name": "ast-v8-to-istanbul",
+      "version": "0.3.12",
+      "license": "MIT",
+      "repository": "https://github.com/AriPerkkio/ast-v8-to-istanbul",
       "private": false
     },
     {
@@ -851,8 +935,22 @@
       "private": false
     },
     {
+      "name": "bcrypt-pbkdf",
+      "version": "1.0.2",
+      "license": "BSD-3-Clause",
+      "repository": "git://github.com/joyent/node-bcrypt-pbkdf",
+      "private": false
+    },
+    {
       "name": "better-sqlite3",
       "version": "11.10.0",
+      "license": "MIT",
+      "repository": "git://github.com/WiseLibs/better-sqlite3",
+      "private": false
+    },
+    {
+      "name": "better-sqlite3",
+      "version": "12.6.2",
       "license": "MIT",
       "repository": "git://github.com/WiseLibs/better-sqlite3",
       "private": false
@@ -897,6 +995,13 @@
       "version": "5.7.1",
       "license": "MIT",
       "repository": "git://github.com/feross/buffer",
+      "private": false
+    },
+    {
+      "name": "buildcheck",
+      "version": "0.0.7",
+      "license": null,
+      "repository": "http://github.com/mscdex/buildcheck",
       "private": false
     },
     {
@@ -964,13 +1069,6 @@
     },
     {
       "name": "content-disposition",
-      "version": "0.5.4",
-      "license": "MIT",
-      "repository": "jshttp/content-disposition",
-      "private": false
-    },
-    {
-      "name": "content-disposition",
       "version": "3.0.0",
       "license": "MIT",
       "repository": "jshttp/content-disposition",
@@ -988,6 +1086,13 @@
       "version": "2.0.2",
       "license": "MIT",
       "repository": "jshttp/cookie",
+      "private": false
+    },
+    {
+      "name": "cpu-features",
+      "version": "0.0.10",
+      "license": null,
+      "repository": "https://github.com/mscdex/cpu-features",
       "private": false
     },
     {
@@ -1065,6 +1170,27 @@
       "version": "2.1.2",
       "license": "Apache-2.0",
       "repository": "git://github.com/lovell/detect-libc",
+      "private": false
+    },
+    {
+      "name": "eastasianwidth",
+      "version": "0.2.0",
+      "license": "MIT",
+      "repository": "git://github.com/komagata/eastasianwidth",
+      "private": false
+    },
+    {
+      "name": "emoji-regex",
+      "version": "8.0.0",
+      "license": "MIT",
+      "repository": "https://github.com/mathiasbynens/emoji-regex",
+      "private": false
+    },
+    {
+      "name": "emoji-regex",
+      "version": "9.2.2",
+      "license": "MIT",
+      "repository": "https://github.com/mathiasbynens/emoji-regex",
       "private": false
     },
     {
@@ -1236,6 +1362,13 @@
       "private": false
     },
     {
+      "name": "fast-json-stringify",
+      "version": "7.3.4",
+      "license": "MIT",
+      "repository": "https://github.com/fastify/fast-json-stringify",
+      "private": false
+    },
+    {
       "name": "fast-levenshtein",
       "version": "2.0.6",
       "license": "MIT",
@@ -1279,7 +1412,7 @@
     },
     {
       "name": "fastify",
-      "version": "5.12.8",
+      "version": "5.12.6",
       "license": "MIT",
       "repository": "https://github.com/fastify/fastify",
       "private": false
@@ -1369,6 +1502,13 @@
       "private": false
     },
     {
+      "name": "fonds",
+      "version": "0.1.0",
+      "license": "AGPL-3.0-only",
+      "repository": null,
+      "private": true
+    },
+    {
       "name": "foreground-child",
       "version": "3.3.1",
       "license": "ISC",
@@ -1391,9 +1531,9 @@
     },
     {
       "name": "glob",
-      "version": "11.1.0",
-      "license": "BlueOak-1.0.0",
-      "repository": "git@github.com:isaacs/node-glob",
+      "version": "10.5.0",
+      "license": "ISC",
+      "repository": "git://github.com/isaacs/node-glob",
       "private": false
     },
     {
@@ -1429,6 +1569,13 @@
       "version": "1.2.0",
       "license": "MIT",
       "repository": "https://github.com/mathiasbynens/he",
+      "private": false
+    },
+    {
+      "name": "html-escaper",
+      "version": "2.0.2",
+      "license": "MIT",
+      "repository": "https://github.com/WebReflection/html-escaper",
       "private": false
     },
     {
@@ -1502,6 +1649,13 @@
       "private": false
     },
     {
+      "name": "is-fullwidth-code-point",
+      "version": "3.0.0",
+      "license": "MIT",
+      "repository": "sindresorhus/is-fullwidth-code-point",
+      "private": false
+    },
+    {
       "name": "is-glob",
       "version": "4.0.3",
       "license": "MIT",
@@ -1516,6 +1670,34 @@
       "private": false
     },
     {
+      "name": "istanbul-lib-coverage",
+      "version": "3.2.2",
+      "license": "BSD-3-Clause",
+      "repository": "ssh://git@github.com/istanbuljs/istanbuljs",
+      "private": false
+    },
+    {
+      "name": "istanbul-lib-report",
+      "version": "3.0.1",
+      "license": "BSD-3-Clause",
+      "repository": "ssh://git@github.com/istanbuljs/istanbuljs",
+      "private": false
+    },
+    {
+      "name": "istanbul-lib-source-maps",
+      "version": "5.0.6",
+      "license": "BSD-3-Clause",
+      "repository": "ssh://git@github.com/istanbuljs/istanbuljs",
+      "private": false
+    },
+    {
+      "name": "istanbul-reports",
+      "version": "3.2.0",
+      "license": "BSD-3-Clause",
+      "repository": "ssh://git@github.com/istanbuljs/istanbuljs",
+      "private": false
+    },
+    {
       "name": "iterare",
       "version": "1.2.1",
       "license": "ISC",
@@ -1524,9 +1706,16 @@
     },
     {
       "name": "jackspeak",
-      "version": "4.2.3",
+      "version": "3.4.3",
       "license": "BlueOak-1.0.0",
       "repository": "https://github.com/isaacs/jackspeak",
+      "private": false
+    },
+    {
+      "name": "js-tokens",
+      "version": "10.0.0",
+      "license": "MIT",
+      "repository": "lydell/js-tokens",
       "private": false
     },
     {
@@ -1643,6 +1832,13 @@
     },
     {
       "name": "lru-cache",
+      "version": "10.4.3",
+      "license": "ISC",
+      "repository": "git://github.com/isaacs/node-lru-cache",
+      "private": false
+    },
+    {
+      "name": "lru-cache",
       "version": "11.5.3",
       "license": "BlueOak-1.0.0",
       "repository": "ssh://git@github.com/isaacs/node-lru-cache",
@@ -1653,6 +1849,20 @@
       "version": "0.30.21",
       "license": "MIT",
       "repository": "https://github.com/Rich-Harris/magic-string",
+      "private": false
+    },
+    {
+      "name": "magicast",
+      "version": "0.3.5",
+      "license": "MIT",
+      "repository": "unjs/magicast",
+      "private": false
+    },
+    {
+      "name": "make-dir",
+      "version": "4.0.0",
+      "license": "MIT",
+      "repository": "sindresorhus/make-dir",
       "private": false
     },
     {
@@ -1730,6 +1940,13 @@
       "version": "0.4.1",
       "license": "MIT",
       "repository": "https://github.com/johnsoncodehk/muggle-string",
+      "private": false
+    },
+    {
+      "name": "nan",
+      "version": "2.30.0",
+      "license": "MIT",
+      "repository": "git://github.com/nodejs/nan",
       "private": false
     },
     {
@@ -1832,7 +2049,7 @@
     },
     {
       "name": "path-scurry",
-      "version": "2.0.2",
+      "version": "1.11.1",
       "license": "BlueOak-1.0.0",
       "repository": "https://github.com/isaacs/path-scurry",
       "private": false
@@ -1898,6 +2115,20 @@
       "version": "7.1.0",
       "license": "MIT",
       "repository": "ssh://git@github.com/pinojs/pino-std-serializers",
+      "private": false
+    },
+    {
+      "name": "playwright",
+      "version": "1.65.0",
+      "license": "Apache-2.0",
+      "repository": "https://github.com/microsoft/playwright",
+      "private": false
+    },
+    {
+      "name": "playwright-core",
+      "version": "1.65.0",
+      "license": "Apache-2.0",
+      "repository": "https://github.com/microsoft/playwright",
       "private": false
     },
     {
@@ -2062,6 +2293,13 @@
       "private": false
     },
     {
+      "name": "safer-buffer",
+      "version": "2.1.2",
+      "license": "MIT",
+      "repository": "https://github.com/ChALkeR/safer-buffer",
+      "private": false
+    },
+    {
       "name": "secure-json-parse",
       "version": "4.1.1",
       "license": "BSD-3-Clause",
@@ -2160,6 +2398,13 @@
       "private": false
     },
     {
+      "name": "ssh2",
+      "version": "1.17.0",
+      "license": null,
+      "repository": "http://github.com/mscdex/ssh2",
+      "private": false
+    },
+    {
       "name": "stackback",
       "version": "0.0.2",
       "license": "MIT",
@@ -2181,10 +2426,38 @@
       "private": false
     },
     {
+      "name": "string-width",
+      "version": "4.2.3",
+      "license": "MIT",
+      "repository": "sindresorhus/string-width",
+      "private": false
+    },
+    {
+      "name": "string-width",
+      "version": "5.1.2",
+      "license": "MIT",
+      "repository": "sindresorhus/string-width",
+      "private": false
+    },
+    {
       "name": "string_decoder",
       "version": "1.3.0",
       "license": "MIT",
       "repository": "git://github.com/nodejs/string_decoder",
+      "private": false
+    },
+    {
+      "name": "strip-ansi",
+      "version": "6.0.1",
+      "license": "MIT",
+      "repository": "chalk/strip-ansi",
+      "private": false
+    },
+    {
+      "name": "strip-ansi",
+      "version": "7.2.0",
+      "license": "MIT",
+      "repository": "chalk/strip-ansi",
       "private": false
     },
     {
@@ -2234,6 +2507,13 @@
       "version": "2.2.0",
       "license": "MIT",
       "repository": "https://github.com/mafintosh/tar-stream",
+      "private": false
+    },
+    {
+      "name": "test-exclude",
+      "version": "7.0.2",
+      "license": "ISC",
+      "repository": "https://github.com/istanbuljs/test-exclude",
       "private": false
     },
     {
@@ -2335,6 +2615,13 @@
       "private": false
     },
     {
+      "name": "tweetnacl",
+      "version": "0.14.5",
+      "license": "Unlicense",
+      "repository": "https://github.com/dchest/tweetnacl-js",
+      "private": false
+    },
+    {
       "name": "type-check",
       "version": "0.4.0",
       "license": "MIT",
@@ -2367,6 +2654,13 @@
       "version": "1.6.0",
       "license": "MIT",
       "repository": "sindresorhus/uint8array-extras",
+      "private": false
+    },
+    {
+      "name": "undici-types",
+      "version": "5.26.5",
+      "license": "MIT",
+      "repository": "https://github.com/nodejs/undici",
       "private": false
     },
     {
@@ -2441,7 +2735,7 @@
     },
     {
       "name": "vue-router",
-      "version": "4.6.4",
+      "version": "4.5.1",
       "license": "MIT",
       "repository": "https://github.com/vuejs/router",
       "private": false
@@ -2482,6 +2776,20 @@
       "private": false
     },
     {
+      "name": "wrap-ansi",
+      "version": "7.0.0",
+      "license": "MIT",
+      "repository": "chalk/wrap-ansi",
+      "private": false
+    },
+    {
+      "name": "wrap-ansi",
+      "version": "8.1.0",
+      "license": "MIT",
+      "repository": "chalk/wrap-ansi",
+      "private": false
+    },
+    {
       "name": "wrappy",
       "version": "1.0.2",
       "license": "ISC",
@@ -2505,7 +2813,7 @@
   ],
   "images": [
     {
-      "name": "archiver",
+      "name": "fonds",
       "dockerfile": "Dockerfile",
       "digest": null,
       "note": "Run scripts/record-image-digest.sh after docker build to fill the image digest."
@@ -2528,5 +2836,5 @@
       "url": "https://nodejs.org/"
     }
   ],
-  "contentSha256": "299bf1448d59d4f821551d97d75e31a46d4d1375fe3ac0ce64dcd2c08cb779fe"
+  "contentSha256": "459329b8f1bfab7d18931eeae167b5f45281ff7331bd28d79962e5f634f04e3d"
 }

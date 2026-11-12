@@ -9,7 +9,7 @@ import {
   type SearchCapability,
   type SearchIndexConfig,
   type SearchIndexStatus,
-} from '@repo-archive/shared';
+} from '@fonds/shared';
 import { asRow, nowIso, text } from '../rows';
 import type { CatalogService } from './catalog';
 import type { StorageService } from './storage';

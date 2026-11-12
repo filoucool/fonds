@@ -10,7 +10,7 @@ import {
   type ComponentKey,
   type ComponentState,
   type ProviderKind,
-} from '@repo-archive/shared';
+} from '@fonds/shared';
 import { atomicWriteFile } from './atomic';
 
 export interface ManifestComponent {

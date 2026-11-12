@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { UrlRejectedError } from '@repo-archive/shared';
+import { UrlRejectedError } from '@fonds/shared';
 
 export interface GitRunOptions {
   gitDir?: string;
@@ -195,8 +195,8 @@ function gitEnv(options: GitRunOptions): NodeJS.ProcessEnv {
   };
   if (options.auth) {
     env.GIT_ASKPASS = askpassPath();
-    env.ARCHIVER_GIT_USERNAME = options.auth.username;
-    env.ARCHIVER_GIT_TOKEN = options.auth.token;
+    env.FONDS_GIT_USERNAME = options.auth.username;
+    env.FONDS_GIT_TOKEN = options.auth.token;
   } else {
     env.GIT_ASKPASS = 'true';
   }
@@ -204,7 +204,7 @@ function gitEnv(options: GitRunOptions): NodeJS.ProcessEnv {
 }
 
 function askpassPath(): string {
-  return process.env.ARCHIVER_ASKPASS ?? '/usr/local/bin/archiver-askpass';
+  return process.env.FONDS_ASKPASS ?? '/usr/local/bin/fonds-askpass';
 }
 
 export function isOid(value: string): boolean {

@@ -3,8 +3,8 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { Body, Controller, Delete, Get, HttpCode, Inject, Param, Patch, Post, Put, Query, Res } from '@nestjs/common';
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import { isRecord, type ExportFormat } from '@repo-archive/shared';
-import { APP_VERSION } from '@repo-archive/shared';
+import { isRecord, type ExportFormat } from '@fonds/shared';
+import { APP_VERSION } from '@fonds/shared';
 import { MaintenanceService } from '../container';
 import { HttpError } from '../errors';
 import { APP_CONFIG } from './tokens';
@@ -66,6 +66,7 @@ export class ApiController {
       categoryId: query.categoryId ?? null,
       tagId: query.tagId ?? null,
       collectionId: query.collectionId ?? null,
+      storagePoolId: query.storagePoolId ?? null,
       sort: query.sort === 'name' || query.sort === 'size' ? query.sort : 'updated',
       includeDeleted: query.includeDeleted === 'true',
     });
@@ -189,8 +190,8 @@ export class ApiController {
     const repo = this.catalog.require(id);
     const located = this.storage.pathsFor(repo.storagePoolId, repo.id);
     const { readFile } = await import('node:fs/promises');
-    const { parseManifest } = await import('@repo-archive/archive-format');
-    const { parseJson } = await import('@repo-archive/shared');
+    const { parseManifest } = await import('@fonds/archive-format');
+    const { parseJson } = await import('@fonds/shared');
     try {
       const manifest = parseManifest(parseJson(await readFile(located.paths.manifest, 'utf8')));
       return {
@@ -463,6 +464,11 @@ export class ApiController {
   @Get('storage/pools')
   pools() {
     return { items: this.storage.list() };
+  }
+
+  @Get('storage/path-candidates')
+  storagePathCandidates() {
+    return { items: this.storage.pathCandidates() };
   }
 
   @Post('storage/pools')

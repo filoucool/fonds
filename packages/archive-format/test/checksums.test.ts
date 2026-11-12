@@ -15,7 +15,7 @@ afterEach(() => {
 // @suite pkg.archive-format.checksums
 describe('checksums', () => {
   it('writes checksums.json and verifies an unchanged tree', async () => {
-    const root = mkdtempSync(path.join(tmpdir(), 'archiver-cs-'));
+    const root = mkdtempSync(path.join(tmpdir(), 'fonds-cs-'));
     roots.push(root);
     mkdirSync(path.join(root, 'nested'), { recursive: true });
     writeFileSync(path.join(root, 'nested', 'a.txt'), 'alpha\n');
@@ -33,7 +33,7 @@ describe('checksums', () => {
   });
 
   it('collects posix-relative paths', async () => {
-    const root = mkdtempSync(path.join(tmpdir(), 'archiver-cs-'));
+    const root = mkdtempSync(path.join(tmpdir(), 'fonds-cs-'));
     roots.push(root);
     writeFileSync(path.join(root, 'root.txt'), 'x');
     const entries = await collectChecksums(root);

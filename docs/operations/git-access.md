@@ -4,7 +4,7 @@ Archives are **read-only**. Git smart HTTP and SSH serve clone/fetch only from `
 
 ## URLs
 
-Set **Settings → Access & Git → Public base URL** (for example `https://archiver.example` or `http://127.0.0.1:8080`).
+Set **Settings → Access & Git → Public base URL** (for example `https://fonds.example` or `http://127.0.0.1:8080`).
 
 | Purpose | HTTP | SSH |
 | --- | --- | --- |

@@ -1,7 +1,7 @@
 import { cp, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import type Database from 'better-sqlite3';
-import { runGit } from '@repo-archive/git-exec';
+import { runGit } from '@fonds/git-exec';
 import { HttpError } from '../errors';
 import { asRow, id, nowIso, text } from '../rows';
 

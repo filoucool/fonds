@@ -1,5 +1,5 @@
-import { COMPONENT_KEYS, isRecord, type ComponentKey, type ProviderKind } from '@repo-archive/shared';
-import type { NetworkPolicy } from '@repo-archive/shared/policy';
+import { COMPONENT_KEYS, isRecord, type ComponentKey, type ProviderKind } from '@fonds/shared';
+import type { NetworkPolicy } from '@fonds/shared/policy';
 import { RateLimitError } from '../errors';
 import { type ArchiveHttp, nextLink } from './http-client';
 

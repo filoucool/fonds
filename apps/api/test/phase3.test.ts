@@ -3,7 +3,7 @@ import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { finalizeBackupManifest, parseBackupManifest } from '@repo-archive/archive-format';
+import { finalizeBackupManifest, parseBackupManifest } from '@fonds/archive-format';
 import { loadConfig } from '../src/config';
 import { createContainer, type Container } from '../src/container';
 import { makeGitDirWritable } from '../src/services/archive-readonly';
@@ -122,7 +122,7 @@ describe('phase3 backups snapshots and dependencies', () => {
 });
 
 function open(): Container {
-  const root = mkdtempSync(path.join(tmpdir(), 'archiver-phase3-'));
+  const root = mkdtempSync(path.join(tmpdir(), 'fonds-phase3-'));
   roots.push(root);
   const config = loadConfig({
     DATA_DIR: root,

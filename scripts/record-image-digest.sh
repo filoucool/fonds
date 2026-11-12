@@ -1,6 +1,6 @@
 #!/bin/sh
 set -eu
-image="${1:-archiver:local}"
+image="${1:-fonds:local}"
 digest="$(docker image inspect "$image" --format '{{index .RepoDigests 0}}')"
 id="$(docker image inspect "$image" --format '{{.Id}}')"
 node --input-type=module -e "

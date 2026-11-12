@@ -1,5 +1,5 @@
 import type Database from 'better-sqlite3';
-import { isRecord } from '@repo-archive/shared';
+import { isRecord } from '@fonds/shared';
 import { id, nowIso } from '../rows';
 
 export class AuditService {

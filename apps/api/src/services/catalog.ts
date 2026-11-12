@@ -12,7 +12,7 @@ import {
   type ArchiveManifest,
   type ManifestArchivedRef,
   type ManifestRef,
-} from '@repo-archive/archive-format';
+} from '@fonds/archive-format';
 import {
   COMPONENT_KEYS,
   computeNextRun,
@@ -47,9 +47,9 @@ import {
   type SyncProfileView,
   type Tag,
   type TextRecord,
-} from '@repo-archive/shared';
-import { assertRemotePermitted, type NetworkPolicy } from '@repo-archive/shared/policy';
-import { UrlRejectedError } from '@repo-archive/shared';
+} from '@fonds/shared';
+import { assertRemotePermitted, type NetworkPolicy } from '@fonds/shared/policy';
+import { UrlRejectedError } from '@fonds/shared';
 import { HttpError } from '../errors';
 import { asRow, asRows, flag, id, integer, integerOrNull, jsonRecord, nowIso, text, textOrNull } from '../rows';
 import type { JobsService } from './jobs';
@@ -121,6 +121,7 @@ export class CatalogService {
              AND (? IS NULL OR category_id = ?)
              AND (? IS NULL OR id IN (SELECT repository_id FROM repository_tags WHERE tag_id = ?))
              AND (? IS NULL OR id IN (SELECT repository_id FROM collection_members WHERE collection_id = ?))
+             AND (? IS NULL OR storage_pool_id = ?)
              AND (? IS NULL OR display_name LIKE ? ESCAPE '!' OR canonical_url LIKE ? ESCAPE '!')
              AND ${comparison}
            ORDER BY ${order}
@@ -138,6 +139,8 @@ export class CatalogService {
           query.tagId ?? null,
           query.collectionId ?? null,
           query.collectionId ?? null,
+          query.storagePoolId ?? null,
+          query.storagePoolId ?? null,
           like,
           like,
           like,
@@ -1120,6 +1123,7 @@ export interface ListQuery {
   categoryId?: string | null;
   tagId?: string | null;
   collectionId?: string | null;
+  storagePoolId?: string | null;
   sort?: 'updated' | 'name' | 'size';
   includeDeleted?: boolean;
 }

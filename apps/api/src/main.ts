@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common';
 import type { FastifyReply } from 'fastify';
-import { isRecord, UrlRejectedError } from '@repo-archive/shared';
+import { isRecord, UrlRejectedError } from '@fonds/shared';
 import { loadConfig } from './config';
 import { createContainer } from './container';
 import { HttpError, StorageThresholdError } from './errors';
@@ -71,7 +71,7 @@ async function bootstrap(): Promise<void> {
     void shutdown();
   });
   await app.listen(config.port, config.host);
-  console.log(`Archiver listening on http://${config.host}:${config.port}`);
+  console.log(`Fonds listening on http://${config.host}:${config.port}`);
   if (config.host === '0.0.0.0') {
     console.log('The process is bound to all interfaces. Publish it only on a trusted network.');
   }

@@ -5,7 +5,7 @@ import { Server } from 'ssh2';
 import type { AuthService } from './auth';
 import type { GitAccessService } from './git-access';
 import type { SettingsService } from './settings';
-import { gitReceivePack, gitUploadPack } from '@repo-archive/git-exec';
+import { gitReceivePack, gitUploadPack } from '@fonds/git-exec';
 
 export class GitSshService {
   private server: Server | null = null;

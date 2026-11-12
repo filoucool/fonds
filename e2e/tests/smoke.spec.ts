@@ -48,7 +48,7 @@ test.describe('UI', () => {
     await page.goto('/dashboard');
     await expect(page.getByRole('heading', { name: 'Dashboard', level: 1 })).toBeVisible();
     await expect(page.getByRole('navigation', { name: 'Primary' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Archiver' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Fonds' })).toBeVisible();
 
     await page.getByRole('link', { name: 'Repositories' }).click();
     await expect(page).toHaveURL(/\/repositories/);
@@ -71,10 +71,10 @@ test.describe('UI', () => {
 
   test('search form talks to the API', async ({ page, request }) => {
     await page.goto('/search');
-    await page.getByPlaceholder('Repository name, path, or source text').fill('archiver');
+    await page.getByPlaceholder('Repository name, path, or source text').fill('fonds');
     await page.locator('form.filters').getByRole('button', { name: 'Search' }).click();
 
-    const viaApi = await request.get('/api/search?q=archiver&capabilities=metadata,filenames,source_text');
+    const viaApi = await request.get('/api/search?q=fonds&capabilities=metadata,filenames,source_text');
     expect(viaApi.ok()).toBeTruthy();
     await expect(page.getByRole('heading', { name: 'Search', level: 1 })).toBeVisible();
     await expect(page.locator('text=Index on disk')).toBeVisible();

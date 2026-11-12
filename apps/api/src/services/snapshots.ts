@@ -10,7 +10,7 @@ import {
   type RetentionPreviewItem,
   type SnapshotCause,
   type SnapshotManifestV1,
-} from '@repo-archive/shared';
+} from '@fonds/shared';
 import { HttpError } from '../errors';
 import { asRow, asRows, id, nowIso, text, textOrNull } from '../rows';
 import type { CatalogService } from './catalog';

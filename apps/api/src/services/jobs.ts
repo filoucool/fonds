@@ -1,5 +1,5 @@
 import type Database from 'better-sqlite3';
-import { isRecord, type JobState, type JobType } from '@repo-archive/shared';
+import { isRecord, type JobState, type JobType } from '@fonds/shared';
 import { HttpError } from '../errors';
 import { asRow, asRows, id, integer, integerOrNull, jsonRecord, nowIso, text, textOrNull } from '../rows';
 

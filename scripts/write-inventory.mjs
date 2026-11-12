@@ -59,7 +59,7 @@ const inventory = {
   packages: [...packages.values()].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : a.version < b.version ? -1 : 1)),
   images: [
     {
-      name: 'archiver',
+      name: 'fonds',
       dockerfile: 'Dockerfile',
       digest: null,
       note: 'Run scripts/record-image-digest.sh after docker build to fill the image digest.',

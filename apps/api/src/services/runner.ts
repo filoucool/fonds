@@ -1,14 +1,14 @@
 import { mkdir, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { atomicWriteFile, resolveInside, sanitizeFileName } from '@repo-archive/archive-format';
+import { atomicWriteFile, resolveInside, sanitizeFileName } from '@fonds/archive-format';
 import {
   COMPONENT_KEYS,
   matchesAnyExclusion,
   redact,
   type ComponentKey,
   type ComponentState,
-} from '@repo-archive/shared';
-import { GitCommandError, listLocalRefs, syncBareRepository, type RefNamespace } from '@repo-archive/git-exec';
+} from '@fonds/shared';
+import { GitCommandError, listLocalRefs, syncBareRepository, type RefNamespace } from '@fonds/git-exec';
 import { ComponentLimitError, JobInterrupted, RateLimitError, StorageThresholdError } from '../errors';
 import { nowIso } from '../rows';
 import { listTreeRecursive, readBlob } from './browse';
@@ -158,7 +158,7 @@ export class ArchiveRunner {
     repo: RepoRecord,
     provider: GitProvider,
     signal: AbortSignal,
-    paths: ReturnType<typeof import('@repo-archive/archive-format').archivePaths>,
+    paths: ReturnType<typeof import('@fonds/archive-format').archivePaths>,
   ): Promise<ComponentState | void> {
     const settings = this.settings.get();
     const profile = this.catalog.effectiveProfile(repo.id).config;

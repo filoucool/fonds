@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import type Database from 'better-sqlite3';
-import { APP_VERSION, type SelfPreservationReport } from '@repo-archive/shared';
+import { APP_VERSION, type SelfPreservationReport } from '@fonds/shared';
 import { HttpError } from '../errors';
 import { id, nowIso } from '../rows';
 import type { CatalogService } from './catalog';
@@ -52,7 +52,7 @@ export class SupplyChainService {
         bomFormat: 'CycloneDX',
         specVersion: '1.5',
         version: 1,
-        metadata: { timestamp: nowIso(), component: { name: 'archiver', version: APP_VERSION } },
+        metadata: { timestamp: nowIso(), component: { name: 'fonds', version: APP_VERSION } },
         components,
         dependencies: [],
       },

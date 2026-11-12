@@ -1,6 +1,6 @@
 # Upgrades and relocation
 
-The process listens on port 8080. The data volume is `/data` (`DATA_DIR`). The named Compose volume is `archiver-data`. Catalog backups, the SQLite file, and pool directories all live on that volume. Moving or replacing the volume is how the archive moves between disks. Recreating the container does not rewrite archive format v1 in place.
+The process listens on port 8080. The data volume is `/data` (`DATA_DIR`). The named Compose volume is `fonds-data`. Catalog backups, the SQLite file, and pool directories all live on that volume. Moving or replacing the volume is how the archive moves between disks. Recreating the container does not rewrite archive format v1 in place.
 
 ## Start and restart
 
@@ -12,13 +12,13 @@ docker compose up --build
 
 Compose publishes `127.0.0.1:8080:8080`. Inside the container network namespace, `HOST=0.0.0.0` so the process accepts connections on the container interface that Compose forwards. The host-side publish address stays loopback.
 
-The Compose restart policy is `unless-stopped`. Docker starts the container again after a daemon restart or a process crash. A container you stop stays stopped. The `archiver-data` volume persists across those restarts.
+The Compose restart policy is `unless-stopped`. Docker starts the container again after a daemon restart or a process crash. A container you stop stays stopped. The `fonds-data` volume persists across those restarts.
 
 Phase 1 has no user login. The API is unauthenticated. Do not publish `0.0.0.0:8080` on the host unless that host is on a trusted network. Details are in [Security model](../security/model.md).
 
 ## Volume ownership
 
-The entrypoint runs as root, chowns `/data`, and then the long-lived process runs as uid 10001 (`archiver`).
+The entrypoint runs as root, chowns `/data`, and then the long-lived process runs as uid 10001 (`fonds`).
 
 A named volume is handled by that chown. A bind mount of a host directory onto `/data` must be writable by uid 10001, or the entrypoint must be allowed to chown `/data`. A bind mount the process cannot write will fail catalog updates, job writes, and archive publishes.
 

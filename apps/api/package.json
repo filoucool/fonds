@@ -1,5 +1,5 @@
 {
-  "name": "@repo-archive/api",
+  "name": "@fonds/api",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,9 +13,9 @@
     "@nestjs/common": "^11.1.6",
     "@nestjs/core": "^11.1.6",
     "@nestjs/platform-fastify": "^11.1.6",
-    "@repo-archive/archive-format": "workspace:*",
-    "@repo-archive/git-exec": "workspace:*",
-    "@repo-archive/shared": "workspace:*",
+    "@fonds/archive-format": "workspace:*",
+    "@fonds/git-exec": "workspace:*",
+    "@fonds/shared": "workspace:*",
     "better-sqlite3": "^12.6.2",
     "fastify": "5.12.6",
     "reflect-metadata": "^0.2.2",

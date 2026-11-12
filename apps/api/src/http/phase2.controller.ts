@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Inject, Param, Patch, Post, Query, Req, Res } from '@nestjs/common';
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import { isRecord, SEARCH_CAPABILITIES, type SearchCapability } from '@repo-archive/shared';
+import { isRecord, SEARCH_CAPABILITIES, type SearchCapability } from '@fonds/shared';
 import { HttpError } from '../errors';
 import { AuditService } from '../services/audit';
 import { AuthService } from '../services/auth';

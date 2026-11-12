@@ -1,6 +1,6 @@
-import { isRecord } from '@repo-archive/shared';
+import { isRecord } from '@fonds/shared';
 
-export interface ArchiverClientOptions {
+export interface FondsClientOptions {
   baseUrl: string;
   token?: string;
 }
@@ -9,11 +9,11 @@ export interface V1Error {
   error: { code: string; message: string; details?: Record<string, unknown> };
 }
 
-export class ArchiverClient {
+export class FondsClient {
   private readonly baseUrl: string;
   private readonly headers: Record<string, string>;
 
-  constructor(options: ArchiverClientOptions) {
+  constructor(options: FondsClientOptions) {
     this.baseUrl = options.baseUrl.replace(/\/$/, '');
     this.headers = { accept: 'application/json' };
     if (options.token) this.headers.authorization = `Bearer ${options.token}`;

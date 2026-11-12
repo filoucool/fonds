@@ -1,7 +1,7 @@
 services:
-  archiver:
+  fonds:
     build: .
-    image: archiver:local
+    image: fonds:local
     ports:
       - "127.0.0.1:8080:8080"
       - "127.0.0.1:2222:2222"
@@ -10,8 +10,8 @@ services:
       PORT: "8080"
       DATA_DIR: /data
     volumes:
-      - archiver-data:/data
+      - fonds-data:/data
     restart: unless-stopped
 
 volumes:
-  archiver-data:
+  fonds-data:

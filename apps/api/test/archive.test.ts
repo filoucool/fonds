@@ -3,8 +3,8 @@ import { chmodSync, mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, w
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { verifyChecksums } from '@repo-archive/archive-format';
-import { standardProfile } from '@repo-archive/shared';
+import { verifyChecksums } from '@fonds/archive-format';
+import { standardProfile } from '@fonds/shared';
 import { loadConfig } from '../src/config';
 import { createContainer, type Container } from '../src/container';
 import { StorageThresholdError } from '../src/errors';
@@ -76,7 +76,7 @@ describe('catalog and preservation', () => {
     const release = path.join(root, 'releases', 'demo.txt');
     mkdirSync(path.dirname(release), { recursive: true });
     writeFileSync(release, 'asset-bytes');
-    const { writeChecksums } = await import('@repo-archive/archive-format');
+    const { writeChecksums } = await import('@fonds/archive-format');
     await writeChecksums(root, new Date().toISOString());
     const original = readFileSync(release);
     writeFileSync(release, 'tampered!!');
@@ -208,7 +208,7 @@ describe('catalog and preservation', () => {
 });
 
 function open(probe?: () => { freeBytes: number; totalBytes: number }): Container {
-  const root = mkdtempSync(path.join(tmpdir(), 'archiver-api-'));
+  const root = mkdtempSync(path.join(tmpdir(), 'fonds-api-'));
   roots.push(root);
   const config = loadConfig({
     DATA_DIR: root,

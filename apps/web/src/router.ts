@@ -4,7 +4,12 @@ import RepositoriesView from './views/RepositoriesView.vue';
 import ImportView from './views/ImportView.vue';
 import JobsView from './views/JobsView.vue';
 import JobDetailView from './views/JobDetailView.vue';
-import StorageView from './views/StorageView.vue';
+import StorageLayout from './views/storage/StorageLayout.vue';
+import StorageOverviewTab from './views/storage/StorageOverviewTab.vue';
+import StoragePoolsTab from './views/storage/StoragePoolsTab.vue';
+import PoolDetailView from './views/storage/PoolDetailView.vue';
+import StorageOperationsTab from './views/storage/StorageOperationsTab.vue';
+import StorageMaintenanceTab from './views/storage/StorageMaintenanceTab.vue';
 import SettingsView from './views/settings/SettingsView.vue';
 import InventoryView from './views/InventoryView.vue';
 import PreservationView from './views/PreservationView.vue';
@@ -92,7 +97,19 @@ const router = createRouter({
     { path: '/import', name: 'import', component: ImportView, meta: { title: 'Import' } },
     { path: '/jobs', name: 'jobs', component: JobsView, meta: { title: 'Jobs' } },
     { path: '/jobs/:id', name: 'job', component: JobDetailView, meta: { title: 'Job' } },
-    { path: '/storage', name: 'storage', component: StorageView, meta: { title: 'Storage' } },
+    {
+      path: '/storage',
+      component: StorageLayout,
+      meta: { title: 'Storage' },
+      children: [
+        { path: '', redirect: '/storage/overview' },
+        { path: 'overview', name: 'storage-overview', component: StorageOverviewTab, meta: { title: 'Storage' } },
+        { path: 'pools', name: 'storage-pools', component: StoragePoolsTab, meta: { title: 'Storage' } },
+        { path: 'pools/:poolId', name: 'storage-pool', component: PoolDetailView, meta: { title: 'Pool' } },
+        { path: 'operations', name: 'storage-operations', component: StorageOperationsTab, meta: { title: 'Storage' } },
+        { path: 'maintenance', name: 'storage-maintenance', component: StorageMaintenanceTab, meta: { title: 'Storage' } },
+      ],
+    },
     { path: '/settings', name: 'settings', component: SettingsView, meta: { title: 'Settings' } },
     { path: '/inventory', name: 'inventory', component: InventoryView, meta: { title: 'Inventory' } },
     { path: '/preservation', name: 'preservation', component: PreservationView, meta: { title: 'Preservation' } },
@@ -115,7 +132,7 @@ router.beforeEach(async (to) => {
 
 router.afterEach((to) => {
   const title = typeof to.meta.title === 'string' ? to.meta.title : '';
-  document.title = title ? `${title} · Archiver` : 'Archiver';
+  document.title = title ? `${title} · Fonds` : 'Fonds';
 });
 
 export default router;

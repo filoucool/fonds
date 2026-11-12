@@ -14,7 +14,7 @@ describe('phase2 security primitives', () => {
   });
 
   it('toggles archive git directory permissions for sync vs serve', () => {
-    const root = mkdtempSync(path.join(tmpdir(), 'archiver-ro-'));
+    const root = mkdtempSync(path.join(tmpdir(), 'fonds-ro-'));
     const gitDir = path.join(root, 'repository.git');
     mkdirSync(gitDir, { recursive: true });
     const file = path.join(gitDir, 'FETCH_HEAD');
