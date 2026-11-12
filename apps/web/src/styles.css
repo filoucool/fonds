@@ -200,9 +200,9 @@
 :root {
   --on-surface: var(--text);
   --muted-on-surface: var(--muted);
-  --sans: 'IBM Plex Sans', 'Segoe UI', sans-serif;
-  --serif: 'Newsreader', 'Iowan Old Style', Palatino, serif;
-  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --sans: system-ui, 'Segoe UI', sans-serif;
+  --serif: ui-serif, 'Iowan Old Style', Palatino, Georgia, serif;
+  --mono: ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', monospace;
   --nav: 220px;
 }
 
