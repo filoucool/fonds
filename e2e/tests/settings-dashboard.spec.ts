@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 // @suite ui.flow.settings-save
 test('dashboard widget preference persists after reload', async ({ page }) => {
-  await page.goto('/dashboard');
+  await page.goto('/settings#dashboard');
   const widgets = page.getByRole('group', { name: 'Widgets' });
   const events = widgets.getByText('Events', { exact: true });
   await expect(events).toBeVisible();
