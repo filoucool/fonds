@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# Fail if any commit in RANGE uses author/committer emails that map to the wrong GitHub user.
+# Fail if any commit in RANGE uses legacy unscoped GitHub noreply author emails.
 set -euo pipefail
-
-FORBIDDEN='felix@users.noreply.github.com'
 
 if [ "${GITHUB_EVENT_NAME:-}" = pull_request ]; then
   base=""
@@ -33,17 +31,17 @@ fi
 
 failed=0
 
+is_legacy_github_noreply() {
+  local email="$1"
+  [[ "$email" == *@users.noreply.github.com ]] && [[ "$email" != *+*@users.noreply.github.com ]]
+}
+
 check_email() {
   local sha="$1"
   local role="$2"
   local email="$3"
-  if [ "$email" = "$FORBIDDEN" ]; then
-    echo "Commit ${sha:0:7}: ${role} ${email} is forbidden (wrong GitHub contributor)." >&2
-    failed=1
-    return
-  fi
-  if [[ "$email" == *@users.noreply.github.com ]] && [[ "$email" != *"+filoucool@"* ]] && [[ "$email" != *"dependabot"* ]]; then
-    echo "Commit ${sha:0:7}: ${role} ${email} — use 25182703+filoucool@users.noreply.github.com." >&2
+  if is_legacy_github_noreply "$email"; then
+    echo "Commit ${sha:0:7}: ${role} ${email} uses legacy unscoped GitHub noreply." >&2
     failed=1
   fi
 }

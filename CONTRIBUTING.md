@@ -21,20 +21,11 @@ For substantial design work, open an issue first.
 
 ## Git commit identity
 
-Commits must attribute work to the **`filoucool`** GitHub account, not the legacy address `felix@users.noreply.github.com` (that maps to a different user).
+Commits are attributed to **whoever is in your local git config** (`user.name` / `user.email`). Nothing in this repo rewrites your name to the maintainer’s.
 
-Allowed emails for human commits:
+Hooks only **reject** the old GitHub format `you@users.noreply.github.com` (no `id+` prefix), which can map to the wrong GitHub user. Use an address from [GitHub → Emails](https://github.com/settings/emails), e.g. `12345678+yourlogin@users.noreply.github.com`.
 
-- `25182703+filoucool@users.noreply.github.com`
-- `felix@nexumnet.com`
-
-Hooks are installed when you run `pnpm install` (`core.hooksPath` → `.githooks`). To enable them on an existing clone without reinstalling:
-
-```bash
-./scripts/setup-git-hooks.sh
-```
-
-Use your normal `git config user.email` / `user.name`; do not override `GIT_AUTHOR_*` / `GIT_COMMITTER_*` with unscoped `@users.noreply.github.com` addresses.
+`pnpm install` runs `scripts/setup-git-hooks.sh` when `.git` is present. To wire hooks on an existing clone: `./scripts/setup-git-hooks.sh`.
 
 ## License
 

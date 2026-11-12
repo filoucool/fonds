@@ -1,26 +1,25 @@
 #!/usr/bin/env bash
-# Reject commits that would attribute work to github.com/felix (wrong noreply).
+# Block legacy unscoped GitHub noreply (e.g. felix@users.noreply.github.com → wrong account).
 set -euo pipefail
 
 author_email="${GIT_AUTHOR_EMAIL:-$(git config --get user.email || true)}"
 committer_email="${GIT_COMMITTER_EMAIL:-$(git config --get user.email || true)}"
 
-forbidden='felix@users.noreply.github.com'
+is_legacy_github_noreply() {
+  local email="$1"
+  [[ "$email" == *@users.noreply.github.com ]] && [[ "$email" != *+*@users.noreply.github.com ]]
+}
 
 check_email() {
   local label="$1"
   local email="$2"
   if [ -z "$email" ]; then
-    echo "pre-commit: no $label email (set git user.email or fix GIT_*_EMAIL)" >&2
+    echo "pre-commit: no $label email (set git user.name and user.email for this repo)" >&2
     exit 1
   fi
-  if [ "$email" = "$forbidden" ]; then
-    echo "pre-commit: blocked $label email $email (maps to wrong GitHub user github.com/felix)." >&2
-    echo "Use 25182703+filoucool@users.noreply.github.com or felix@nexumnet.com." >&2
-    exit 1
-  fi
-  if [[ "$email" == *@users.noreply.github.com ]] && [[ "$email" != *"+filoucool@"* ]] && [[ "$email" != *"dependabot"* ]]; then
-    echo "pre-commit: blocked $label email $email (unscoped GitHub noreply — use 25182703+filoucool@...)." >&2
+  if is_legacy_github_noreply "$email"; then
+    echo "pre-commit: blocked $label email $email (legacy unscoped GitHub noreply)." >&2
+    echo "Use your GitHub email from https://github.com/settings/emails (e.g. 123456+you@users.noreply.github.com)." >&2
     exit 1
   fi
 }
