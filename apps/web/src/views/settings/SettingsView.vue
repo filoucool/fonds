@@ -11,6 +11,7 @@ import QueuePanel from './QueuePanel.vue';
 import SyncProfilesPanel from './SyncProfilesPanel.vue';
 import TagsPanel from './TagsPanel.vue';
 import AccessPanel from './AccessPanel.vue';
+import DashboardWidgetsPanel from './DashboardWidgetsPanel.vue';
 import GitAccessCredentialsPanel from './GitAccessCredentialsPanel.vue';
 </script>
 
@@ -21,6 +22,7 @@ import GitAccessCredentialsPanel from './GitAccessCredentialsPanel.vue';
   />
   <nav class="subnav" aria-label="Settings sections">
     <a href="#appearance">Appearance</a>
+    <a href="#dashboard">Dashboard</a>
     <a href="#profiles">Archival profiles</a>
     <a href="#sync">Sync profiles</a>
     <a href="#credentials">Credentials</a>
@@ -36,6 +38,7 @@ import GitAccessCredentialsPanel from './GitAccessCredentialsPanel.vue';
   </nav>
   <div class="stack">
     <AppearancePanel />
+    <DashboardWidgetsPanel />
     <ArchivalProfilesPanel />
     <SyncProfilesPanel />
     <CredentialsPanel />

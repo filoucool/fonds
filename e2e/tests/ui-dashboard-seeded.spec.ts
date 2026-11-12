@@ -22,8 +22,8 @@ test.describe('dashboard with seeded data', () => {
     expect(count).toBeGreaterThanOrEqual(1);
   });
 
-  test('widget toggles are present', async ({ page }) => {
-    await page.goto('/dashboard');
+  test('widget toggles are on settings', async ({ page }) => {
+    await page.goto('/settings#dashboard');
     const widgets = page.getByRole('group', { name: 'Widgets' });
     await expect(widgets).toBeVisible();
     await expect(widgets.getByText('Status', { exact: true })).toBeVisible();
