@@ -9,8 +9,8 @@ Track implementation in [`manifest.json`](./manifest.json). Status legend: **don
 | Packages | 3 | — | archive-format, cli, api-client, most of shared |
 | API integration | 7 | — | per-route HTTP, git-http, auth CSRF |
 | API readonly GET | — | 4 specs | repo-scoped GETs need seeded archive |
-| UI navigation | — | 4 specs | seeded repo tab content |
-| UI workflows | — | 3 specs | import→job, settings save, export |
+| UI navigation | — | 13+ specs | login, settings PATCH flows |
+| UI workflows | — | 9 `ui-*.spec.ts` | second import via UI, classification save |
 
 ---
 

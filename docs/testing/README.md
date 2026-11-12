@@ -34,7 +34,10 @@ E2E uses a **setup project** (`e2e/tests/archive.setup.ts`) that archives a loca
 pnpm typecheck && pnpm test
 pnpm build && pnpm --filter @repo-archive/e2e test
 pnpm test:manifest
+pnpm test:coverage && pnpm coverage:audit
 ```
+
+See **[coverage-audit.md](./coverage-audit.md)** for the 95% release gate and gap analysis.
 
 ## CI today
 

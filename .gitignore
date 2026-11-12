@@ -4,6 +4,7 @@ dist
 .DS_Store
 data
 coverage
+docs/testing/coverage-report.json
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm

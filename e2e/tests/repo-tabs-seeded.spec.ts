@@ -87,6 +87,7 @@ const TAB_EXPECTATIONS: TabExpectation[] = [
     },
   },
   {
+    // @suite ui.flow.search-index
     tab: 'search-index',
     assert: async (page) => {
       await expect(page.getByRole('heading', { name: 'Search index', level: 2 })).toBeVisible();
@@ -94,6 +95,7 @@ const TAB_EXPECTATIONS: TabExpectation[] = [
     },
   },
   {
+    // @suite ui.flow.snapshots
     tab: 'snapshots',
     assert: async (page) => {
       await expect(page.getByText(/no snapshots yet/i)).toBeVisible();
