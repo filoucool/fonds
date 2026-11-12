@@ -8,10 +8,11 @@ test('settings exposes every configuration panel', async ({ page }) => {
   await expect(page.getByRole('navigation', { name: 'Settings sections' })).toBeVisible();
 
   for (const section of SETTINGS_SECTIONS) {
-    if (typeof section === 'string') {
-      await expect(page.getByRole('heading', { name: section, exact: true })).toBeVisible();
-    } else {
+    await page.goto(`/settings#${section.hash}`);
+    if ('pattern' in section && section.pattern) {
       await expect(page.getByRole('heading', { name: section.pattern })).toBeVisible();
+    } else {
+      await expect(page.getByRole('heading', { name: section.heading, exact: true })).toBeVisible();
     }
   }
 });

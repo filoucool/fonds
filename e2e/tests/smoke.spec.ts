@@ -81,7 +81,7 @@ test.describe('UI', () => {
   });
 
   test('settings access section is reachable', async ({ page }) => {
-    await page.goto('/settings');
+    await page.goto('/settings#access');
     await expect(page.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible();
     await expect(page.getByRole('heading', { name: /Access, Git/i })).toBeVisible();
   });

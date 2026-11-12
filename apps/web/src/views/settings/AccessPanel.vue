@@ -39,7 +39,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section id="access" class="panel stack">
+  <section id="access" class="stack">
     <h2>Access, Git &amp; search</h2>
     <p class="muted">
       Authentication defaults to trusted LAN (no login). Enable local auth via API bootstrap before switching mode.
