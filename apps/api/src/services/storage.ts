@@ -1,5 +1,5 @@
 import { cp, mkdir, rm, stat } from 'node:fs/promises';
-import { statfsSync } from 'node:fs';
+import { existsSync, statfsSync } from 'node:fs';
 import path from 'node:path';
 import type Database from 'better-sqlite3';
 import { archivePaths, archiveRelativePath } from '@fonds/archive-format';
@@ -8,6 +8,12 @@ import { HttpError, StorageThresholdError } from '../errors';
 import { asRow, asRows, flag, id, integer, nowIso, text } from '../rows';
 import type { SettingsService } from './settings';
 import { makeGitDirWritable } from './archive-readonly';
+import {
+  listDataDirChildren,
+  mountPointsUnderAnchors,
+  storageRootsFromEnv,
+  type StoragePathCandidate,
+} from './storage-paths';
 
 export interface SpaceInfo {
   freeBytes: number;
@@ -41,10 +47,56 @@ export class StorageService {
     private readonly sqlite: Database.Database,
     private readonly settings: SettingsService,
     private readonly probe: SpaceProbe = statfsProbe,
+    private readonly dataDir?: string,
   ) {}
 
   list(): StoragePoolView[] {
     return this.pools().map((pool) => this.view(pool));
+  }
+
+  pathCandidates(): StoragePathCandidate[] {
+    const seen = new Set<string>();
+    const out: StoragePathCandidate[] = [];
+    const add = (dir: string, label: string, kind: StoragePathCandidate['kind']) => {
+      const resolved = path.resolve(dir);
+      if (seen.has(resolved)) return;
+      if (!existsSync(resolved)) return;
+      let space: SpaceInfo;
+      try {
+        space = this.probe(resolved);
+      } catch {
+        return;
+      }
+      seen.add(resolved);
+      out.push({ path: resolved, label, kind, freeBytes: space.freeBytes, totalBytes: space.totalBytes });
+    };
+
+    const anchors: string[] = [];
+    if (this.dataDir) {
+      const dataRoot = path.resolve(this.dataDir);
+      anchors.push(dataRoot);
+      add(dataRoot, 'Data directory', 'data-dir');
+      for (const child of listDataDirChildren(dataRoot, (dir) => this.probe(dir))) {
+        if (seen.has(child.path)) continue;
+        seen.add(child.path);
+        out.push(child);
+      }
+    }
+
+    for (const root of storageRootsFromEnv()) {
+      anchors.push(root);
+      add(root, path.basename(root) || root, 'configured');
+    }
+
+    for (const pool of this.pools()) {
+      add(pool.rootPath, `Pool: ${pool.name}`, 'configured');
+    }
+
+    for (const mount of mountPointsUnderAnchors(anchors)) {
+      add(mount.path, mount.label, 'mount');
+    }
+
+    return out.sort((a, b) => a.path.localeCompare(b.path));
   }
 
   get(poolId: string): PoolRecord {

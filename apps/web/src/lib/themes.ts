@@ -8,12 +8,6 @@ export const THEMES = [
     scheme: 'dark',
   },
   {
-    id: 'noctua',
-    name: 'Noctua',
-    description: 'Beige field and brown frame, the two fan colors.',
-    scheme: 'light',
-  },
-  {
     id: 'card-catalog',
     name: 'Card catalog',
     description: 'Aged paper, oak drawers, and oxblood ink.',
@@ -35,6 +29,30 @@ export const THEMES = [
     id: 'blue-buckram',
     name: 'Blue buckram',
     description: 'Faded library cloth and dull gilt.',
+    scheme: 'dark',
+  },
+  {
+    id: 'manuscript',
+    name: 'Manuscript',
+    description: 'Yellowed vellum and iron-gall brown.',
+    scheme: 'light',
+  },
+  {
+    id: 'coal-gas',
+    name: 'Coal gas',
+    description: 'Sooty stacks under a hissing mantle lamp.',
+    scheme: 'dark',
+  },
+  {
+    id: 'ledger',
+    name: 'Ledger',
+    description: 'Ruled ledger paper and blue-black ink.',
+    scheme: 'light',
+  },
+  {
+    id: 'wax-seal',
+    name: 'Wax seal',
+    description: 'Dark mahogany desk and dull sealing wax.',
     scheme: 'dark',
   },
 ] as const;

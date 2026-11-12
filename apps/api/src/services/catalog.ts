@@ -121,6 +121,7 @@ export class CatalogService {
              AND (? IS NULL OR category_id = ?)
              AND (? IS NULL OR id IN (SELECT repository_id FROM repository_tags WHERE tag_id = ?))
              AND (? IS NULL OR id IN (SELECT repository_id FROM collection_members WHERE collection_id = ?))
+             AND (? IS NULL OR storage_pool_id = ?)
              AND (? IS NULL OR display_name LIKE ? ESCAPE '!' OR canonical_url LIKE ? ESCAPE '!')
              AND ${comparison}
            ORDER BY ${order}
@@ -138,6 +139,8 @@ export class CatalogService {
           query.tagId ?? null,
           query.collectionId ?? null,
           query.collectionId ?? null,
+          query.storagePoolId ?? null,
+          query.storagePoolId ?? null,
           like,
           like,
           like,
@@ -1120,6 +1123,7 @@ export interface ListQuery {
   categoryId?: string | null;
   tagId?: string | null;
   collectionId?: string | null;
+  storagePoolId?: string | null;
   sort?: 'updated' | 'name' | 'size';
   includeDeleted?: boolean;
 }

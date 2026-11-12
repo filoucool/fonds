@@ -72,7 +72,7 @@ export function createContainer(config: AppConfig, probe?: SpaceProbe): Containe
   const sqlite = openDatabase(config.catalogPath);
   seedDatabase(sqlite, config.dataDir);
   const settings = new SettingsService(sqlite);
-  const storage = new StorageService(sqlite, settings, probe);
+  const storage = new StorageService(sqlite, settings, probe, config.dataDir);
   const jobs = new JobsService(sqlite);
   const catalog = new CatalogService(sqlite, settings, storage, jobs);
   const http = new NodeHttpClient();
