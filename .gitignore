@@ -1,5 +1,9 @@
 node_modules
 dist
+# Accidental tsc emit into package src/ (build output belongs in dist/)
+packages/*/src/*.js
+packages/*/src/*.d.ts
+packages/*/src/*.js.map
 *.tsbuildinfo
 .DS_Store
 data
