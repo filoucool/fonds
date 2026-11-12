@@ -71,6 +71,11 @@ Planned enhancements (not yet implemented):
 - **Writable working copies:** sandboxes for allowed pushes that preserve fetch/publish separation and archival refs.
 - **Dependency graph & toolchain archive:** inventory runtime and build dependencies, relate them in a graph, and preserve the Fonds toolchain alongside user repos.
 - **`fonds rescue` offline toolkit:** verify, rebuild the catalog, and export from copied pool data with no server process.
+- **LFS integrity audit:** report missing pointers and orphaned LFS objects, with optional re-fetch when credentials still work.
+- **Job SLO dashboard:** queue depth, sync duration percentiles, failure rates, and lease timeouts over time.
+- **IP allowlists & mTLS:** network-level access control beyond OIDC for trusted LAN or edge deployment.
+- **Token rotation assistant:** track expiring provider credentials and warn before sync begins to fail.
+- **Preservation attestation pack:** one download with fsck summary, checksum coverage, image digest, dependency inventory, and an auditor-facing cover sheet.
 
 ## Quick start (Docker)
 
