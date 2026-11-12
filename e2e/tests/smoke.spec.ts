@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
 
+// @suite api.get.health
+// @suite api.get.dashboard
+// @suite api.get.phase2
 test.describe('API', () => {
   test('health responds', async ({ request }) => {
     const response = await request.get('/api/health');
@@ -37,6 +40,9 @@ test.describe('API', () => {
   });
 });
 
+// @suite ui.shell.nav
+// @suite ui.dashboard.data
+// @suite ui.search.form
 test.describe('UI', () => {
   test('shell loads and primary navigation works', async ({ page }) => {
     await page.goto('/dashboard');

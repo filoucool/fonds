@@ -22,11 +22,20 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list'], ['html', { open: 'never' }]],
   outputDir: './test-results',
+  timeout: 60_000,
   use: {
     baseURL,
     trace: 'on-first-retry',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    { name: 'setup', testMatch: /.*\.setup\.ts/ },
+    {
+      name: 'chromium',
+      testIgnore: /.*\.setup\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+      dependencies: ['setup'],
+    },
+  ],
   webServer: serverReady
     ? {
         command: `node ${apiEntry}`,
@@ -37,11 +46,11 @@ export default defineConfig({
           HOST: '127.0.0.1',
           PORT: port,
           WEB_DIST: path.join(repoRoot, 'apps/web/dist'),
-          WORKER_ENABLED: 'false',
+          WORKER_ENABLED: 'true',
         },
         url: `${baseURL}/api/health`,
         reuseExistingServer: !process.env.CI,
-        timeout: 120_000,
+        timeout: 180_000,
       }
     : undefined,
 });

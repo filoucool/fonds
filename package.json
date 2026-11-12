@@ -18,6 +18,7 @@
     "typecheck": "pnpm build:packages && pnpm -r --if-present typecheck",
     "test": "vitest run",
     "test:e2e": "pnpm build && pnpm --filter @repo-archive/e2e exec playwright install chromium && pnpm --filter @repo-archive/e2e test",
+    "test:manifest": "node scripts/check-test-manifest.mjs",
     "lint": "eslint .",
     "dev:api": "pnpm --filter @repo-archive/api dev",
     "dev:web": "pnpm --filter @repo-archive/web dev",
