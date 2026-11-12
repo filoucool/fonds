@@ -16,7 +16,6 @@ The **archive directories on disk are the source of truth**. The SQLite catalog 
 - [Run from a checkout](#run-from-a-checkout)
 - [Tests](#tests)
 - [Documentation](#documentation)
-- [Roadmap](#roadmap)
 - [Operations](#operations)
 - [Contributing](#contributing)
 - [License](#license)
@@ -148,18 +147,6 @@ Preservation scenarios use local Git repositories, destructive upstream actions,
 | Upgrades and disk moves | [docs/operations/upgrades-and-relocation.md](docs/operations/upgrades-and-relocation.md) |
 | Security model | [docs/security/model.md](docs/security/model.md) |
 | Testing | [docs/testing/README.md](docs/testing/README.md) |
-
----
-
-## Roadmap
-
-| Phase | Focus |
-| --- | --- |
-| **1** | Archive core: preservation ref model, jobs, pools, export/import, catalog rebuild. |
-| **2** | Access and tooling: search, HTTP/SSH Git, auth, `/api/v1`, `fonds` CLI. |
-| **3** | **Self-preservation:** backups, snapshots, dependency graph, recursive dependency archiving, preservation UI. |
-
-Phase 1 acceptance criteria (preservation under force-push, offline archive read, export without catalog, and more) are summarized in the architecture doc.
 
 ---
 
