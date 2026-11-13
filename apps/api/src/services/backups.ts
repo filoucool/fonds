@@ -20,7 +20,7 @@ import type { JobsService } from './jobs';
 import type { NotificationService } from './notifications';
 import type { SettingsService } from './settings';
 import type { StorageService } from './storage';
-import { assertBackupComplete, sha256File, uploadBackupTree, verifyBackupTree, writeCompleteMarker } from './backup-transfer';
+import { sha256File, uploadBackupTree, verifyBackupTree, writeCompleteMarker } from './backup-transfer';
 
 export class BackupService {
   constructor(

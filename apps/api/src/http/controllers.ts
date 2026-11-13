@@ -1,8 +1,8 @@
-import { createReadStream, readFileSync } from 'node:fs';
+import { createReadStream } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { Body, Controller, Delete, Get, HttpCode, Inject, Param, Patch, Post, Put, Query, Res } from '@nestjs/common';
-import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { FastifyReply } from 'fastify';
 import { isRecord, type ExportFormat } from '@fonds/shared';
 import { APP_VERSION } from '@fonds/shared';
 import { MaintenanceService } from '../container';

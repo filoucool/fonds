@@ -155,6 +155,7 @@ Preservation scenarios use local Git repositories, destructive upstream actions,
 | Backup and recovery | [docs/operations/backup-recovery.md](docs/operations/backup-recovery.md) |
 | Upgrades and disk moves | [docs/operations/upgrades-and-relocation.md](docs/operations/upgrades-and-relocation.md) |
 | Security model | [docs/security/model.md](docs/security/model.md) |
+| Reporting vulnerabilities | [SECURITY.md](SECURITY.md) |
 | Testing | [docs/testing/README.md](docs/testing/README.md) |
 
 ## Operations

@@ -4,13 +4,14 @@ import { api, errorMessage } from '../../api/client';
 
 const busy = ref(false);
 const error = ref<string | null>(null);
-const mode = ref<'trusted' | 'local' | 'oidc'>('trusted');
+const mode = ref<'trusted' | 'local'>('trusted');
 const publicBaseUrl = ref('');
 const indexing = ref(false);
 
 async function load() {
   const settings = await api.getSettings();
-  mode.value = settings.auth?.mode ?? 'trusted';
+  const authMode = settings.auth?.mode;
+  mode.value = authMode === 'local' ? 'local' : 'trusted';
   publicBaseUrl.value = settings.gitAccess?.publicBaseUrl ?? '';
   indexing.value = settings.search?.globalIndexingEnabled ?? false;
 }
@@ -42,7 +43,8 @@ onMounted(() => {
   <section id="access" class="stack">
     <h2>Access, Git &amp; search</h2>
     <p class="muted">
-      Authentication defaults to trusted LAN (no login). Enable local auth via API bootstrap before switching mode.
+      Authentication defaults to trusted LAN (no login). Create the first admin with
+      <code>POST /api/auth/bootstrap</code> before switching to local accounts here.
       REST contract: <a href="/api/v1/openapi.json" target="_blank" rel="noopener">/api/v1/openapi.json</a>.
     </p>
     <p v-if="error" class="error">{{ error }}</p>
@@ -51,7 +53,6 @@ onMounted(() => {
       <select v-model="mode" :disabled="busy">
         <option value="trusted">Trusted network (no login)</option>
         <option value="local">Local accounts</option>
-        <option value="oidc">OpenID Connect</option>
       </select>
     </label>
     <label>

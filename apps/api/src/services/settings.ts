@@ -24,9 +24,12 @@ export class SettingsService {
     return parsed;
   }
 
-  update(patch: Record<string, unknown>): AppSettings {
+  update(patch: Record<string, unknown>, origin: 'api' | 'internal' = 'api'): AppSettings {
     const current = this.get();
-    const next = { ...current, ...sanitizePatch(patch, current) };
+    const sanitized = sanitizePatch(patch, current);
+    const rawAuth = isRecord(patch.auth) ? patch.auth : undefined;
+    assertAuthSettingsPatch(current.auth, sanitized.auth, rawAuth, this.sqlite, origin);
+    const next = { ...current, ...sanitized };
     if (!isSettings(next)) throw new HttpError(400, 'settings are invalid');
     this.sqlite
       .prepare(`UPDATE settings SET value_json = ?, updated_at = ? WHERE key = 'app'`)
@@ -102,6 +105,30 @@ function sanitizeAuth(value: Record<string, unknown>): Partial<AppSettings['auth
   if ('oidcClientId' in value) next.oidcClientId = value.oidcClientId === null ? null : stringValue(value.oidcClientId, 'auth.oidcClientId');
   if ('bootstrapCompleted' in value) next.bootstrapCompleted = bool(value.bootstrapCompleted, 'auth.bootstrapCompleted');
   return next;
+}
+
+function assertAuthSettingsPatch(
+  current: AppSettings['auth'],
+  patch: Partial<AppSettings['auth']> | undefined,
+  rawAuth: Record<string, unknown> | undefined,
+  sqlite: Database.Database,
+  origin: 'api' | 'internal',
+): void {
+  if (!patch) return;
+  if (origin === 'api' && rawAuth && 'bootstrapCompleted' in rawAuth) {
+    throw new HttpError(400, 'auth.bootstrapCompleted cannot be changed through settings');
+  }
+  const nextMode = patch.mode ?? current.mode;
+  if (nextMode === 'oidc') {
+    throw new HttpError(400, 'oidc is not implemented');
+  }
+  if (patch.mode === 'local' && current.mode !== 'local') {
+    const row = asRow(sqlite.prepare(`SELECT COUNT(*) AS count FROM users`).get());
+    const count = row ? Number(row.count) : 0;
+    if (count < 1) {
+      throw new HttpError(400, 'create an admin account with POST /api/auth/bootstrap before enabling local auth');
+    }
+  }
 }
 
 function sanitizeGitAccess(value: Record<string, unknown>): Partial<AppSettings['gitAccess']> {

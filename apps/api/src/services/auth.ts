@@ -49,9 +49,12 @@ export class AuthService {
     this.sqlite
       .prepare(`INSERT INTO users (id, username, password_hash, role, totp_secret, created_at, updated_at) VALUES (?, ?, ?, 'admin', NULL, ?, ?)`)
       .run(userId, username.trim(), hashPassword(password), now, now);
-    this.settings.update({
-      auth: { ...auth, mode: 'local', bootstrapCompleted: true },
-    });
+    this.settings.update(
+      {
+        auth: { ...auth, mode: 'local', bootstrapCompleted: true },
+      },
+      'internal',
+    );
     this.audit.record(username, 'auth.bootstrap', {});
     return this.createSession(userId);
   }
