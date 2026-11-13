@@ -12,6 +12,7 @@ import { StorageService } from '../services/storage';
 import { WorkerService } from '../services/worker';
 import { WorkingRepositoryService } from '../services/working-repos';
 import { SESSION_COOKIE, resolveRequestAuth } from './auth-context';
+import { touchAuthRateLimit } from './rate-limit';
 
 @Controller('api')
 export class Phase2Controller {
@@ -29,7 +30,8 @@ export class Phase2Controller {
 
   @Post('auth/bootstrap')
   @HttpCode(201)
-  bootstrap(@Body() body: unknown, @Res({ passthrough: true }) reply: FastifyReply) {
+  bootstrap(@Body() body: unknown, @Req() request: FastifyRequest, @Res({ passthrough: true }) reply: FastifyReply) {
+    touchAuthRateLimit(request, 'bootstrap');
     const input = record(body);
     if (typeof input.username !== 'string' || typeof input.password !== 'string') throw new HttpError(400, 'username and password are required');
     const created = this.auth.bootstrap(input.username, input.password);
@@ -38,7 +40,8 @@ export class Phase2Controller {
   }
 
   @Post('auth/login')
-  login(@Body() body: unknown, @Res({ passthrough: true }) reply: FastifyReply) {
+  login(@Body() body: unknown, @Req() request: FastifyRequest, @Res({ passthrough: true }) reply: FastifyReply) {
+    touchAuthRateLimit(request, 'login');
     const input = record(body);
     if (typeof input.username !== 'string' || typeof input.password !== 'string') throw new HttpError(400, 'username and password are required');
     const created = this.auth.login(input.username, input.password);
