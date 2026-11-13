@@ -151,6 +151,17 @@ describe('git smart HTTP info/refs', () => {
     expect(response.body).toContain('git-upload-pack');
   });
 
+  it('POST git-upload-pack is reachable (trusted / auth disabled)', async () => {
+    const pack = await harness.app.inject({
+      method: 'POST',
+      url: `/git/archive/${repoId}/git-upload-pack`,
+      headers: { 'content-type': 'application/x-git-upload-pack-request' },
+      payload: Buffer.from('0000', 'ascii'),
+    });
+    expect(pack.statusCode).not.toBe(404);
+    expect(pack.statusCode).not.toBe(401);
+  });
+
   it('refuses receive-pack on read-only archives', async () => {
     const response = await harness.app.inject({
       method: 'POST',

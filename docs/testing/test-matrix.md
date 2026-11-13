@@ -107,7 +107,7 @@ Track implementation in [`manifest.json`](./manifest.json). Status legend: **don
 
 | Method | Path | Status |
 |--------|------|--------|
-| POST | `auth/bootstrap`, `login`, `logout` | planned (`api.mutate.auth`, `ui.flow.login`) |
+| POST | `auth/bootstrap`, `login`, `logout` | vitest done (`api.mutate.auth`); E2E login (`ui.flow.login`) |
 | GET | `auth/session` | E2E done |
 | GET | `search` | E2E done |
 | CRUD | `repositories/:id/search-index` | planned |
@@ -133,14 +133,14 @@ Track implementation in [`manifest.json`](./manifest.json). Status legend: **don
 |--------|------|--------|
 | GET | `openapi.json` | done |
 | GET | repositories, search, pools, settings | E2E done |
-| POST | import, sync, verify, export, cancel | planned (`api.mutate.v1`) |
+| POST | import, sync, verify, export, cancel | vitest partial (`integration.v1.mutations`); E2E verify (`api.mutate.v1`) |
 
 ## Git smart HTTP (`git-http.ts`)
 
 | Route | Status |
 |-------|--------|
-| `GET/POST /git/archive/:id/*` | planned |
-| `GET/POST /git/working/:name/*` | planned |
+| `GET/POST /git/archive/:id/*` | vitest done (`git.http.archive-upload-pack`) |
+| `GET/POST /git/working/:name/*` | vitest partial (`git.http.working-receive-pack`) |
 
 ---
 

@@ -103,10 +103,22 @@ describe('local authentication CSRF', () => {
       });
       expect(bootstrap.statusCode).toBeLessThan(300);
       const session = sessionFromBootstrapResponse(bootstrap);
-      const patch = await injectJson(localHarness.app, 'PATCH', '/api/settings', { allowFileUrls: false }, { cookie: session.cookieHeader });
+      const patch = await injectJson(
+        localHarness.app,
+        'PATCH',
+        '/api/settings',
+        { allowFileUrls: false },
+        { cookie: session.cookieHeader },
+      );
       expect(patch.statusCode).toBe(403);
       expect(patch.body).toEqual({ error: 'csrf token invalid' });
-      const allowed = await injectJson(localHarness.app, 'PATCH', '/api/settings', { allowFileUrls: true }, { cookie: session.cookieHeader, 'x-csrf-token': session.csrfToken });
+      const allowed = await injectJson(
+        localHarness.app,
+        'PATCH',
+        '/api/settings',
+        { allowFileUrls: true },
+        { cookie: session.cookieHeader, 'x-csrf-token': session.csrfToken },
+      );
       expect(allowed.statusCode).toBeLessThan(300);
     });
   });
