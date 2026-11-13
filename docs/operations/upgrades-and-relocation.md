@@ -14,7 +14,7 @@ Compose publishes `127.0.0.1:8080:8080`. Inside the container network namespace,
 
 The Compose restart policy is `unless-stopped`. Docker starts the container again after a daemon restart or a process crash. A container you stop stays stopped. The `fonds-data` volume persists across those restarts.
 
-Phase 1 has no user login. The API is unauthenticated. Do not publish `0.0.0.0:8080` on the host unless that host is on a trusted network. Details are in [Security model](../security/model.md).
+Default auth mode is **trusted** (no login). Do not publish `0.0.0.0:8080` on the host unless that host is on a trusted network. Details are in [Security model](../security/model.md).
 
 ## Volume ownership
 
@@ -76,9 +76,9 @@ Take a catalog backup and a pool copy before a relocation. The backup procedure 
 
 ## Dependency inventory
 
-Phase 1 records what the build used. It does not archive those dependencies.
+The dependency inventory records what the build used. It does not archive those dependencies.
 
 - `pnpm inventory` runs `node scripts/write-inventory.mjs` and writes `docs/dependency-inventory.json`.
 - After an image build, `scripts/record-image-digest.sh` records the image digest.
 
-Automatic preservation of the dependencies listed in that inventory is Phase 3. Recursive dependency archiving, a managed offsite backup scheduler, and the rest of the Phase 2 and Phase 3 list are not in this build. They are named in [Architecture](../architecture/overview.md).
+Automatic preservation of the dependencies listed in that inventory is on the roadmap. Recursive dependency archiving, a managed offsite backup scheduler, and related items are described in [Architecture](../architecture/overview.md).

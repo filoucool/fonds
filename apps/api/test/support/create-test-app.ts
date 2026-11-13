@@ -90,7 +90,7 @@ export async function createTestApp(dataDir?: string): Promise<TestApp> {
     const ctx = resolveRequestAuth(request, container.auth);
     const apiAllowed = ctx.kind === 'session' || (ctx.kind === 'token' && ctx.tokenScopes.includes('api'));
     if (!apiAllowed) {
-      reply.status(401).send({ error: 'authentication required' });
+      return reply.status(401).send({ error: 'authentication required' });
     }
   });
   fastify.addHook('preHandler', async (request, reply) => {
@@ -104,7 +104,7 @@ export async function createTestApp(dataDir?: string): Promise<TestApp> {
     const csrfHeader = request.headers['x-csrf-token'];
     const csrf = Array.isArray(csrfHeader) ? csrfHeader[0] : csrfHeader;
     if (typeof csrf !== 'string' || csrf !== ctx.session.csrfToken) {
-      reply.status(403).send({ error: 'csrf token invalid' });
+      return reply.status(403).send({ error: 'csrf token invalid' });
     }
   });
   nest.useGlobalFilters(new ApiExceptionFilter());

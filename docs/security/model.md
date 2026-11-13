@@ -1,10 +1,46 @@
 # Security model
 
-Phase 1 serves an unauthenticated API and an unauthenticated web UI. There is no user login. Anyone who can open the port can call the API, including catalog backup, import, verify, and purge.
+Fonds combines **long-term Git preservation** with **optional access control**. Defaults are chosen for a single operator on loopback; exposing the service on a wider network requires explicit hardening.
 
-Bind the process to loopback. The default listen address is `127.0.0.1:8080`. Compose publishes `127.0.0.1:8080:8080` and sets `HOST=0.0.0.0` only inside the container network namespace, so the forwarded port reaches the process. Do not publish `0.0.0.0:8080` on the host unless the host is on a trusted network.
+## Authentication and exposure
 
-Treat the Docker host, the data volume, and every catalog backup as credential stores.
+### Default: trusted mode
+
+Fresh installs use `auth.mode: trusted`. In this mode:
+
+- The REST API and web UI **do not require login**.
+- Anyone who can open the HTTP port can call mutating endpoints: import, sync, settings changes, credential storage, catalog backup, and repository purge (purge still requires typing the repository name).
+- Optional Git smart HTTP and SSH, when enabled, also allow anonymous clone/fetch unless you switch to local auth.
+
+**Treat trusted mode like root on the host.** Bind to loopback (`127.0.0.1:8080` from checkout; Compose maps `127.0.0.1:8080:8080` on the host while the process listens on `0.0.0.0` inside the container).
+
+### Local mode
+
+When `auth.mode` is `local`:
+
+- Most `/api/*` routes require a **session cookie** or a **Bearer token** with the `api` scope.
+- Browser sessions use an HTTP-only cookie; mutating requests from the UI must send the matching **`X-CSRF-Token`** header.
+- `POST /api/auth/bootstrap` and `POST /api/auth/login` stay reachable without a session. Bootstrap is allowed only while no admin account exists (or bootstrap has not been completed with existing users, per server rules).
+- At least one local user must exist before settings can switch from `trusted` to `local` (bootstrap creates the first user and enables local mode).
+
+`requireHttpsForLogin` is stored in settings for future use; operators should still terminate TLS at a reverse proxy for remote access.
+
+### OpenID Connect
+
+`oidc` appears in shared types for forward compatibility. **It is not implemented.** The API rejects `auth.mode: oidc` in settings patches.
+
+### Git access (HTTP / SSH)
+
+When `gitAccess.httpEnabled` or SSH is on:
+
+- In **trusted** mode, smart HTTP does not require Git credentials (same trust boundary as the API).
+- In **local** mode, fetch requires a session or a token with `git_fetch`; push to a **working** copy requires `git_push`. Archive remotes are read-only for receive-pack.
+
+Access tokens (`ra_…` prefix) and user SSH public keys are stored in SQLite separately from upstream provider tokens.
+
+### API versioning
+
+`/api/v1` uses the same authentication rules as `/api` when local auth is enabled, plus per-IP rate limiting on mutations. See [Operations](../operations/api-cli.md).
 
 ## Remote URLs
 
@@ -60,6 +96,8 @@ Protect every file under `$DATA_DIR/app/backups/` and every cold copy of `catalo
 
 The application does not encrypt the catalog, the pools, or backups. Use disk encryption when the volume or the backup media must be unreadable at rest.
 
+Settings patches cannot change `auth.bootstrapCompleted`; use bootstrap and normal operation instead.
+
 ## Delete
 
 Ordinary delete writes a tombstone. The archive is not removed by that action.
@@ -68,7 +106,7 @@ Permanent delete is `POST purge`. Purge requires the repository `displayName` to
 
 ## Acceptance
 
-URL and path command-injection resistance, as required for Phase 1, means all of the following hold together:
+URL and path command-injection resistance means all of the following hold together:
 
 - the protocol allowlist and the `settings.allowFileUrls` default reject unexpected URL schemes and local paths
 - private, loopback, link-local, metadata, CGNAT, and other non-global addresses are rejected unless `allowPrivateNetworks` or an explicit hostname, IP, or IPv4 CIDR exception allows them
@@ -76,4 +114,4 @@ URL and path command-injection resistance, as required for Phase 1, means all of
 - git runs from an argument array in a scrubbed environment, with hooks, aliases, credential helpers, submodule recursion, LFS smudge, user gitconfig, and proxy variables disabled
 - blob paths reject `..` and absolute paths, and checksum walks do not follow symlinks out of the archive
 
-The rest of the Phase 1 matrix, including preservation and rebuild, is in [Architecture](../architecture/overview.md).
+Preservation and catalog rebuild behavior are in [Architecture](../architecture/overview.md). Vulnerability reporting: [SECURITY.md](../../SECURITY.md) at the repository root.

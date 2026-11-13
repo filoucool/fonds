@@ -12,7 +12,7 @@ import {
   type SnapshotManifestV1,
 } from '@fonds/shared';
 import { HttpError } from '../errors';
-import { asRow, asRows, id, nowIso, text, textOrNull } from '../rows';
+import { asRow, asRows, id, nowIso, text } from '../rows';
 import type { CatalogService } from './catalog';
 import type { StorageService } from './storage';
 import type { SettingsService } from './settings';
@@ -144,7 +144,6 @@ export class SnapshotService {
   }
 
   prune(repositoryId: string, dryRun: boolean, confirmProtected = false): RetentionPreview {
-    const policy = this.settings.get().phase3.snapshots.retention;
     const preview = this.retentionPreview(repositoryId);
     if (preview.wouldDelete.some((item) => item.protected) && !confirmProtected) {
       throw new HttpError(409, 'retention would delete pinned snapshots; confirm explicitly');

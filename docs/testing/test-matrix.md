@@ -28,8 +28,8 @@ Track implementation in [`manifest.json`](./manifest.json). Status legend: **don
 | `profiles.ts` | standard/minimal profiles | `packages/shared/test/profiles.test.ts` | planned |
 | `components.ts` | component flags | `packages/shared/test/components.test.ts` | planned |
 | `api-types.ts` | type guards / narrowing helpers | `packages/shared/test/api-types.test.ts` | planned |
-| `phase2.ts` | phase2 DTO shapes | `packages/shared/test/phase2.test.ts` | planned |
-| `phase3.ts` | phase3 DTO shapes | `packages/shared/test/phase3.test.ts` | planned |
+| `phase2.ts` | access/auth settings DTO shapes | `packages/shared/test/phase2.test.ts` | planned |
+| `phase3.ts` | preservation DTO shapes | `packages/shared/test/phase3.test.ts` | planned |
 
 ### `@fonds/archive-format`
 
@@ -103,7 +103,7 @@ Track implementation in [`manifest.json`](./manifest.json). Status legend: **don
 | GET | `exports/:id`, download | partial | — | planned |
 | GET | `inventory` | — | done | — |
 
-## API — phase 2 (`phase2.controller.ts`)
+## API — access & search (`phase2.controller.ts`)
 
 | Method | Path | Status |
 |--------|------|--------|
@@ -116,7 +116,7 @@ Track implementation in [`manifest.json`](./manifest.json). Status legend: **don
 | CRUD | `access-tokens`, `ssh-keys` | planned |
 | GET | `audit-events` | E2E done |
 
-## API — phase 3 (`phase3.controller.ts`)
+## API — preservation (`phase3.controller.ts`)
 
 | Method | Path | Status |
 |--------|------|--------|
@@ -185,7 +185,7 @@ Appearance, Archival profiles, Sync profiles, Credentials, Access & Git & search
 | `storage`, `search`, `working-repos` | — | dedicated service tests |
 | `supply-chain`, `recovery`, `notifications` | — | planned |
 | `exporter`, `backup-transfer` | export-migration | edge cases |
-| `git-access`, `git-ssh` | partial phase2 | git-http integration |
+| `git-access`, `git-ssh` | partial | git-http integration |
 
 ---
 
@@ -196,7 +196,7 @@ Appearance, Archival profiles, Sync profiles, Credentials, Access & Git & search
 3. **Auth mode**: bootstrap user, login, CSRF on PATCH settings.
 4. **Storage**: create pool, migrate repo (integration + E2E).
 5. **Export download** stream bytes + checksum.
-6. **Phase 3 backup run** with worker.
+6. **Preservation backup run** with worker.
 7. **Git clone** against `/git/archive/:id` (spawn `git clone` in test).
 8. **CLI smoke** against running API in vitest or CI job.
 

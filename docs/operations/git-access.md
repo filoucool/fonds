@@ -1,4 +1,4 @@
-# Git access (Phase 2)
+# Git access
 
 Archives are **read-only**. Git smart HTTP and SSH serve clone/fetch only from `repository.git` under each archive id. Push is accepted only on **working copies** under `$DATA_DIR/working-repos/`.
 

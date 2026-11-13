@@ -7,7 +7,7 @@ Goal: **pre-release confidence from CI only** — unit and package tests for pur
 | Layer | Runner | Location | What it proves |
 |-------|--------|----------|----------------|
 | Unit | Vitest | `packages/*/test`, small `apps/api` units | Pure functions, format, policy, crypto, git helpers |
-| Integration | Vitest | `apps/api/test` | Real SQLite + data dir: import, sync, verify, export, phase3 |
+| Integration | Vitest | `apps/api/test` | Real SQLite + data dir: import, sync, verify, export, preservation |
 | API smoke (readonly) | Playwright `request` | `e2e/tests/api-*.spec.ts` | Every safe GET returns 2xx and a stable JSON shape |
 | UI navigation | Playwright | `e2e/tests/navigation*.spec.ts` | SPA routes resolve, headings, settings panels, repo tabs |
 | UI workflows | Playwright | `e2e/tests/*-flow.spec.ts` | Multi-step flows (import, job cancel, storage migrate, …) |

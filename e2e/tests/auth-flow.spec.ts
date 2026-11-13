@@ -11,7 +11,7 @@ test.describe('login (public route)', () => {
   test('protected route redirects to login when password auth is required', async ({ page, request }) => {
     const mode = await request.get('/api/auth/session');
     const body: unknown = await mode.json();
-    if (typeof body !== 'object' || body === null || (body as { mode?: string }).mode !== 'password') {
+    if (typeof body !== 'object' || body === null || (body as { mode?: string }).mode !== 'local') {
       test.skip();
       return;
     }

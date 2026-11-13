@@ -19,7 +19,7 @@ import { seedLocalRepository } from './support/seed-repo';
 // @suite api.mutate.phase3-recovery
 let harness: TestApp | undefined;
 let repoId: string;
-let missingId = '00000000-0000-4000-8000-000000000099';
+const missingId = '00000000-0000-4000-8000-000000000099';
 
 beforeAll(async () => {
   harness = await createTestApp();
