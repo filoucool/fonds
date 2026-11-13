@@ -23,7 +23,7 @@ We aim to acknowledge reports within a few business days. Fixes for confirmed is
 
 1. While still on a trusted network (or loopback), create the first admin: `POST /api/auth/bootstrap` with username and password (minimum 12 characters). This creates the user and switches mode to `local`.
 2. Optional: set `auth.mode` to `local` in settings only **after** at least one user exists (the API enforces this).
-3. Configure HTTPS or a reverse proxy in production; session cookies are not marked `Secure` by default.
+3. Configure HTTPS or a reverse proxy in production. Set `auth.requireHttpsForLogin` to reject login over plain HTTP; otherwise session cookies are marked `Secure` only when the login request is HTTPS.
 
 OpenID Connect (`oidc`) is **not implemented**; the API rejects selecting that mode.
 

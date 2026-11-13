@@ -23,7 +23,7 @@ When `auth.mode` is `local`:
 - `POST /api/auth/bootstrap` and `POST /api/auth/login` stay reachable without a session. Bootstrap is allowed only while no admin account exists (or bootstrap has not been completed with existing users, per server rules).
 - At least one local user must exist before settings can switch from `trusted` to `local` (bootstrap creates the first user and enables local mode).
 
-`requireHttpsForLogin` is stored in settings for future use; operators should still terminate TLS at a reverse proxy for remote access.
+When `auth.requireHttpsForLogin` is true, `POST /api/auth/bootstrap` and `POST /api/auth/login` are rejected unless the request is HTTPS (direct TLS or `X-Forwarded-Proto: https` from a reverse proxy). Session cookies are marked `Secure` when the login request is HTTPS or when this setting is enabled.
 
 ### OpenID Connect
 
