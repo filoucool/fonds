@@ -11,7 +11,7 @@ import { SettingsService } from '../services/settings';
 import { StorageService } from '../services/storage';
 import { WorkerService } from '../services/worker';
 import { WorkingRepositoryService } from '../services/working-repos';
-import { SESSION_COOKIE, resolveRequestAuth } from './auth-context';
+import { SESSION_COOKIE, requestIsHttps, resolveRequestAuth, sessionCookieSecure } from './auth-context';
 
 @Controller('api')
 export class Phase2Controller {
@@ -29,20 +29,22 @@ export class Phase2Controller {
 
   @Post('auth/bootstrap')
   @HttpCode(201)
-  bootstrap(@Body() body: unknown, @Res({ passthrough: true }) reply: FastifyReply) {
+  bootstrap(@Body() body: unknown, @Req() request: FastifyRequest, @Res({ passthrough: true }) reply: FastifyReply) {
     const input = record(body);
     if (typeof input.username !== 'string' || typeof input.password !== 'string') throw new HttpError(400, 'username and password are required');
+    assertHttpsForLogin(request, this.settings);
     const created = this.auth.bootstrap(input.username, input.password);
-    setSessionCookie(reply, created.token);
+    setSessionCookie(reply, created.token, request, this.settings);
     return { user: created.session.user, csrfToken: created.session.csrfToken, expiresAt: created.session.expiresAt };
   }
 
   @Post('auth/login')
-  login(@Body() body: unknown, @Res({ passthrough: true }) reply: FastifyReply) {
+  login(@Body() body: unknown, @Req() request: FastifyRequest, @Res({ passthrough: true }) reply: FastifyReply) {
     const input = record(body);
     if (typeof input.username !== 'string' || typeof input.password !== 'string') throw new HttpError(400, 'username and password are required');
+    assertHttpsForLogin(request, this.settings);
     const created = this.auth.login(input.username, input.password);
-    setSessionCookie(reply, created.token);
+    setSessionCookie(reply, created.token, request, this.settings);
     return { user: created.session.user, csrfToken: created.session.csrfToken, expiresAt: created.session.expiresAt };
   }
 
@@ -51,7 +53,7 @@ export class Phase2Controller {
   logout(@Req() request: FastifyRequest, @Res({ passthrough: true }) reply: FastifyReply) {
     const ctx = resolveRequestAuth(request, this.auth);
     if (ctx.session) this.auth.logout(ctx.session.sessionId);
-    reply.clearCookie(SESSION_COOKIE);
+    clearSessionCookie(reply, request, this.settings);
   }
 
   @Get('auth/session')
@@ -250,13 +252,27 @@ function requireUser(request: FastifyRequest, auth: AuthService): string {
   throw new HttpError(401, 'authentication required');
 }
 
-function setSessionCookie(reply: FastifyReply, token: string): void {
+function assertHttpsForLogin(request: FastifyRequest, settings: SettingsService): void {
+  if (!settings.get().auth.requireHttpsForLogin) return;
+  if (!requestIsHttps(request)) throw new HttpError(403, 'HTTPS is required for login');
+}
+
+function setSessionCookie(reply: FastifyReply, token: string, request: FastifyRequest, settings: SettingsService): void {
+  const requireHttps = settings.get().auth.requireHttpsForLogin;
   reply.setCookie(SESSION_COOKIE, token, {
     path: '/',
     httpOnly: true,
     sameSite: 'lax',
-    secure: false,
+    secure: sessionCookieSecure(request, requireHttps),
     maxAge: 60 * 60 * 24 * 7,
+  });
+}
+
+function clearSessionCookie(reply: FastifyReply, request: FastifyRequest, settings: SettingsService): void {
+  const requireHttps = settings.get().auth.requireHttpsForLogin;
+  reply.clearCookie(SESSION_COOKIE, {
+    path: '/',
+    secure: sessionCookieSecure(request, requireHttps),
   });
 }
 

@@ -580,7 +580,7 @@ export function defaultSettings(poolId: string): AppSettings {
     },
     notifications: {
       inAppEnabled: true,
-      emailEnabled: false,
+      emailEnabled: false, // persisted only; no SMTP delivery yet
       webhookEnabled: false,
       webhookUrl: null,
       webhookSecret: null,

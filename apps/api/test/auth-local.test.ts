@@ -103,7 +103,6 @@ describe('local authentication CSRF', () => {
       });
       expect(bootstrap.statusCode).toBeLessThan(300);
       const session = sessionFromBootstrapResponse(bootstrap);
-
       const patch = await injectJson(
         localHarness.app,
         'PATCH',
@@ -113,7 +112,6 @@ describe('local authentication CSRF', () => {
       );
       expect(patch.statusCode).toBe(403);
       expect(patch.body).toEqual({ error: 'csrf token invalid' });
-
       const allowed = await injectJson(
         localHarness.app,
         'PATCH',

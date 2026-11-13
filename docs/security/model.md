@@ -1,6 +1,6 @@
 # Security model
 
-Fonds combines **preservation semantics** (Phase 1) with **optional access control** (Phase 2). This document describes both. Defaults are chosen for a single operator on loopback; exposing the service on a wider network requires explicit hardening.
+Fonds combines **long-term Git preservation** with **optional access control**. Defaults are chosen for a single operator on loopback; exposing the service on a wider network requires explicit hardening.
 
 ## Authentication and exposure
 
@@ -23,7 +23,11 @@ When `auth.mode` is `local`:
 - `POST /api/auth/bootstrap` and `POST /api/auth/login` stay reachable without a session. Bootstrap is allowed only while no admin account exists (or bootstrap has not been completed with existing users, per server rules).
 - At least one local user must exist before settings can switch from `trusted` to `local` (bootstrap creates the first user and enables local mode).
 
-`requireHttpsForLogin` is stored in settings for future use; operators should still terminate TLS at a reverse proxy for remote access.
+When `auth.requireHttpsForLogin` is true, `POST /api/auth/bootstrap` and `POST /api/auth/login` are rejected unless the request is HTTPS (direct TLS or `X-Forwarded-Proto: https` from a reverse proxy). Session cookies are marked `Secure` when the login request is HTTPS or when this setting is enabled.
+
+### Two-factor authentication (TOTP)
+
+The `users.totp_secret` column is reserved for a future TOTP enrollment flow. **It is not implemented.** Local login is password-only; bootstrap always inserts `NULL` for `totp_secret`, and the web settings UI has no 2FA controls.
 
 ### OpenID Connect
 
@@ -37,6 +41,10 @@ When `gitAccess.httpEnabled` or SSH is on:
 - In **local** mode, fetch requires a session or a token with `git_fetch`; push to a **working** copy requires `git_push`. Archive remotes are read-only for receive-pack.
 
 Access tokens (`ra_…` prefix) and user SSH public keys are stored in SQLite separately from upstream provider tokens.
+
+### Notifications
+
+`settings.notifications.emailEnabled` is stored in app settings for forward compatibility. **Email delivery is not implemented.** `NotificationService` queues in-app delivery rows and optional webhook POSTs only; toggling `emailEnabled` via the settings API has no effect. The web settings UI does not expose notification email controls.
 
 ### API versioning
 

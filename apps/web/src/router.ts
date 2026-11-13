@@ -117,17 +117,27 @@ const router = createRouter({
   ],
 });
 
+function loginRedirect(fullPath: string) {
+  return { path: '/login', query: { redirect: fullPath } };
+}
+
 router.beforeEach(async (to) => {
   if (to.meta.public === true) return true;
   try {
     const session = await api.getAuthSession();
     if (session.mode !== 'trusted' && !session.authenticated) {
-      return { path: '/login', query: { redirect: to.fullPath } };
+      return loginRedirect(to.fullPath);
     }
-  } catch {
     return true;
+  } catch {
+    try {
+      const settings = await api.getSettings();
+      if (settings.auth?.mode === 'trusted') return true;
+    } catch {
+      // fail closed when auth mode cannot be verified
+    }
+    return loginRedirect(to.fullPath);
   }
-  return true;
 });
 
 router.afterEach((to) => {

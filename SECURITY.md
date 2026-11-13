@@ -4,7 +4,7 @@
 
 If you believe you have found a security issue in Fonds, please report it privately rather than opening a public issue.
 
-1. Use [GitHub private security advisories](https://github.com/filoucool/archiver/security/advisories/new) for this repository if you have access, **or**
+1. Use [GitHub private security advisories](https://github.com/OWNER/REPO/security/advisories/new) for this repository (replace `OWNER/REPO` with `GITHUB_REPOSITORY`, e.g. `myorg/archiver`) if you have access, **or**
 2. Open a minimal public issue asking for a private contact channel (do not include exploit details in the issue).
 
 Include steps to reproduce, affected version or commit, and the impact you believe it has.
@@ -23,9 +23,11 @@ We aim to acknowledge reports within a few business days. Fixes for confirmed is
 
 1. While still on a trusted network (or loopback), create the first admin: `POST /api/auth/bootstrap` with username and password (minimum 12 characters). This creates the user and switches mode to `local`.
 2. Optional: set `auth.mode` to `local` in settings only **after** at least one user exists (the API enforces this).
-3. Configure HTTPS or a reverse proxy in production; session cookies are not marked `Secure` by default.
+3. Configure HTTPS or a reverse proxy in production. Set `auth.requireHttpsForLogin` to reject login over plain HTTP; otherwise session cookies are marked `Secure` only when the login request is HTTPS.
 
 OpenID Connect (`oidc`) is **not implemented**; the API rejects selecting that mode.
+
+Notification email (`settings.notifications.emailEnabled`) and user TOTP (`users.totp_secret`) are **not implemented**; they are stored for forward compatibility only. See [docs/security/model.md](docs/security/model.md).
 
 ## Credential storage
 

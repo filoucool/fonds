@@ -131,10 +131,10 @@ export async function injectJson(
     method,
     url,
     payload: payload === undefined ? undefined : JSON.stringify(payload),
-    headers:
-      payload === undefined
-        ? { ...(extraHeaders ?? {}) }
-        : { 'content-type': 'application/json', ...(extraHeaders ?? {}) },
+    headers: {
+      ...(extraHeaders ?? {}),
+      ...(payload === undefined ? {} : { 'content-type': 'application/json' }),
+    },
   });
   let body: unknown = response.body;
   try {

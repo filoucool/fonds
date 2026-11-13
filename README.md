@@ -37,13 +37,13 @@ The project aims for long-term self-preservation. That drives technical choices:
 | **Git is the engine** | Repository operations go through the native `git` CLI (argument arrays, scrubbed environment), not a heavy Git library stack. |
 | **Recoverable without the server** | Each archive folder is self-describing (`archive.json`, checksums, bare `repository.git`). Import and catalog rebuild work from disk alone. |
 | **Know what we depend on** | `pnpm inventory` writes `docs/dependency-inventory.json` (names, versions, licenses, upstream links). After `docker build`, `scripts/record-image-digest.sh` records image digests. |
-| **Preserve dependencies too (roadmap)** | Phase 3 adds managed backups, snapshots, a dependency graph, and automated preservation of build/runtime dependencies so the project (and its toolchain) can be archived alongside your repos. |
+| **Preserve dependencies too (roadmap)** | Planned: managed backups, snapshots, a dependency graph, and automated preservation of build/runtime dependencies so the project (and its toolchain) can be archived alongside your repos. |
 
-Runtime dependencies stay small: **Node.js, SQLite, and Git**, plus whatever you configure for optional Phase 2 features (search, HTTP/SSH Git access, auth). We avoid extra infrastructure you would need to keep running just to read an archive.
+Runtime dependencies stay small: **Node.js, SQLite, and Git**, plus whatever you configure for optional features (search, HTTP/SSH Git access, auth). We avoid extra infrastructure you would need to keep running just to read an archive.
 
 ### Self-hosted by default
 
-Bind to loopback or a trusted network unless you have configured authentication and TLS. Phase 2 adds configurable auth (default: trusted LAN), versioned `/api/v1`, OpenAPI, the `fonds` CLI, and read-only archive access over HTTP/SSH with separate writable working copies for pushes.
+Bind to loopback or a trusted network unless you have configured authentication and TLS. The server also offers configurable auth (default: trusted LAN), versioned `/api/v1`, OpenAPI, the `fonds` CLI, and read-only archive access over HTTP/SSH with separate writable working copies for pushes.
 
 ## Features
 
@@ -52,8 +52,8 @@ Bind to loopback or a trusted network unless you have configured authentication 
 - **Integrity:** verify via `git fsck`, manifest ref resolution, and `checksums.json` without re-downloading objects.
 - **Export:** git bundle, portable directory, or `tar.gz` package; import and catalog rebuild without the original database.
 - **Storage pools:** sharded archive layout, free-space thresholds, optional balancing.
-- **Phase 2 (in progress / optional):** search indexes, Git clone over HTTP/SSH, `fonds` CLI including offline rescue commands.
-- **Phase 3 (Preservation UI):** managed backups, snapshots, dependency discovery, and self-preservation reports (`/preservation`, `/api/phase3/*`).
+- **Search, CLI & Git access (optional):** search indexes, Git clone over HTTP/SSH, `fonds` CLI including offline rescue commands.
+- **Preservation:** managed backups, snapshots, dependency discovery, and self-preservation reports (UI at `/preservation` plus matching REST endpoints).
 
 ### Roadmap
 
@@ -176,7 +176,7 @@ sh scripts/record-image-digest.sh fonds:local
 
 ## Contributing
 
-Fonds is an open source project. Issues and pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines, test expectations, and how contributions are licensed.
+Fonds is an open source project. Issues and pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines, test expectations, and how contributions are licensed. Participants are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## License
 
