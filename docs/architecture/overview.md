@@ -1,6 +1,6 @@
 # Architecture
 
-Phase 1 is a private, self-hosted archive of Git repositories, run in Docker. Each archive directory is recoverable on its own. The SQLite catalog is an index derived from those directories. This phase is an archive, not a GitHub replacement.
+Fonds is a private, self-hosted archive of Git repositories, run in Docker. Each archive directory is recoverable on its own. The SQLite catalog is an index derived from those directories. It is an archive, not a Git hosting platform.
 
 The implementation is a TypeScript monorepo. The API is NestJS on Fastify. The UI is a Vue 3 static build served by that same API process. Git operations go through the native git CLI, one argument array per invocation.
 
@@ -118,20 +118,20 @@ Pool balancing exists. `balancingEnabled` defaults to `false`.
 
 Credentials are stored in SQLite and nowhere else. Git authentication uses a temporary askpass environment. The token is not placed in the remote URL and is not written into repository config. Backups of the catalog therefore contain provider tokens. Manifests, sync records, and exports do not. See [Security model](../security/model.md).
 
-## Phase 2 (access, search, integrations)
+## Access, search, and integrations
 
-Phase 2 adds optional search indexes (off by default), Git clone over HTTP and SSH with separate writable working copies, configurable authentication, a versioned `/api/v1` surface with OpenAPI, and the `fonds` CLI including offline rescue commands. Archives remain read-only at the protocol and filesystem layer.
+Optional search indexes (off by default), Git clone over HTTP and SSH with separate writable working copies, configurable authentication, a versioned `/api/v1` surface with OpenAPI, and the `fonds` CLI including offline rescue commands. Archives remain read-only at the protocol and filesystem layer.
 
-## Deferred (Phase 3)
+## Preservation and toolchain (roadmap)
 
-- managed backups (local, SFTP, S3-compatible), snapshots, dependency graph, and self-preservation (`/api/phase3`, **Preservation** in the UI)
-- recursive dependency archiving
+- Managed backups (local, SFTP, S3-compatible), snapshots, dependency graph, and self-preservation (**Preservation** in the UI and matching REST endpoints)
+- Recursive dependency archiving
 
-`pnpm inventory` writes `docs/dependency-inventory.json`, and `scripts/record-image-digest.sh` records image digests after a build. Automatic preservation of those dependencies is Phase 3.
+`pnpm inventory` writes `docs/dependency-inventory.json`, and `scripts/record-image-digest.sh` records image digests after a build. Automatic preservation of those dependencies is on the roadmap.
 
 ## Acceptance
 
-Deferred items above are outside this matrix. Phase 1 is accepted when every row below holds.
+Roadmap items above are outside this matrix. The core archive behavior is accepted when every row below holds.
 
 | Check | Pass condition |
 | --- | --- |

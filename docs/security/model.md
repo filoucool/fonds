@@ -1,6 +1,6 @@
 # Security model
 
-Fonds combines **preservation semantics** (Phase 1) with **optional access control** (Phase 2). This document describes both. Defaults are chosen for a single operator on loopback; exposing the service on a wider network requires explicit hardening.
+Fonds combines **long-term Git preservation** with **optional access control**. Defaults are chosen for a single operator on loopback; exposing the service on a wider network requires explicit hardening.
 
 ## Authentication and exposure
 
