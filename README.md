@@ -176,7 +176,7 @@ sh scripts/record-image-digest.sh fonds:local
 
 ## Contributing
 
-Fonds is an open source project. Issues and pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines, test expectations, and how contributions are licensed.
+Fonds is an open source project. Issues and pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines, test expectations, and how contributions are licensed. Participants are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## License
 
