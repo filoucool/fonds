@@ -4,7 +4,7 @@
 
 If you believe you have found a security issue in Fonds, please report it privately rather than opening a public issue.
 
-1. Use [GitHub private security advisories](https://github.com/filoucool/archiver/security/advisories/new) for this repository if you have access, **or**
+1. Use [GitHub private security advisories](https://github.com/OWNER/REPO/security/advisories/new) for this repository (replace `OWNER/REPO` with `GITHUB_REPOSITORY`, e.g. `myorg/archiver`) if you have access, **or**
 2. Open a minimal public issue asking for a private contact channel (do not include exploit details in the issue).
 
 Include steps to reproduce, affected version or commit, and the impact you believe it has.
