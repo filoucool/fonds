@@ -299,7 +299,7 @@
       "id": "api.mutate.auth",
       "status": "done",
       "layer": "vitest",
-      "file": "apps/api/test/http-surface.test.ts"
+      "file": "apps/api/test/auth-local.test.ts"
     },
     {
       "id": "api.mutate.search-index",
@@ -420,6 +420,12 @@
       "status": "done",
       "layer": "vitest",
       "file": "apps/api/test/default-branch-files.test.ts"
+    },
+    {
+      "id": "integration.v1.mutations",
+      "status": "done",
+      "layer": "vitest",
+      "file": "apps/api/test/v1-mutations.test.ts"
     },
     {
       "id": "integration.phase2.crypto-perms",

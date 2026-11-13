@@ -125,12 +125,16 @@ export async function injectJson(
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT',
   url: string,
   payload?: unknown,
+  extraHeaders?: Record<string, string>,
 ): Promise<{ statusCode: number; body: unknown }> {
   const response = await app.inject({
     method,
     url,
     payload: payload === undefined ? undefined : JSON.stringify(payload),
-    headers: payload === undefined ? {} : { 'content-type': 'application/json' },
+    headers:
+      payload === undefined
+        ? { ...(extraHeaders ?? {}) }
+        : { 'content-type': 'application/json', ...(extraHeaders ?? {}) },
   });
   let body: unknown = response.body;
   try {

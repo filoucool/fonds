@@ -1,3 +1,5 @@
+// @suite api.contract.v1-openapi
+// @suite api.contract.v1-envelope
 import { describe, expect, it } from 'vitest';
 import { V1_OPENAPI } from '../src/openapi/v1-spec';
 import { v1ErrorFromHttp } from '../src/http/v1-envelope';

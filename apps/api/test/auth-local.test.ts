@@ -74,3 +74,54 @@ describe('local authentication', () => {
     expect(settings.statusCode).toBe(401);
   });
 });
+
+function sessionFromBootstrapResponse(response: {
+  body: string;
+  headers: Record<string, string | string[] | undefined>;
+}): { cookieHeader: string; csrfToken: string } {
+  const parsed: unknown = JSON.parse(response.body);
+  if (!parsed || typeof parsed !== 'object' || typeof (parsed as { csrfToken?: string }).csrfToken !== 'string') {
+    throw new Error('bootstrap response missing csrfToken');
+  }
+  const csrfToken = (parsed as { csrfToken: string }).csrfToken;
+  const setCookie = response.headers['set-cookie'];
+  const parts = Array.isArray(setCookie) ? setCookie : setCookie ? [setCookie] : [];
+  const sessionPart = parts.find((entry) => entry.startsWith('fonds_session='));
+  if (!sessionPart) throw new Error('bootstrap response missing session cookie');
+  const cookieValue = sessionPart.split(';')[0] ?? sessionPart;
+  return { cookieHeader: cookieValue, csrfToken };
+}
+
+describe('local authentication CSRF', () => {
+  it('returns 403 on session PATCH without X-CSRF-Token after bootstrap', async () => {
+    await withTrustedApp(async (localHarness) => {
+      const bootstrap = await localHarness.app.inject({
+        method: 'POST',
+        url: '/api/auth/bootstrap',
+        headers: { 'content-type': 'application/json' },
+        payload: JSON.stringify({ username: 'admin', password: 'twelve-char-password' }),
+      });
+      expect(bootstrap.statusCode).toBeLessThan(300);
+      const session = sessionFromBootstrapResponse(bootstrap);
+
+      const patch = await injectJson(
+        localHarness.app,
+        'PATCH',
+        '/api/settings',
+        { allowFileUrls: false },
+        { cookie: session.cookieHeader },
+      );
+      expect(patch.statusCode).toBe(403);
+      expect(patch.body).toEqual({ error: 'csrf token invalid' });
+
+      const allowed = await injectJson(
+        localHarness.app,
+        'PATCH',
+        '/api/settings',
+        { allowFileUrls: true },
+        { cookie: session.cookieHeader, 'x-csrf-token': session.csrfToken },
+      );
+      expect(allowed.statusCode).toBeLessThan(300);
+    });
+  });
+});
