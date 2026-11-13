@@ -24,7 +24,7 @@ pnpm test:manifest    # Suite tag consistency for E2E
 
 **Not in the line gate (by design today):** `apps/api/src/http/*` Nest controllers (~0% lines). They are thin wrappers; cover them with **HTTP integration tests** (`app.inject`) counted in manifest, or add a separate `api.http.lines` gate later.
 
-**Frontend line coverage:** `apps/web` (~78 TS/Vue files) has **no** Vitest line report. “Frontend coverage” for release is **behavioral** (manifest + routes + 83 E2E tests), not Istanbul lines. Optional phase 2: `apps/web/test` with `@vue/test-utils` for `lib/*` and dialogs.
+**Frontend line coverage:** `apps/web` (~78 TS/Vue files) has **no** Vitest line report. “Frontend coverage” for release is **behavioral** (manifest + routes + 83 E2E tests), not Istanbul lines. Optional later: `apps/web/test` with `@vue/test-utils` for `lib/*` and dialogs.
 
 ## Snapshot (run `pnpm coverage:audit` for latest)
 
@@ -54,7 +54,7 @@ Largest **service** files still under-tested:
 
 ## Roadmap to 95%
 
-### Phase A — Packages (days, high ROI)
+### Track A — Packages (days, high ROI)
 
 1. Add `packages/shared/test/{json,glob,profiles,schedule}.test.ts`
 2. Add `packages/archive-format/test/{layout,manifest,atomic}.test.ts`
@@ -63,21 +63,21 @@ Largest **service** files still under-tested:
 
 **Gate:** `backend.packages.lines ≥ 95%`
 
-### Phase B — API services (weeks)
+### Track B — API services (weeks)
 
 1. Split `apps/api/test/archive.test.ts` scenarios by domain (storage, search-index, browse blob)
 2. Add `auth-http.test.ts` (session, CSRF) with Fastify inject
 3. Add `git-http.test.ts` for smart HTTP
-4. Phase 3: recovery, notifications, worker tick with `WORKER_ENABLED`
+4. Preservation services: recovery, notifications, worker tick with `WORKER_ENABLED`
 
 **Gate:** `backend.services.lines ≥ 95%`
 
-### Phase C — HTTP layer (parallel)
+### Track C — HTTP layer (parallel)
 
 1. `apps/api/test/http-fastify.test.ts` — boot app on ephemeral port, hit representative GET/PATCH/POST for every controller group
 2. Optionally add `api.http.lines` gate at 80% then 95%
 
-### Phase D — Frontend behavioral (weeks)
+### Track D — Frontend behavioral (weeks)
 
 1. `auth-flow.spec.ts` — bootstrap + login (unblocks `/login` route score → ~100% routes)
 2. Settings save flows per panel (PATCH + CSRF)
@@ -86,7 +86,7 @@ Largest **service** files still under-tested:
 
 **Gate:** `frontend.ui.manifest ≥ 95%`
 
-### Phase E — Optional UI line coverage
+### Track E — Optional UI line coverage
 
 1. Vitest + happy-dom/vue for `apps/web/src/lib/{format,route,labels}.ts`
 2. Mount tests for `ExportDialog`, `JobActions`, `useCursorPager`

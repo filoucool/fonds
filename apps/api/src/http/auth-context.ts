@@ -4,6 +4,21 @@ import type { AuthService, SessionContext } from '../services/auth';
 
 export const SESSION_COOKIE = 'fonds_session';
 
+export function requestIsHttps(request: FastifyRequest): boolean {
+  const forwarded = request.headers['x-forwarded-proto'];
+  const proto = Array.isArray(forwarded) ? forwarded[0] : forwarded;
+  if (typeof proto === 'string') {
+    const first = proto.split(',')[0]?.trim().toLowerCase();
+    if (first === 'https') return true;
+    if (first === 'http') return false;
+  }
+  return request.protocol === 'https';
+}
+
+export function sessionCookieSecure(request: FastifyRequest, requireHttpsForLogin: boolean): boolean {
+  return requestIsHttps(request) || requireHttpsForLogin;
+}
+
 export interface RequestAuth {
   kind: 'anonymous' | 'session' | 'token';
   userId: string | null;

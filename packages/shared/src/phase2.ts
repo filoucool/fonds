@@ -43,6 +43,7 @@ export interface AuthSettings {
 
 export interface NotificationSettings {
   inAppEnabled: boolean;
+  /** Reserved for future SMTP delivery; `NotificationService` does not read this yet (settings UI does not expose it). */
   emailEnabled: boolean;
   webhookEnabled: boolean;
   webhookUrl: string | null;
