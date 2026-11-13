@@ -27,6 +27,8 @@ We aim to acknowledge reports within a few business days. Fixes for confirmed is
 
 OpenID Connect (`oidc`) is **not implemented**; the API rejects selecting that mode.
 
+Notification email (`settings.notifications.emailEnabled`) and user TOTP (`users.totp_secret`) are **not implemented**; they are stored for forward compatibility only. See [docs/security/model.md](docs/security/model.md).
+
 ## Credential storage
 
 Provider tokens and Git-access credentials live in SQLite at `$DATA_DIR/app/catalog.sqlite`. Catalog backups made via the API copy those secrets. Archive directories (`archive.json`, pools, exports) do **not** contain upstream tokens.

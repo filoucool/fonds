@@ -2,6 +2,7 @@ import type Database from 'better-sqlite3';
 import type { SettingsService } from './settings';
 import { id, nowIso } from '../rows';
 
+/** Delivers in-app queue rows and optional webhooks; `settings.notifications.emailEnabled` is not used. */
 export class NotificationService {
   constructor(
     private readonly sqlite: Database.Database,

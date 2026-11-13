@@ -46,6 +46,7 @@ export class AuthService {
     if (password.length < 12) throw new HttpError(400, 'password must be at least 12 characters');
     const userId = id();
     const now = nowIso();
+    // totp_secret column is reserved; login is password-only until TOTP enrollment exists.
     this.sqlite
       .prepare(`INSERT INTO users (id, username, password_hash, role, totp_secret, created_at, updated_at) VALUES (?, ?, ?, 'admin', NULL, ?, ?)`)
       .run(userId, username.trim(), hashPassword(password), now, now);
