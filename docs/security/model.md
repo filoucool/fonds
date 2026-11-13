@@ -25,6 +25,10 @@ When `auth.mode` is `local`:
 
 `requireHttpsForLogin` is stored in settings for future use; operators should still terminate TLS at a reverse proxy for remote access.
 
+### Two-factor authentication (TOTP)
+
+The `users.totp_secret` column is reserved for a future TOTP enrollment flow. **It is not implemented.** Local login is password-only; bootstrap always inserts `NULL` for `totp_secret`, and the web settings UI has no 2FA controls.
+
 ### OpenID Connect
 
 `oidc` appears in shared types for forward compatibility. **It is not implemented.** The API rejects `auth.mode: oidc` in settings patches.
@@ -37,6 +41,10 @@ When `gitAccess.httpEnabled` or SSH is on:
 - In **local** mode, fetch requires a session or a token with `git_fetch`; push to a **working** copy requires `git_push`. Archive remotes are read-only for receive-pack.
 
 Access tokens (`ra_…` prefix) and user SSH public keys are stored in SQLite separately from upstream provider tokens.
+
+### Notifications
+
+`settings.notifications.emailEnabled` is stored in app settings for forward compatibility. **Email delivery is not implemented.** `NotificationService` queues in-app delivery rows and optional webhook POSTs only; toggling `emailEnabled` via the settings API has no effect. The web settings UI does not expose notification email controls.
 
 ### API versioning
 

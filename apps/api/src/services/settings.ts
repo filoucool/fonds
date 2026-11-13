@@ -162,6 +162,7 @@ function sanitizeSearch(value: Record<string, unknown>): Partial<AppSettings['se
   return next;
 }
 
+// emailEnabled is persisted for forward compatibility; NotificationService ignores it until SMTP delivery exists.
 function sanitizeNotifications(value: Record<string, unknown>): Partial<AppSettings['notifications']> {
   const next: Partial<AppSettings['notifications']> = {};
   if ('inAppEnabled' in value) next.inAppEnabled = bool(value.inAppEnabled, 'notifications.inAppEnabled');
