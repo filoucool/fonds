@@ -699,6 +699,10 @@ async function globalSearch(q: string, capabilities: string, filters: Record<str
 
 type AuthSession = { authenticated: boolean; mode: string; user?: { username: string }; csrfToken?: string };
 
+function bootstrapAllowed(session: AuthSession): boolean {
+  return !session.authenticated && session.mode === 'trusted';
+}
+
 async function getAuthSession(): Promise<AuthSession> {
   const data = await request<AuthSession>('/api/auth/session');
   if (data.authenticated && data.csrfToken) csrfToken = data.csrfToken;
@@ -707,6 +711,14 @@ async function getAuthSession(): Promise<AuthSession> {
 
 async function login(username: string, password: string): Promise<void> {
   const data = await request<{ csrfToken?: string }>('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ username, password }),
+  });
+  if (data.csrfToken) csrfToken = data.csrfToken;
+}
+
+async function bootstrapAdmin(username: string, password: string): Promise<void> {
+  const data = await request<{ csrfToken?: string }>('/api/auth/bootstrap', {
     method: 'POST',
     body: JSON.stringify({ username, password }),
   });
@@ -893,6 +905,8 @@ export const api = {
   globalSearch,
   getCloneUrls,
   getAuthSession,
+  bootstrapAllowed,
+  bootstrapAdmin,
   login,
   logout,
   getSearchIndex,
