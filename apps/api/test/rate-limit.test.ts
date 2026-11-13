@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
 import type { FastifyRequest } from 'fastify';
-import { clearIpRateLimitsForTests, touchIpRateLimit } from '../src/http/rate-limit';
+import { touchIpRateLimit } from '../src/http/rate-limit';
 import { assertV1Idempotency, clearV1GuardsForTests, storeV1Idempotency } from '../src/http/v1-guards';
 
 function fakeRequest(ip: string): FastifyRequest {
