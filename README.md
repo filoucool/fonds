@@ -14,7 +14,9 @@ In archival science, a **fonds** is more than a collection of files. It is the a
 
 Yet most of us still treat Git hosting services as permanent archives. **Hosting is not preservation.** A mirror follows the present, but it does not necessarily protect the past. A single force-push or deleted branch can make years of work unreachable. Accounts can be suspended, organizations can disappear, and repositories can be removed without warning. Legal disputes, takedown requests, and changes in platform policies can make entire projects inaccessible overnight.
 
-Much of the open-source ecosystem depends on a handful of centralized platforms. When one of those platforms changes its rules, faces legal pressure, or simply decides a repository should no longer exist, the consequences can reach far beyond its original maintainers. Projects disappear, dependencies become inaccessible, and years of collective work risk being lost. Sometimes, the code that vanishes isn't even yours. It's the library your software depends on, the tool you relied on for years, or a project you hoped would always be there.
+Much of the open-source ecosystem depends on a handful of centralized platforms. GitHub, the world's largest source-code hosting platform, is owned entirely by Microsoft. That concentration of power is not merely theoretical. Recent controversies have exposed its consequences: thousands of repositories caught in sweeping copyright takedowns, and developer data subjected to changing corporate policies. In 2026 alone, an overbroad takedown temporarily disabled roughly 8,100 repositories, including legitimate projects. When a single corporation controls access to so much of our collective work, its decisions, mistakes, and legal obligations can have consequences far beyond its own interests.
+
+Sometimes, the code that vanishes isn't even yours. It's the library your software depends on, the tool you relied on for years, or a project you hoped would always be there. **Decades of work should not depend on the continued goodwill of a corporation.**
 
 **Fonds exists to make sure that history doesn't simply disappear.**
 
