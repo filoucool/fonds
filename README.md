@@ -1,5 +1,15 @@
 # Fonds
 
+<dl>
+<dt><strong>fonds</strong></dt>
+<dd>
+<em>n.</em>
+<p>the entire body of records of an organization, family, or individual that have been created and accumulated as the result of an organic process reflecting the functions of the creator</p>
+</dd>
+</dl>
+
+---
+
 **Self-hosted preservation for Git repositories.** Not a hosting platform: an archive you can still read decades from now.
 
 Fonds keeps a **bare Git repository** plus a versioned on-disk manifest (`archive.json`) for every project you care about. Before each upstream update it records previous branch and tag tips in a dedicated ref namespace so force-pushes, deletions, and upstream disappearances do not erase history you already captured.
