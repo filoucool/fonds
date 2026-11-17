@@ -10,11 +10,11 @@
 
 ---
 
-In archival work, a **fonds** is the records from one creator, kept as a set because they share the same origin. A Git repository has a rough equivalent: commits, tags, releases, and refs that document how the project changed over time.
+In archives, a **fonds** is more than a single box of files. It is the body of records that built up while a creator was doing real work, kept together because they share the same origin. Software has something like that too: commits, tags, releases, and refs that show how a project actually evolved. That history is worth keeping, not only whatever is on `main` right now.
 
-Hosting stores repositories; it does not by itself preserve every revision you once depended on. A mirror follows upstream as it is now. Force-pushes and deleted branches drop older tips unless something else recorded them. Access can be revoked. Lawsuits against individual maintainers and against organizations both show up as lost or frozen repositories on the host. Self-hosting the archive is one way to keep a copy that does not track a single vendor's decisions.
+Many of us still treat a Git host as the archive. Hosting is custody, not preservation. A mirror chases the present; it does not always keep what was true yesterday. Force-pushes and deleted branches drop older tips. Accounts lock. Lawsuits against individual maintainers and against organizations show up as repositories that disappear or sit frozen on the host. When most open source lives on one provider, policy and legal pressure can hit a lot of projects at once. Running your own archive is one way to keep a copy that does not depend on a single vendor's timeline.
 
-**Fonds** is **self-hosted preservation for Git repositories**. It is not a hosting platform. It is an archive you can still read decades from now, including if the upstream disappears.
+**Fonds** is for people who want a fonds of their own Git work: solo maintainers, teams, and anyone who needs a durable record. It is **self-hosted preservation for Git repositories**, not another hosting platform. It is an archive you can still read decades from now, even if the upstream or the service around it is gone.
 
 Fonds keeps a **bare Git repository** plus a versioned on-disk manifest (`archive.json`) for every project you register. Before each upstream update it records previous branch and tag tips in a dedicated ref namespace so force-pushes, deletions, and upstream disappearances do not erase history you already captured. The **archive directories on disk are the source of truth**. The SQLite catalog is a derived index: if the database is lost, the catalog can be rebuilt by scanning pools. Exports are designed to be useful without the original server.
 
