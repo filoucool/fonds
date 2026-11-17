@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fonds — preserve Git history that hosting cannot guarantee</title>
+    <meta
+      name="description"
+      content="Self-hosted Git preservation. Force-pushes, takedowns, and platform risk do not erase the history you have already archived."
+    />
+    <meta name="theme-color" content="#0e100c" />
+    <script>
+      document.documentElement.className = 'js';
+      document.documentElement.dataset.motion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'reduce'
+        : 'ok';
+    </script>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="config.js"></script>
+  </head>
+  <body class="page-landing">
+    <a class="skip" href="#story">Skip to story</a>
+
+    <main id="story">
+      <section class="scene scene-scroll scene-title span-title" id="fonds">
+        <div class="scene-sticky">
+          <svg class="title-graph" id="title-graph" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M40 360 H1160" />
+              <path d="M260 360 V220 H640 V120 H900 V360" />
+              <path d="M380 360 V520 H770 V360" />
+              <path d="M640 220 V360" />
+            </g>
+            <g fill="currentColor">
+              <circle cx="40" cy="360" r="4" />
+              <circle cx="150" cy="360" r="4" />
+              <circle cx="260" cy="360" r="5" />
+              <circle cx="380" cy="360" r="4" />
+              <circle cx="510" cy="360" r="4" />
+              <circle cx="640" cy="360" r="5" />
+              <circle cx="770" cy="360" r="4" />
+              <circle cx="900" cy="360" r="5" />
+              <circle cx="1040" cy="360" r="4" />
+              <circle cx="1160" cy="360" r="4" />
+              <circle cx="260" cy="220" r="4" />
+              <circle cx="420" cy="220" r="4" />
+              <circle cx="640" cy="220" r="4" />
+              <circle cx="640" cy="120" r="4" />
+              <circle cx="780" cy="120" r="4" />
+              <circle cx="900" cy="120" r="4" />
+              <circle cx="380" cy="520" r="4" />
+              <circle cx="560" cy="520" r="4" />
+              <circle cx="770" cy="520" r="4" />
+            </g>
+          </svg>
+          <nav class="top-actions" aria-label="Get started">
+            <a class="link-card" id="btn-github" href="https://github.com/filoucool/fonds">
+              <span class="card-kicker">Source</span>
+              <span class="card-title">View on GitHub</span>
+              <span class="card-meta" id="github-meta">filoucool/fonds</span>
+            </a>
+            <a class="link-card" id="btn-demo" href="https://demo.tryfonds.com">
+              <span class="card-kicker">Running</span>
+              <span class="card-title">Try the live demo</span>
+              <span class="card-meta" id="demo-meta">demo.tryfonds.com</span>
+            </a>
+            <a class="link-card" href="downloads.html">
+              <span class="card-kicker">Releases</span>
+              <span class="card-title">Downloads</span>
+              <span class="card-meta">Archives you can keep</span>
+            </a>
+          </nav>
+          <div class="title-copy">
+            <p class="eyebrow">Self-hosted Git preservation</p>
+            <h1>Fonds</h1>
+            <p class="claim">
+              <span class="word">history</span>
+              <span class="word">doesn’t</span>
+              <span class="word">simply</span>
+              <span class="word">disappear.</span>
+            </p>
+          </div>
+          <a class="story-cue" href="#definition">
+            <span>Learn the full story</span>
+            <svg class="story-arrow" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </a>
+        </div>
+      </section>
+
+      <section class="scene scene-scroll scene-definition span-hold" id="definition">
+        <div class="scene-sticky">
+        <article class="definition">
+          <h2 class="def-word">fonds</h2>
+          <p class="def-pos">n.</p>
+          <p class="def-text">
+            the entire body of <mark>commits, tags, and releases</mark> of a <mark>repository</mark>, preserved together
+            because they share an origin and tell the story of <mark>the people who wrote it</mark>
+          </p>
+        </article>
+        </div>
+      </section>
+
+      <section class="scene scene-scroll scene-loss span-loss" id="loss">
+        <div class="scene-sticky">
+          <p class="eyebrow">The loss</p>
+          <h2>A mirror follows the present.</h2>
+          <div class="split">
+            <div class="side side-host">
+              <p class="side-label">Host</p>
+              <div class="graph-frame">
+                <svg class="repo-graph" viewBox="0 0 520 480" preserveAspectRatio="xMidYMid meet" aria-label="History on the host">
+                  <g class="edges" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path class="edge edge-spine" d="M210 430 V278" />
+                    <path class="edge edge-old is-old" d="M210 278 V118" />
+                    <path class="edge edge-feature is-feature" d="M210 278 C280 278 360 260 360 238 V158" />
+                    <path class="edge edge-new" d="M210 278 C140 278 72 240 72 198 V118" />
+                  </g>
+                  <g class="nodes">
+                    <circle class="node node-spine" cx="210" cy="430" r="5" />
+                    <circle class="node node-spine" cx="210" cy="358" r="5" />
+                    <circle class="node node-spine" cx="210" cy="278" r="6" />
+                    <g class="hit is-old" tabindex="0" data-kind="main" data-keep="refs/archive/keep/c91ab70e44d1" data-history="Still reachable from the archived main tip">
+                      <circle class="node" cx="210" cy="198" r="6" />
+                      <circle class="hit-area" cx="210" cy="198" r="16" />
+                      <circle class="hit-ring" cx="210" cy="198" r="12" />
+                    </g>
+                    <g class="hit is-old" tabindex="0" data-kind="main" data-keep="refs/archive/keep/4f1c8a2b3c4d" data-history="refs/archive/history/heads/main/20260318T041200Z-9c1e4ab2-4f1c8a2b3c4d">
+                      <circle class="node" cx="210" cy="118" r="7" />
+                      <circle class="hit-area" cx="210" cy="118" r="16" />
+                      <circle class="hit-ring" cx="210" cy="118" r="13" />
+                    </g>
+                    <g class="hit is-feature" tabindex="0" data-kind="feature" data-keep="refs/archive/keep/9aa21d0e11b8" data-history="Still reachable from the archived feature tip">
+                      <circle class="node" cx="360" cy="238" r="6" />
+                      <circle class="hit-area" cx="360" cy="238" r="16" />
+                      <circle class="hit-ring" cx="360" cy="238" r="12" />
+                    </g>
+                    <g class="hit is-feature" tabindex="0" data-kind="feature" data-keep="refs/archive/keep/9aa21d0e11b8" data-history="refs/archive/history/heads/feature/20260318T041200Z-9c1e4ab2-9aa21d0e11b8">
+                      <circle class="node" cx="360" cy="158" r="7" />
+                      <circle class="hit-area" cx="360" cy="158" r="16" />
+                      <circle class="hit-ring" cx="360" cy="158" r="13" />
+                    </g>
+                    <circle class="node node-new" cx="72" cy="198" r="6" />
+                    <circle class="node node-new" cx="72" cy="118" r="7" />
+                  </g>
+                  <g font-size="22">
+                    <text class="tag tag-main-new" x="58" y="108" text-anchor="end">main</text>
+                    <text class="tag tag-main-old" x="226" y="104">main</text>
+                    <text class="tag tag-keep tag-keep-main" x="226" y="142">
+                      <tspan x="226">keep/</tspan>
+                      <tspan x="226" dy="22">4f1c8a2</tspan>
+                    </text>
+                    <text class="tag tag-feature" x="378" y="116">feature</text>
+                    <text class="tag tag-keep tag-keep-feature" x="378" y="186">
+                      <tspan x="378">keep/</tspan>
+                      <tspan x="378" dy="22">9aa21d0</tspan>
+                    </text>
+                  </g>
+                </svg>
+                <p class="gone-stamp" aria-hidden="true">404</p>
+              </div>
+            </div>
+            <div class="side side-fonds">
+              <p class="side-label">Fonds <span class="side-quiet">on disk</span></p>
+              <div class="graph-frame">
+                <svg class="repo-graph" viewBox="0 0 520 480" preserveAspectRatio="xMidYMid meet" aria-label="History in Fonds">
+                  <g class="edges" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path class="edge edge-spine" d="M210 430 V278" />
+                    <path class="edge edge-old is-old" d="M210 278 V118" />
+                    <path class="edge edge-feature is-feature" d="M210 278 C280 278 360 260 360 238 V158" />
+                    <path class="edge edge-new" d="M210 278 C140 278 72 240 72 198 V118" />
+                  </g>
+                  <g class="nodes">
+                    <circle class="node node-spine" cx="210" cy="430" r="5" />
+                    <circle class="node node-spine" cx="210" cy="358" r="5" />
+                    <circle class="node node-spine" cx="210" cy="278" r="6" />
+                    <g class="hit is-old" tabindex="0" data-kind="main" data-keep="refs/archive/keep/c91ab70e44d1" data-history="Still reachable from the archived main tip">
+                      <circle class="node" cx="210" cy="198" r="6" />
+                      <circle class="hit-area" cx="210" cy="198" r="16" />
+                      <circle class="hit-ring" cx="210" cy="198" r="12" />
+                    </g>
+                    <g class="hit is-old" tabindex="0" data-kind="main" data-keep="refs/archive/keep/4f1c8a2b3c4d" data-history="refs/archive/history/heads/main/20260318T041200Z-9c1e4ab2-4f1c8a2b3c4d">
+                      <circle class="node" cx="210" cy="118" r="7" />
+                      <circle class="hit-area" cx="210" cy="118" r="16" />
+                      <circle class="hit-ring" cx="210" cy="118" r="13" />
+                    </g>
+                    <g class="hit is-feature" tabindex="0" data-kind="feature" data-keep="refs/archive/keep/9aa21d0e11b8" data-history="Still reachable from the archived feature tip">
+                      <circle class="node" cx="360" cy="238" r="6" />
+                      <circle class="hit-area" cx="360" cy="238" r="16" />
+                      <circle class="hit-ring" cx="360" cy="238" r="12" />
+                    </g>
+                    <g class="hit is-feature" tabindex="0" data-kind="feature" data-keep="refs/archive/keep/9aa21d0e11b8" data-history="refs/archive/history/heads/feature/20260318T041200Z-9c1e4ab2-9aa21d0e11b8">
+                      <circle class="node" cx="360" cy="158" r="7" />
+                      <circle class="hit-area" cx="360" cy="158" r="16" />
+                      <circle class="hit-ring" cx="360" cy="158" r="13" />
+                    </g>
+                    <circle class="node node-new" cx="72" cy="198" r="6" />
+                    <circle class="node node-new" cx="72" cy="118" r="7" />
+                  </g>
+                  <g font-size="22">
+                    <text class="tag tag-main-new" x="58" y="108" text-anchor="end">main</text>
+                    <text class="tag tag-main-old" x="226" y="104">main</text>
+                    <text class="tag tag-keep tag-keep-main" x="226" y="142">
+                      <tspan x="226">keep/</tspan>
+                      <tspan x="226" dy="22">4f1c8a2</tspan>
+                    </text>
+                    <text class="tag tag-feature" x="378" y="116">feature</text>
+                    <text class="tag tag-keep tag-keep-feature" x="378" y="186">
+                      <tspan x="378">keep/</tspan>
+                      <tspan x="378" dy="22">9aa21d0</tspan>
+                    </text>
+                  </g>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="phase-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          <p class="beat" id="loss-beat">The same commits, in two places.</p>
+          <ol class="beat-list">
+            <li>A force-push leaves the old main reachable from <code>refs/archive/keep/</code>.</li>
+            <li>A deleted branch stays under <code>refs/archive/history/</code>.</li>
+            <li>If the host returns 404, the directory is still on disk.</li>
+          </ol>
+          <p class="hover-hint">Hover a faded commit.</p>
+        </div>
+      </section>
+
+      <section class="scene scene-scroll scene-hosting span-hosting" id="hosting">
+        <div class="scene-sticky host-sticky">
+          <h2 class="host-line">Hosting is not preservation.</h2>
+          <div class="tile-field" id="tile-field" aria-hidden="true"></div>
+          <p class="tile-caption" id="tile-caption">
+            In 2026, an overbroad takedown temporarily disabled about 8,100 repositories. The copies already archived stayed.
+          </p>
+        </div>
+      </section>
+
+      <section class="scene scene-scroll scene-deps span-deps" id="dependencies">
+        <div class="scene-sticky">
+          <h2>Sometimes the code that vanishes isn’t yours.</h2>
+          <p class="sr-only">
+            billing and search used only the host copies of dep1 and dep3, so they go hollow when those disappear. admin
+            keeps an archived copy of dep2 and stays.
+          </p>
+          <div class="tree" aria-hidden="true">
+            <div class="pill pill-root">your project</div>
+            <div class="tree-stem"></div>
+            <div class="tree-kids">
+              <div class="kid fate-host">
+                <span class="wire"></span>
+                <div class="pill">billing</div>
+                <span class="wire"></span>
+                <div class="pill pill-up node-removed">dep1 <span class="stamp">removed</span></div>
+              </div>
+              <div class="kid fate-kept">
+                <span class="wire"></span>
+                <div class="pill">admin</div>
+                <span class="wire"></span>
+                <div class="pill pill-up node-archived">dep2 <span class="archive-badge">archived</span></div>
+              </div>
+              <div class="kid fate-host">
+                <span class="wire"></span>
+                <div class="pill">search</div>
+                <span class="wire"></span>
+                <div class="pill pill-up node-removed">dep3 <span class="stamp">removed</span></div>
+              </div>
+            </div>
+          </div>
+          <p class="deps-line" id="deps-line">Decades of work should not depend on the continued goodwill of a corporation.</p>
+        </div>
+      </section>
+
+      <section class="scene scene-scroll scene-proof span-hold" id="remains">
+        <div class="scene-sticky">
+        <p class="eyebrow">What remains</p>
+        <h2>A directory, not an account.</h2>
+        <p class="lede-line">Fonds is a self-hosted archive for the repositories you choose, on disks you control.</p>
+        <div class="proof-grid">
+          <article class="shelf-card">
+            <p class="card-kicker">01</p>
+            <h3>The folder</h3>
+            <p class="shelf-note">Each project is a directory. The manifest says what is inside. Git checks the objects.</p>
+            <ul class="files">
+              <li><span class="fname">repository.git</span><span class="fnote">bare git, plus archive refs</span></li>
+              <li><span class="fname">archive.json</span><span class="fnote">manifest</span></li>
+              <li><span class="fname">checksums.json</span><span class="fnote">sha256 of the files</span></li>
+            </ul>
+            <details class="folder" id="archive-folder" open>
+              <summary>
+                <span class="folder-name">archive.json</span>
+                <span class="folder-hint">Open the manifest</span>
+              </summary>
+              <pre class="manifest">{
+  "schemaVersion": 1,
+  "displayName": "libauth",
+  "storage": { "relativeLayout": "v1" }
+}</pre>
+            </details>
+          </article>
+
+          <article class="shelf-card" id="ref-card">
+            <p class="card-kicker">02</p>
+            <h3>The refs</h3>
+            <p class="shelf-note">Before a fetch publishes, the previous tips are copied. Then the branch is allowed to move.</p>
+            <ol class="ref-list">
+              <li class="row-head">
+                <span class="ref">refs/heads/main</span>
+                <span>
+                  <span class="oid oid-before">4f1c8a2b3c4d</span>
+                  <span class="oid oid-after">b70e33c91aa0</span>
+                </span>
+              </li>
+              <li class="row-head">
+                <span class="ref">refs/heads/feature</span>
+                <span class="oid">9aa21d0e11b8</span>
+              </li>
+              <li class="row-keep"><span class="ref">refs/archive/keep/4f1c8a2b3c4d</span></li>
+              <li class="row-keep"><span class="ref" title="refs/archive/history/heads/main/20260318T041200Z-9c1e4ab2-4f1c8a2b3c4d">refs/archive/history/heads/main/…</span></li>
+              <li class="row-keep"><span class="ref">refs/archive/keep/9aa21d0e11b8</span></li>
+              <li class="row-keep"><span class="ref" title="refs/archive/history/heads/feature/20260318T041200Z-9c1e4ab2-9aa21d0e11b8">refs/archive/history/heads/feature/…</span></li>
+            </ol>
+            <p class="action-status" id="ref-status" aria-live="polite"></p>
+            <button type="button" id="copy-tips">Copy tips, then fetch</button>
+          </article>
+
+          <article class="shelf-card">
+            <p class="card-kicker">03</p>
+            <h3>The catalog</h3>
+            <p class="shelf-note">SQLite is an index. The pool is the archive. Lose the database and the directories rebuild it.</p>
+            <div class="catalog">
+              <div>
+                <h4>Index</h4>
+                <ul id="catalog-index">
+                  <li>acme/parser</li>
+                  <li>acme/cli</li>
+                  <li>libauth</li>
+                </ul>
+              </div>
+              <div>
+                <h4>Pool</h4>
+                <ul id="catalog-pool">
+                  <li>a1/archive.json</li>
+                  <li>a1/repository.git</li>
+                  <li>b4/archive.json</li>
+                  <li>b4/repository.git</li>
+                  <li>c0/archive.json</li>
+                  <li>c0/repository.git</li>
+                </ul>
+              </div>
+            </div>
+            <p class="action-status" id="catalog-status" aria-live="polite"></p>
+            <button type="button" id="lose-db">Lose the database</button>
+          </article>
+        </div>
+        <p class="closing">An archive that depends on its own software to survive isn’t much of an archive at all.</p>
+        </div>
+      </section>
+
+      <section class="scene scene-close" id="decades">
+        <div class="principle-wrap">
+          <p class="principle">Software worth keeping today should still be accessible tomorrow.</p>
+        </div>
+        <footer class="site-footer">
+          <a class="to-top" href="#fonds">Back to top</a>
+          <p class="footer-line">
+            <a id="footer-github" href="https://github.com/filoucool/fonds">filoucool/fonds</a>
+            <span class="sep">·</span>
+            <span>AGPL-3.0</span>
+          </p>
+        </footer>
+      </section>
+    </main>
+    <p class="tip" id="commit-tip" hidden>
+      <span id="tip-history"></span>
+      <span id="tip-keep"></span>
+    </p>
+    <script src="story.js"></script>
+  </body>
+</html>
