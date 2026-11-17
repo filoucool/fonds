@@ -10,11 +10,23 @@
 
 ---
 
-**Self-hosted preservation for Git repositories.** Not a hosting platform: an archive you can still read decades from now.
+In archival science, a **fonds** is more than a collection of files. It is the accumulated record of a creator's work, preserved together because those records share a common origin and tell a larger story. Software has its own equivalent: commits, tags, releases, and references that document how a project came to be, how it changed, and what it once was. That history matters. Preserving only what exists on `main` today means risking the loss of everything that came before it.
 
-Fonds keeps a **bare Git repository** plus a versioned on-disk manifest (`archive.json`) for every project you care about. Before each upstream update it records previous branch and tag tips in a dedicated ref namespace so force-pushes, deletions, and upstream disappearances do not erase history you already captured.
+Yet most of us still treat Git hosting services as permanent archives. **Hosting is not preservation.** A mirror follows the present, but it does not necessarily protect the past. A single force-push or deleted branch can make years of work unreachable. Accounts can be suspended, organizations can disappear, and repositories can be removed without warning. Legal disputes, takedown requests, and changes in platform policies can make entire projects inaccessible overnight.
 
-The **archive directories on disk are the source of truth**. The SQLite catalog is a derived index: if the database is lost, the catalog can be rebuilt by scanning pools. Exports are designed to be useful without the original server.
+Much of the open-source ecosystem depends on a handful of centralized platforms. When one of those platforms changes its rules, faces legal pressure, or simply decides a repository should no longer exist, the consequences can reach far beyond its original maintainers. Projects disappear, dependencies become inaccessible, and years of collective work risk being lost. Sometimes, the code that vanishes isn't even yours. It's the library your software depends on, the tool you relied on for years, or a project you hoped would always be there.
+
+**Fonds exists to make sure that history doesn't simply disappear.**
+
+Fonds is a **self-hosted Git preservation system** designed to archive the repositories that matter to you: your own projects, your dependencies, and the upstream work you cannot afford to lose. Whether a repository is deleted, abandoned, made private, or removed following a legal dispute, the history you've already preserved remains yours.
+
+Fonds is not another Git hosting platform. It is an independent archive, built around a simple principle: **software worth keeping today should still be accessible decades from now**, regardless of what happens to its original maintainers, repositories, or hosting services.
+
+For every registered project, Fonds maintains a **bare Git repository** alongside a versioned, on-disk manifest (`archive.json`). Before each upstream update, it preserves the existing branch and tag tips in a dedicated reference namespace. This ensures that force-pushes, branch deletions, and upstream disappearances cannot erase the history Fonds has already captured.
+
+The **archive directories on disk are the source of truth**. The SQLite catalog serves only as a derived index. If the database is lost or corrupted, it can be rebuilt by scanning the archive pools. Exports are designed to remain useful independently of the original server, without requiring Fonds itself to be running.
+
+Because an archive that depends on its own software to survive isn't much of an archive at all.
 
 ## Table of contents
 
